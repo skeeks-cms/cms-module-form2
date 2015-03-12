@@ -11,7 +11,7 @@ use skeeks\cms\base\Module as CmsModule;
 
 /**
  * Class Module
- * @package skeeks\cms\modules\admin
+ * @package skeeks\modules\cms\form
  */
 class Module extends CmsModule
 {

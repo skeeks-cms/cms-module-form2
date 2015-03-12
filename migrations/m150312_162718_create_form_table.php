@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m150307_162718_create_form_table extends Migration
+class m150312_162718_create_form_table extends Migration
 {
     public function up()
     {
@@ -38,7 +38,8 @@ class m150307_162718_create_form_table extends Migration
             'emails'                => Schema::TYPE_TEXT . ' NULL',
             'phones'                => Schema::TYPE_TEXT . ' NULL',
 
-            
+            'elements'              => Schema::TYPE_TEXT . ' NULL',
+
         ], $tableOptions);
 
         $this->execute("ALTER TABLE {{%form_form}} ADD INDEX(updated_by);");

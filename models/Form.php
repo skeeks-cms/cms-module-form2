@@ -11,6 +11,7 @@ use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\Implode;
+use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
 
 /**
@@ -34,7 +35,7 @@ class Form extends Core
     {
         return array_merge(parent::behaviors(), [
             [
-                "class"  => Implode::className(),
+                "class"  => Serialize::className(),
                 'fields' => ['emails', 'phones']
             ],
         ]);

@@ -9,35 +9,6 @@
  * @since 1.0.0
  */
 return [
-    'components' =>
-    [
-        'adminMenu' =>
-        [
-            'groups' =>
-            [
-                'form' =>
-                [
-                    'label'     => 'Конструктор форм',
-                    'priority'  => 0,
-
-                    'items' =>
-                    [
-                        [
-                            "label" => "Формы",
-                            "url"   => ["form/admin-form"]
-                        ],
-
-                        [
-                            "label" => "Сообщения с форм",
-                            "url"   => ["form/admin-message"]
-                        ],
-
-                    ]
-                ]
-            ]
-        ]
-    ],
-
     'modules' =>
     [
         'form' => [
