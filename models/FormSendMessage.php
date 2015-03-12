@@ -1,0 +1,71 @@
+<?php
+/**
+ * @author Semenov Alexander <semenov@skeeks.com>
+ * @link http://skeeks.com/
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 07.03.2015
+ */
+namespace skeeks\modules\cms\form\models;
+
+use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
+use skeeks\cms\models\behaviors\HasStatus;
+use skeeks\cms\models\behaviors\Implode;
+use skeeks\cms\models\Core;
+
+/**
+ * Class FormSendMessage
+ * @package skeeks\modules\cms\form\models
+ */
+class FormSendMessage extends Core
+{
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%form_send_message}}';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return array_merge(parent::behaviors(), []);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return array_merge(parent::rules(), [
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'form_id'], 'integer'],
+            [['data', 'additional_data'], 'string']
+        ]);
+    }
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
+        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
+
+        return $scenarios;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(), [
+            'id'            => \Yii::t('app', 'ID'),
+            'value'         => \Yii::t('app', 'Телефон'),
+            'form_id'       => \Yii::t('app', 'Форма'),
+        ]);
+    }
+
+}
