@@ -36,7 +36,7 @@ class Form extends Core
         return array_merge(parent::behaviors(), [
             [
                 "class"  => Serialize::className(),
-                'fields' => ['emails', 'phones']
+                'fields' => ['emails', 'phones', 'elements']
             ],
         ]);
     }
@@ -49,7 +49,7 @@ class Form extends Core
         return array_merge(parent::rules(), [
             [['name'], 'required'],
             [['name', 'description'], 'string'],
-            [['emails', 'phones'], 'safe'],
+            [['emails', 'phones', 'elements'], 'safe'],
         ]);
     }
 
@@ -57,8 +57,8 @@ class Form extends Core
     {
         $scenarios = parent::scenarios();
 
-        $scenarios['create'] = ['name', 'description', 'emails', 'phones'];
-        $scenarios['update'] = ['name', 'description', 'emails', 'phones'];
+        $scenarios['create'] = $scenarios[self::SCENARIO_DEFAULT];
+        $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
 
         return $scenarios;
     }
@@ -74,5 +74,6 @@ class Form extends Core
             'description' => \Yii::t('app', 'Description'),
         ]);
     }
+
 
 }
