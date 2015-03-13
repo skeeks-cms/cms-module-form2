@@ -84,4 +84,40 @@ class Form extends Core
         ]);
     }
 
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFormEmails()
+    {
+        return $this->hasMany(FormEmail::className(), ['form_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFormFields()
+    {
+        return $this->hasMany(FormField::className(), ['form_id' => 'id']);
+    }
+
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFormPhones()
+    {
+        return $this->hasMany(FormPhone::className(), ['form_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFormSendMessages()
+    {
+        return $this->hasMany(FormSendMessage::className(), ['form_id' => 'id']);
+    }
+
 }
