@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m150312_162718_create_form_table extends Migration
+class m150307_162718_create_form_table extends Migration
 {
     public function up()
     {
@@ -34,11 +34,9 @@ class m150312_162718_create_form_table extends Migration
 
             'name'                  => Schema::TYPE_STRING . '(255) NOT NULL',
             'description'           => Schema::TYPE_TEXT . ' NULL',
+            'template'              => Schema::TYPE_TEXT . ' NULL',
 
-            'emails'                => Schema::TYPE_TEXT . ' NULL',
-            'phones'                => Schema::TYPE_TEXT . ' NULL',
-
-            'elements'              => Schema::TYPE_TEXT . ' NULL',
+            'code'                  => Schema::TYPE_STRING . '(32) NULL',
 
         ], $tableOptions);
 
@@ -49,6 +47,7 @@ class m150312_162718_create_form_table extends Migration
         $this->execute("ALTER TABLE {{%form_form}} ADD INDEX(updated_at);");
 
         $this->execute("ALTER TABLE {{%form_form}} ADD INDEX(name);");
+        $this->execute("ALTER TABLE {{%form_form}} ADD UNIQUE(code);");
 
         $this->execute("ALTER TABLE {{%form_form}} COMMENT = 'Конструктор форм';");
 

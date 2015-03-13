@@ -9,7 +9,7 @@
  * @since 1.0.0
  */
 
-namespace skeeks\modules\cms\form\models;
+namespace skeeks\modules\cms\form\models\forms;
 
 use Yii;
 use yii\base\Model;
@@ -17,11 +17,9 @@ use yii\base\Model;
 /**
  * Login form
  */
-class FormElement extends Model
+class EmailForm extends Model
 {
-    public $label;
-
-    public $attribute;
+    public $value;
 
     /**
      * @inheritdoc
@@ -30,7 +28,9 @@ class FormElement extends Model
     {
         return [
             // username and password are both required
-            [['attribute', 'label'], 'string'],
+            [['value'], 'required'],
+            // rememberMe must be a boolean value
+            ['value', 'email'],
         ];
     }
 

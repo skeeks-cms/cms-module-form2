@@ -14,17 +14,17 @@ use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\Core;
 
 /**
- * Class Form
+ * Class FormEmail
  * @package skeeks\modules\cms\form\models
  */
-class Form extends Core
+class FormEmail extends Core
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%form_form}}';
+        return '{{%form_email}}';
     }
 
     /**
@@ -41,23 +41,11 @@ class Form extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
-            [['name'], 'required'],
-            [['description', 'template'], 'string'],
-            [['name'], 'string', 'max' => 255],
-            [['code'], 'string', 'max' => 32],
-            [['code'], 'unique'],
-
-            [['code'], 'validateCode']
+            [['value', 'form_id'], 'required'],
+            [['value'], 'string', 'max' => 255],
+            [['form_id', 'value'], 'unique', 'targetAttribute' => ['form_id', 'value'], 'message' => 'The combination of Value and Form ID has already been taken.'],
+            [['value'], 'email'],
         ]);
-    }
-
-    public function validateCode($attribute)
-    {
-        if(!preg_match('/^[a-z]{1}[a-z0-1-]{3,32}$/', $this->$attribute))
-        {
-            $this->addError($attribute, 'Используйте только буквы латинского алфавита и цифры. Начинаться должен с буквы. Пример block1.');
-        }
     }
 
     public function scenarios()
@@ -77,10 +65,8 @@ class Form extends Core
     {
         return array_merge(parent::attributeLabels(), [
             'id'            => \Yii::t('app', 'ID'),
-            'name'          => \Yii::t('app', 'Name'),
-            'code'          => \Yii::t('app', 'Уникальный код'),
-            'description'   => \Yii::t('app', 'Небольшое описание'),
-            'template'      => \Yii::t('app', 'Шаблон формы'),
+            'value'         => \Yii::t('app', 'Email'),
+            'form_id'       => \Yii::t('app', 'Форма'),
         ]);
     }
 
