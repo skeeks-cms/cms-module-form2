@@ -11,7 +11,6 @@ use skeeks\cms\base\db\ActiveRecord;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\Implode;
-use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
 
 /**
@@ -33,12 +32,7 @@ class Form extends Core
      */
     public function behaviors()
     {
-        return array_merge(parent::behaviors(), [
-            [
-                "class"  => Serialize::className(),
-                'fields' => ['emails', 'phones', 'elements']
-            ],
-        ]);
+        return array_merge(parent::behaviors(), []);
     }
 
     /**
@@ -47,10 +41,23 @@ class Form extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
+            [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
             [['name'], 'required'],
-            [['name', 'description'], 'string'],
-            [['emails', 'phones', 'elements'], 'safe'],
+            [['description', 'template'], 'string'],
+            [['name'], 'string', 'max' => 255],
+            [['code'], 'string', 'max' => 32],
+            [['code'], 'unique'],
+
+            [['code'], 'validateCode']
         ]);
+    }
+
+    public function validateCode($attribute)
+    {
+        if(!preg_match('/^[a-z]{1}[a-z0-1-]{3,32}$/', $this->$attribute))
+        {
+            $this->addError($attribute, 'Используйте только буквы латинского алфавита и цифры. Начинаться должен с буквы. Пример block1.');
+        }
     }
 
     public function scenarios()
@@ -68,12 +75,13 @@ class Form extends Core
      */
     public function attributeLabels()
     {
-        return  array_merge(parent::attributeLabels(), [
-            'id' => \Yii::t('app', 'ID'),
-            'name' => \Yii::t('app', 'Name'),
-            'description' => \Yii::t('app', 'Description'),
+        return array_merge(parent::attributeLabels(), [
+            'id'            => \Yii::t('app', 'ID'),
+            'name'          => \Yii::t('app', 'Name'),
+            'code'          => \Yii::t('app', 'Уникальный код'),
+            'description'   => \Yii::t('app', 'Небольшое описание'),
+            'template'      => \Yii::t('app', 'Шаблон формы'),
         ]);
     }
-
 
 }
