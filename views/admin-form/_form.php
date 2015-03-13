@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\form\ActiveFormStyled as ActiveForm;
+use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use common\models\User;
 
 /* @var $this yii\web\View */
@@ -66,7 +66,9 @@ use common\models\User;
         'gridViewOptions'   => [
             'columns' => [
                 //['class' => 'yii\grid\SerialColumn'],
-                'value',
+                'attribute',
+                'label',
+                'hint',
             ],
         ],
     ]); ?>

@@ -13,7 +13,20 @@ use common\models\User;
 <?php $form = ActiveForm::begin(); ?>
 <?php  ?>
 
-<?= $form->field($model, 'form_id')->hiddenInput(['value' => (int) \Yii::$app->request->get('form_id')])->label(false); ?>
+<? if ($form_id = \Yii::$app->request->get('form_id')) : ?>
+    <?= $form->field($model, 'form_id')->hiddenInput(['value' => $form_id])->label(false); ?>
+<? else: ?>
+    <?= $form->field($model, 'form_id')->label('Форма')->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+                'items' => \yii\helpers\ArrayHelper::map(
+                    \skeeks\modules\cms\form\models\Form::find()->all(),
+                     "id",
+                     "name"
+                 ),
+        ]);
+    ?>
+<? endif; ?>
+
 <?= $form->field($model, 'value')->textInput(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

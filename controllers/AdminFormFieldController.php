@@ -24,7 +24,6 @@ class AdminFormFieldController extends AdminModelEditorSmartController
     public function init()
     {
         $this->_label                   = "Управление email форм";
-        $this->_modelShowAttribute      = "value";
         $this->_modelClassName          = FormField::className();
         $this->modelValidate            = true;
         $this->enableScenarios          = true;

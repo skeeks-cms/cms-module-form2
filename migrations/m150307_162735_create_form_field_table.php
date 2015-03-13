@@ -38,6 +38,8 @@ class m150307_162735_create_form_field_table extends Migration
             'widget'                => Schema::TYPE_TEXT . ' NULL',
             'rules'                 => Schema::TYPE_TEXT . ' NULL',
 
+            'priority'              => Schema::TYPE_INTEGER . ' NOT NULL DEFAULT 0',
+
             'attribute'             => Schema::TYPE_STRING . '(255) NOT NULL',
             'form_id'               => Schema::TYPE_INTEGER . '(255) NOT NULL',
             
@@ -50,6 +52,7 @@ class m150307_162735_create_form_field_table extends Migration
         $this->execute("ALTER TABLE {{%form_field}} ADD INDEX(updated_at);");
 
         $this->execute("ALTER TABLE {{%form_field}} ADD INDEX(label);");
+        $this->execute("ALTER TABLE {{%form_field}} ADD INDEX(priority);");
         $this->execute("ALTER TABLE {{%form_field}} ADD UNIQUE(attribute,form_id);");
 
         $this->execute("ALTER TABLE {{%form_field}} COMMENT = 'Элементы форм';");
