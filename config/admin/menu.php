@@ -1,4 +1,4 @@
-fltkf<?php
+<?php
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
