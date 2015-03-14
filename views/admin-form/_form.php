@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\ActiveForm;
+use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use common\models\User;
 
 /* @var $this yii\web\View */
@@ -17,54 +17,62 @@ use common\models\User;
     <?= $form->field($model, 'name')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-    'label'             => "Email адреса",
-    'hint'              => "Укажите email адреса, на которые будут приходить уведомления об отправке формы.",
-    'parentModel'       => $model,
-    'relation'          => [
-        'form_id' => 'id'
-    ],
-    'controllerRoute'   => 'form/admin-form-email',
-    'gridViewOptions'   => [
-        'columns' => [
-            //['class' => 'yii\grid\SerialColumn'],
-            'value',
-        ],
-    ],
-]); ?>
 
-<?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-    'label'             => "Телефоны",
-    'hint'              => "Укажите телефоны, на которые будут приходить уведомления об отправке формы.",
-    'parentModel'       => $model,
-    'relation'          => [
-        'form_id' => 'id'
-    ],
-    'controllerRoute'   => 'form/admin-form-phone',
-    'gridViewOptions'   => [
-        'columns' => [
-            //['class' => 'yii\grid\SerialColumn'],
-            'value',
+<?= $form->fieldSet('Настройки уведомлений')?>
+    <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+        'label'             => "Email адреса",
+        'hint'              => "Укажите email адреса, на которые будут приходить уведомления об отправке формы.",
+        'parentModel'       => $model,
+        'relation'          => [
+            'form_id' => 'id'
         ],
-    ],
-]); ?>
-
-<?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-    'label'             => "Элементы формы",
-    'hint'              => "",
-    'parentModel'       => $model,
-    'relation'          => [
-        'form_id' => 'id'
-    ],
-    'controllerRoute'   => 'form/admin-form-field',
-    'gridViewOptions'   => [
-        'columns' => [
-            //['class' => 'yii\grid\SerialColumn'],
-            'value',
+        'controllerRoute'   => 'form/admin-form-email',
+        'gridViewOptions'   => [
+            'columns' => [
+                //['class' => 'yii\grid\SerialColumn'],
+                'value',
+            ],
         ],
-    ],
-]); ?>
+    ]); ?>
 
+    <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+        'label'             => "Телефоны",
+        'hint'              => "Укажите телефоны, на которые будут приходить уведомления об отправке формы.",
+        'parentModel'       => $model,
+        'relation'          => [
+            'form_id' => 'id'
+        ],
+        'controllerRoute'   => 'form/admin-form-phone',
+        'gridViewOptions'   => [
+            'columns' => [
+                //['class' => 'yii\grid\SerialColumn'],
+                'value',
+            ],
+        ],
+    ]); ?>
+
+<?= $form->fieldSetEnd(); ?>
+
+
+<?= $form->fieldSet('Элементы формы')?>
+    <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+        'label'             => "Элементы формы",
+        'hint'              => "",
+        'parentModel'       => $model,
+        'relation'          => [
+            'form_id' => 'id'
+        ],
+        'controllerRoute'   => 'form/admin-form-field',
+        'gridViewOptions'   => [
+            'columns' => [
+                //['class' => 'yii\grid\SerialColumn'],
+                'attribute',
+                'label',
+                'hint',
+            ],
+        ],
+    ]); ?>
+<?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

@@ -12,19 +12,20 @@ namespace skeeks\modules\cms\form\controllers;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorSmartController;
 use skeeks\modules\cms\form\models\Form;
 use skeeks\modules\cms\form\models\FormEmail;
-use skeeks\modules\cms\form\models\FormField;
 use skeeks\modules\cms\form\models\FormPhone;
+use skeeks\modules\cms\form\models\FormSendMessage;
 
 /**
  * Class AdminFormEmailController
  * @package skeeks\modules\cms\form\controllers
  */
-class AdminFormFieldController extends AdminModelEditorSmartController
+class AdminFormSendMessageController extends AdminModelEditorSmartController
 {
     public function init()
     {
-        $this->_label                   = "Управление email форм";
-        $this->_modelClassName          = FormField::className();
+        $this->_label                   = "Сообщения с форм";
+        $this->_modelShowAttribute      = "id";
+        $this->_modelClassName          = FormSendMessage::className();
         $this->modelValidate            = true;
         $this->enableScenarios          = true;
         parent::init();

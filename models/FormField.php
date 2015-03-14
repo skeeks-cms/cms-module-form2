@@ -42,13 +42,19 @@ class FormField extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'form_id'], 'integer'],
-            [['hint', 'widget', 'rules'], 'string'],
-            [['attribute', 'form_id'], 'required'],
+            [['hint'], 'string'],
+            [['widget', 'rules'], 'safe'],
+            [[ 'form_id'], 'required'],
+            ['attribute', 'default', 'value' => function(FormField $model, $attribute)
+            {
+                return "sx-field-" . md5(rand(1, 10) . time());
+            }],
             [['label', 'attribute'], 'string', 'max' => 255],
             [['attribute', 'form_id'], 'unique', 'targetAttribute' => ['attribute', 'form_id'], 'message' => 'Этот элемент уже привязан к форме']
 
         ]);
     }
+
 
     public function scenarios()
     {
@@ -69,7 +75,25 @@ class FormField extends Core
             'id'            => \Yii::t('app', 'ID'),
             'value'         => \Yii::t('app', 'Email'),
             'form_id'       => \Yii::t('app', 'Форма'),
+            'attribute'       => \Yii::t('app', 'Уникальный код (необязательно)'),
+            'hint'       => \Yii::t('app', 'Небольшая подсказка элемента'),
+            'label'       => \Yii::t('app', 'Название'),
         ]);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function findForm()
+    {
+        return $this->hasOne(Form::className(), ['id' => 'form_id']);
+    }
+
+    /**
+     * @return Form
+     */
+    public function fetchForm()
+    {
+        return $this->findForm()->one();
+    }
 }
