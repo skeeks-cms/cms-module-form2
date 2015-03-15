@@ -64,6 +64,7 @@ use common\models\User;
         ],
         'controllerRoute'   => 'form/admin-form-field',
         'gridViewOptions'   => [
+            'sortable' => true,
             'columns' => [
                 //['class' => 'yii\grid\SerialColumn'],
                 'attribute',

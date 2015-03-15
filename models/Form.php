@@ -122,4 +122,9 @@ class Form extends Core
 
 
 
+    public function render()
+    {
+
+    }
+
 }
