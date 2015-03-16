@@ -35,7 +35,12 @@ class m150307_162735_create_form_field_table extends Migration
             'label'                 => Schema::TYPE_STRING . '(255) NULL',
             'hint'                  => Schema::TYPE_TEXT . ' NULL',
 
-            'widget'                => Schema::TYPE_TEXT . ' NULL',
+            'element'               => Schema::TYPE_TEXT . '(255)  NULL',
+            'widget'                => Schema::TYPE_TEXT . '(255)  NULL',
+
+            'widget_settings'       => Schema::TYPE_TEXT . ' NULL',
+            'element_settings'      => Schema::TYPE_TEXT . ' NULL',
+
             'rules'                 => Schema::TYPE_TEXT . ' NULL',
 
             'priority'              => Schema::TYPE_INTEGER . ' NOT NULL DEFAULT 0',

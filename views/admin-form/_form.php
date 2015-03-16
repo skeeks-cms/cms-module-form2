@@ -13,7 +13,7 @@ use common\models\User;
 <?php $form = ActiveForm::begin(); ?>
 <?php  ?>
 
-<?= $form->fieldSet('Общая ниформация')?>
+<?= $form->fieldSet('Общая информация')?>
     <?= $form->field($model, 'name')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
@@ -62,8 +62,17 @@ use common\models\User;
         'relation'          => [
             'form_id' => 'id'
         ],
+
+        'sort'              => [
+            'defaultOrder' =>
+            [
+                'priority' => SORT_DESC
+            ]
+        ],
+
         'controllerRoute'   => 'form/admin-form-field',
         'gridViewOptions'   => [
+
             'sortable' => true,
             'columns' => [
                 //['class' => 'yii\grid\SerialColumn'],

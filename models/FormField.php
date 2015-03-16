@@ -43,6 +43,7 @@ class FormField extends Core
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'form_id'], 'integer'],
             [['hint'], 'string'],
+            [['priority'], 'integer'],
             [['widget', 'rules'], 'safe'],
             [[ 'form_id'], 'required'],
             ['attribute', 'default', 'value' => function(FormField $model, $attribute)
