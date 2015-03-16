@@ -26,4 +26,29 @@ use yii\web\UploadedFile;
  * @package skeeks\cms\components
  */
 class FormRegisteredElements extends RegisteredWidgets
-{}
+{
+
+    public function baseElements()
+    {
+        return [
+            'skeeks\modules\cms\form\elements\textarea\Textarea' =>
+            [
+                'name'          => 'Текстовое поле (textarea)',
+                'description'   => '',
+            ],
+
+            'skeeks\modules\cms\form\elements\textInput\TextInput' =>
+            [
+                'name'          => 'Текстовый input (TextInput)',
+                'description'   => '',
+            ],
+        ];
+    }
+
+    public function init()
+    {
+        parent::init();
+
+        $this->components = ArrayHelper::merge($this->baseElements(), (array) $this->components);
+    }
+}

@@ -32,11 +32,12 @@ class FormWidget extends Widget
     /**
      * @var null|string
      */
-    public $slider_id               = '';
+    public $form_id               = '';
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
+            [['form_id'], 'required'],
             [['form_id'], 'integer'],
         ]);
     }

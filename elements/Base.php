@@ -5,12 +5,19 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 16.03.2015
  */
-namespace skeeks\modules\cms\form\models\form\elements;
+namespace skeeks\modules\cms\form\elements;
 
 use skeeks\cms\base\Widget;
 
-class Base extends Widget
+abstract class Base extends Widget
 {
+    /**
+     * @var bool Элемент или виджет
+     */
+    public $element = true;
+
+    public $elementCode;
+
     public $value;
     public $attributeClass;
 

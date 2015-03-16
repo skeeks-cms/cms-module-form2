@@ -5,9 +5,11 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 16.03.2015
  */
-namespace skeeks\modules\cms\form\models\form\elements\textarea;
+namespace skeeks\modules\cms\form\elements\textarea;
 
-use skeeks\modules\cms\form\models\form\elements\Base;
+use skeeks\modules\cms\form\elements\Base;
 
 class Textarea extends Base
-{}
+{
+    public $elementCode = 'textarea';
+}

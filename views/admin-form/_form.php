@@ -82,7 +82,11 @@ use common\models\User;
             ],
         ],
     ]); ?>
+
+
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
+
+<?= $model->render(); ?>

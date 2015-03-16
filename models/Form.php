@@ -124,7 +124,19 @@ class Form extends Core
 
     public function render()
     {
+        /**
+         * @var $moduleForm \skeeks\modules\cms\form\Module
+         */
+        $moduleForm = \Yii::$app->getModule('form');
 
+        $formFields = $this->getFormFields()->orderBy('priority DESC')->all();
+
+        return $moduleForm->renderFile('blank-form.php', [
+            'module'    => $moduleForm,
+            'modelForm' => $this,
+            'fields'    => $formFields,
+            'model'     => new FormValidateModel()
+        ]);
     }
 
 }

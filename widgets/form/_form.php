@@ -16,13 +16,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 /* @var $model \skeeks\cms\models\WidgetConfig */
 ?>
 <?php $form = ActiveForm::begin(); ?>
-<?= $form->templateElement($model); ?>
 
 <?= $form->field($model, 'form_id')->widget(
 
     \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
         'items' => \yii\helpers\ArrayHelper::map(
-            \skeeks\modules\cms\slider\models\Slider::find()->all(),
+            \skeeks\modules\cms\form\models\Form::find()->all(),
             'id', 'name'
         ),
         'controllerRoute' => 'form/admin-form',

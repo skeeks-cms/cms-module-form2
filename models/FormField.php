@@ -45,7 +45,7 @@ class FormField extends Core
             [['hint'], 'string'],
             [['priority'], 'integer'],
             [['widget', 'rules'], 'safe'],
-            [[ 'form_id'], 'required'],
+            [[ 'form_id', 'element'], 'required'],
             ['attribute', 'default', 'value' => function(FormField $model, $attribute)
             {
                 return "sx-field-" . md5(rand(1, 10) . time());
