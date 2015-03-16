@@ -36,6 +36,19 @@ return [
                 ],
             ]
         ],
+
+        "registeredWidgets" =>
+        [
+            'components' =>
+            [
+                'skeeks\modules\cms\form\widgets\form\FormWidget' =>
+                [
+                    'name'          => 'Конструктор форм',
+                    'description'   => 'Виджет показа сконструированной формы',
+                ],
+            ]
+        ],
+
     ],
 
     'modules' =>
