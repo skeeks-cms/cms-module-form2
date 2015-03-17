@@ -48,7 +48,7 @@ class FormField extends Core
             [[ 'form_id', 'element'], 'required'],
             ['attribute', 'default', 'value' => function(FormField $model, $attribute)
             {
-                return "sx-field-" . md5(rand(1, 10) . time());
+                return "sx_field_" . md5(rand(1, 10) . time());
             }],
             [['label', 'attribute'], 'string', 'max' => 255],
             [['attribute', 'form_id'], 'unique', 'targetAttribute' => ['attribute', 'form_id'], 'message' => 'Этот элемент уже привязан к форме']

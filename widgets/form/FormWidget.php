@@ -53,8 +53,8 @@ class FormWidget extends Widget
     public function run()
     {
         parent::run();
-        $foemModel = Form::find()->where(['id' => $this->form_id])->one();
-        if ($foemModel)
+        $formModel = Form::find()->where(['id' => $this->form_id])->one();
+        if ($formModel)
         {
 
         }

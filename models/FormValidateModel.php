@@ -12,7 +12,10 @@ use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\Core;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
+use yii\helpers\BaseHtml;
 
 /**
  * Class FormValidateModel
@@ -20,24 +23,180 @@ use yii\base\Model;
  */
 class FormValidateModel extends Model
 {
+
+    /**
+     * @var Form
+     */
+    public $form = null;
+
+    public function init()
+    {
+        parent::init();
+
+        if (!$this->form instanceof Form)
+        {
+            throw new InvalidConfigException;
+        }
+
+        if ($fields = $this->form->fields())
+        {
+            foreach ($fields as $field)
+            {
+                $this->_attributes[$field->attribute] = '';
+            }
+        }
+    }
+
+
+    /**
+     * @var array attribute values indexed by attribute names
+     */
+    private $_attributes = [];
+
+
+
+    /**
+     * PHP getter magic method.
+     * This method is overridden so that attributes and related objects can be accessed like properties.
+     *
+     * @param string $name property name
+     * @throws \yii\base\InvalidParamException if relation name is wrong
+     * @return mixed property value
+     * @see getAttribute()
+     */
+    public function __get($name)
+    {
+        if (isset($this->_attributes[$name]) || array_key_exists($name, $this->_attributes)) {
+            return $this->_attributes[$name];
+        } elseif ($this->hasAttribute($name)) {
+            return null;
+        } else {
+            if (isset($this->_related[$name]) || array_key_exists($name, $this->_related)) {
+                return $this->_related[$name];
+            }
+            $value = parent::__get($name);
+            if ($value instanceof ActiveQueryInterface) {
+                return $this->_related[$name] = $value->findFor($name, $this);
+            } else {
+                return $value;
+            }
+        }
+    }
+
+    /**
+     * PHP setter magic method.
+     * This method is overridden so that AR attributes can be accessed like properties.
+     * @param string $name property name
+     * @param mixed $value property value
+     */
+    public function __set($name, $value)
+    {
+        if ($this->hasAttribute($name)) {
+            $this->_attributes[$name] = $value;
+        } else {
+            parent::__set($name, $value);
+        }
+    }
+
+    /**
+     * Checks if a property value is null.
+     * This method overrides the parent implementation by checking if the named attribute is null or not.
+     * @param string $name the property name or the event name
+     * @return boolean whether the property value is null
+     */
+    public function __isset($name)
+    {
+        try {
+            return $this->__get($name) !== null;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Sets a component property to be null.
+     * This method overrides the parent implementation by clearing
+     * the specified attribute value.
+     * @param string $name the property name or the event name
+     */
+    public function __unset($name)
+    {
+        if ($this->hasAttribute($name)) {
+            unset($this->_attributes[$name]);
+        } elseif (array_key_exists($name, $this->_related)) {
+            unset($this->_related[$name]);
+        } elseif ($this->getRelation($name, false) === null) {
+            parent::__unset($name);
+        }
+    }
+
+
+
+
+
+
+
+    /**
+     * Returns a value indicating whether the model has an attribute with the specified name.
+     * @param string $name the name of the attribute
+     * @return boolean whether the model has an attribute with the specified name.
+     */
+    public function hasAttribute($name)
+    {
+        return isset($this->_attributes[$name]) || in_array($name, $this->attributes());
+    }
+
+    /**
+     * Returns the named attribute value.
+     * If this record is the result of a query and the attribute is not loaded,
+     * null will be returned.
+     * @param string $name the attribute name
+     * @return mixed the attribute value. Null if the attribute is not set or does not exist.
+     * @see hasAttribute()
+     */
+    public function getAttribute($name)
+    {
+        return isset($this->_attributes[$name]) ? $this->_attributes[$name] : null;
+    }
+
+    /**
+     * Sets the named attribute value.
+     * @param string $name the attribute name
+     * @param mixed $value the attribute value.
+     * @throws InvalidParamException if the named attribute does not exist.
+     * @see hasAttribute()
+     */
+    public function setAttribute($name, $value)
+    {
+        if ($this->hasAttribute($name)) {
+            $this->_attributes[$name] = $value;
+        } else {
+            throw new InvalidParamException(get_class($this) . ' has no attribute named "' . $name . '".');
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
-        return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
-            [['name'], 'required'],
-            [['description', 'template'], 'string'],
-            [['name'], 'string', 'max' => 255],
-            [['code'], 'string', 'max' => 32],
-            [['code'], 'unique'],
-
-            [['code'], 'validateCode']
-        ]);
+        return array_merge(parent::rules());
     }
 
-    public function scenarios()
+    /*public function scenarios()
     {
         $scenarios = parent::scenarios();
 
@@ -45,19 +204,20 @@ class FormValidateModel extends Model
         $scenarios['update'] = $scenarios[self::SCENARIO_DEFAULT];
 
         return $scenarios;
-    }
+    }*/
 
     /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
-        return array_merge(parent::attributeLabels(), [
-            'id'            => \Yii::t('app', 'ID'),
-            'name'          => \Yii::t('app', 'Name'),
-            'code'          => \Yii::t('app', 'Уникальный код'),
-            'description'   => \Yii::t('app', 'Небольшое описание'),
-            'template'      => \Yii::t('app', 'Шаблон формы'),
-        ]);
+        $result = [];
+
+        foreach ($this->form->fields() as $field)
+        {
+            $result[$field->attribute] = $field->label;
+        }
+
+        return $result;
     }
 }

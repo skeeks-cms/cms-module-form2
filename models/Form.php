@@ -12,6 +12,9 @@ use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\Core;
+use yii\base\Exception;
+use yii\base\UserException;
+use yii\web\ErrorHandler;
 
 /**
  * Class Form
@@ -121,6 +124,34 @@ class Form extends Core
     }
 
 
+    /**
+     * @return FormValidateModel
+     */
+    public function createValidateModel()
+    {
+        return new FormValidateModel([
+            'form' => $this
+        ]);
+    }
+
+
+    /**
+     * @var FormField[]
+     */
+    protected $_fields = null;
+
+    /**
+     * @return FormField[]
+     */
+    public function fields()
+    {
+        if ($this->_fields === null)
+        {
+            $this->_fields = $this->getFormFields()->orderBy('priority DESC')->all();
+        }
+
+        return $this->_fields;
+    }
 
     public function render()
     {
@@ -129,14 +160,21 @@ class Form extends Core
          */
         $moduleForm = \Yii::$app->getModule('form');
 
-        $formFields = $this->getFormFields()->orderBy('priority DESC')->all();
+        try
+        {
+            return $moduleForm->renderFile('blank-form.php', [
+                'module'    => $moduleForm,
+                'modelForm' => $this,
+                'fields'    => $this->fields(),
+                'model'     => $this->createValidateModel()
+            ]);
 
-        return $moduleForm->renderFile('blank-form.php', [
-            'module'    => $moduleForm,
-            'modelForm' => $this,
-            'fields'    => $formFields,
-            'model'     => new FormValidateModel()
-        ]);
+        } catch (\Exception $e)
+        {
+            ob_end_clean();
+            //ErrorHandler::convertExceptionToError($e);
+            return 'Ошибка рендеринга формы: ' . $e->getMessage();
+        }
     }
 
 }
