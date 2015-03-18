@@ -89,4 +89,13 @@ use common\models\User;
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
 
-<?= $model->render(); ?>
+<div class="row">
+    <div class="col-md-12">
+        <div class="" style="border: 1px solid rgba(32, 168, 216, 0.23); padding: 10px; margin-top: 10px;">
+            <h2>Вот так будет выглядеть форма:</h2>
+            <hr />
+            <?= $model->render(); ?>
+        </div>
+
+    </div>
+</div>

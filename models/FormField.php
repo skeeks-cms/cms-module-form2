@@ -12,6 +12,11 @@ use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\Core;
+use skeeks\modules\cms\form\elements\Base;
+use yii\base\Model;
+use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveField;
+use yii\widgets\ActiveForm;
 
 /**
  * Class FormEmail
@@ -32,7 +37,25 @@ class FormField extends Core
      */
     public function behaviors()
     {
-        return array_merge(parent::behaviors(), []);
+        return ArrayHelper::merge(parent::behaviors(), [
+            Implode::className() =>
+            [
+                'class' => Implode::className(),
+                'fields' => ['rules']
+            ]
+        ]);
+    }
+
+    /**
+     * @return array
+     */
+    static public function availableRules()
+    {
+        return [
+            'required'  => 'Обязательно к заполнению',
+            'email'     => 'Проверка на email',
+            'integer'   => 'Целое число'
+        ];
     }
 
     /**
@@ -43,8 +66,9 @@ class FormField extends Core
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'form_id'], 'integer'],
             [['hint'], 'string'],
+            [['element_config'], 'safe'],
             [['priority'], 'integer'],
-            [['widget', 'rules'], 'safe'],
+            [['rules'], 'safe'],
             [[ 'form_id', 'element'], 'required'],
             ['attribute', 'default', 'value' => function(FormField $model, $attribute)
             {
@@ -96,5 +120,86 @@ class FormField extends Core
     public function fetchForm()
     {
         return $this->findForm()->one();
+    }
+
+    /**
+     * @return \skeeks\cms\models\WidgetDescriptor
+     */
+    public function elenentDescriptor()
+    {
+        return \Yii::$app->formRegisteredElements->getComponent($this->element);
+    }
+
+
+    /**
+     * @return array
+     */
+    public function rulesForActiveForm()
+    {
+        $result = [];
+
+        if ((array) $this->rules)
+        {
+            foreach ((array) $this->rules as $ruleCode)
+            {
+                $result[] = [[$this->attribute], $ruleCode];
+            }
+        } else
+        {
+            $result[] = [[$this->attribute], 'safe'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param ActiveForm $activeForm
+     * @param Model $model
+     * @return mixed
+     */
+    public function renderActiveForm(ActiveForm $activeForm, Model $model)
+    {
+        if ($element = $this->elenentDescriptor())
+        {
+            $elementConfig = (array) $this->element_config;
+            /**
+             * @var $field ActiveField
+             */
+            $field = $activeForm
+                ->field($model, $this->attribute);
+
+            if (!$field)
+            {
+                return '';
+            }
+
+            //Элемент или виджет
+            if (is_subclass_of($this->element, Base::className()))
+            {
+                $element = new $this->element;
+                $field->{$element->elementCode}($elementConfig);
+            } else
+            {
+                $field->widget($this->element, $elementConfig);
+            }
+
+            if ($this->hint)
+            {
+                $field->hint((string) $this->hint);
+            }
+
+            if ($this->label)
+            {
+                $field->label($this->label);
+            } else
+            {
+                $field->label(false);
+            }
+
+
+            return $field;
+        }
+
+        return '';
     }
 }

@@ -13,7 +13,6 @@ use skeeks\modules\cms\form\components\FormRegisteredWidgets;
 /**
  *
  * @property FormRegisteredElements              $formRegisteredElements
- * @property FormRegisteredWidgets               $formRegisteredWidgets
  *
  * Class Application
  * @package yii\web

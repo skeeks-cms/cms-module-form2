@@ -15,6 +15,7 @@ use skeeks\cms\models\Core;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 use yii\helpers\BaseHtml;
 
 /**
@@ -27,18 +28,18 @@ class FormValidateModel extends Model
     /**
      * @var Form
      */
-    public $form = null;
+    public $modelForm = null;
 
     public function init()
     {
         parent::init();
 
-        if (!$this->form instanceof Form)
+        if (!$this->modelForm instanceof Form)
         {
             throw new InvalidConfigException;
         }
 
-        if ($fields = $this->form->fields())
+        if ($fields = $this->modelForm->fields())
         {
             foreach ($fields as $field)
             {
@@ -52,7 +53,20 @@ class FormValidateModel extends Model
      * @var array attribute values indexed by attribute names
      */
     private $_attributes = [];
+    private $_related = [];
 
+
+    public function rules()
+    {
+        $result = parent::rules();
+
+        foreach ($this->modelForm->fields() as $field)
+        {
+            $result = ArrayHelper::merge($result, $field->rulesForActiveForm());
+        }
+
+        return $result;
+    }
 
 
     /**
@@ -188,13 +202,6 @@ class FormValidateModel extends Model
 
 
 
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return array_merge(parent::rules());
-    }
 
     /*public function scenarios()
     {
@@ -213,7 +220,7 @@ class FormValidateModel extends Model
     {
         $result = [];
 
-        foreach ($this->form->fields() as $field)
+        foreach ($this->modelForm->fields() as $field)
         {
             $result[$field->attribute] = $field->label;
         }

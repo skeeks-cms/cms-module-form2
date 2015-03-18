@@ -56,7 +56,7 @@ class FormWidget extends Widget
         $formModel = Form::find()->where(['id' => $this->form_id])->one();
         if ($formModel)
         {
-
+            return $formModel->render();
         }
 
         return '';

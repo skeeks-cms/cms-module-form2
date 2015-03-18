@@ -9,14 +9,9 @@ namespace skeeks\modules\cms\form\elements;
 
 use skeeks\cms\base\Widget;
 
-abstract class Base extends Widget
+class Base extends Widget
 {
-    /**
-     * @var bool Элемент или виджет
-     */
-    public $element = true;
-
-    public $elementCode;
+    public $elementCode = '';
 
     public $value;
     public $attributeClass;

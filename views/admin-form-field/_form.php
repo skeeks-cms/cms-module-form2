@@ -45,6 +45,13 @@ use common\models\User;
     <?= $form->field($model, 'attribute')->textInput(); ?>
     <?= $form->field($model, 'label')->textInput(); ?>
     <?= $form->field($model, 'hint')->textInput(); ?>
+    <?= $form->field($model, 'rules')->widget(
+        \skeeks\widget\chosen\Chosen::className(),
+        [
+            'items' => \skeeks\modules\cms\form\models\FormField::availableRules(),
+            'multiple' => true
+        ]
+    ); ?>
 <? endif; ?>
 
 

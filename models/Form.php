@@ -22,6 +22,8 @@ use yii\web\ErrorHandler;
  */
 class Form extends Core
 {
+    const FROM_PARAM_ID_NAME = 'sx-auto-form';
+
     /**
      * @inheritdoc
      */
@@ -130,7 +132,7 @@ class Form extends Core
     public function createValidateModel()
     {
         return new FormValidateModel([
-            'form' => $this
+            'modelForm' => $this
         ]);
     }
 
@@ -172,7 +174,7 @@ class Form extends Core
         } catch (\Exception $e)
         {
             ob_end_clean();
-            //ErrorHandler::convertExceptionToError($e);
+            ErrorHandler::convertExceptionToError($e);
             return 'Ошибка рендеринга формы: ' . $e->getMessage();
         }
     }
