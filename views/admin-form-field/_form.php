@@ -16,7 +16,8 @@ use common\models\User;
 <? if ($form_id = \Yii::$app->request->get('form_id')) : ?>
     <?= $form->field($model, 'form_id')->hiddenInput(['value' => $form_id])->label(false); ?>
 <? else: ?>
-    <?= $form->field($model, 'form_id')->label('Форма')->widget(
+    <?= $form->field($model, 'form_id')->hiddenInput(['value' => $form_id])->label(false); ?>
+    <?/*= $form->field($model, 'form_id')->label('Форма')->widget(
         \skeeks\widget\chosen\Chosen::className(), [
                 'items' => \yii\helpers\ArrayHelper::map(
                     \skeeks\modules\cms\form\models\Form::find()->all(),
@@ -24,12 +25,36 @@ use common\models\User;
                      "name"
                  ),
         ]);
-    ?>
+    */?>
 <? endif; ?>
 
-<?= $form->field($model, 'attribute')->textInput(); ?>
-<?= $form->field($model, 'label')->textInput(); ?>
-<?= $form->field($model, 'hint')->textInput(); ?>
+
+<?/* if ($model->isNewRecord) : */?>
+    <?= $form->field($model, 'element')->label('Элемент формы')->widget(
+        \skeeks\widget\chosen\Chosen::className(), [
+                'items' => \yii\helpers\ArrayHelper::map(
+                     \Yii::$app->formRegisteredElements->getComponents(),
+                     "id",
+                     "name"
+                 ),
+        ]);
+    ?>
+<?/* endif ; */?>
+
+<? if (!$model->isNewRecord) : ?>
+    <?= $form->field($model, 'attribute')->textInput(); ?>
+    <?= $form->field($model, 'label')->textInput(); ?>
+    <?= $form->field($model, 'hint')->textInput(); ?>
+    <?= $form->field($model, 'rules')->widget(
+        \skeeks\widget\chosen\Chosen::className(),
+        [
+            'items' => \skeeks\modules\cms\form\models\FormField::availableRules(),
+            'multiple' => true
+        ]
+    ); ?>
+<? endif; ?>
+
+
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

@@ -13,7 +13,7 @@ use common\models\User;
 <?php $form = ActiveForm::begin(); ?>
 <?php  ?>
 
-<?= $form->fieldSet('Общая ниформация')?>
+<?= $form->fieldSet('Общая информация')?>
     <?= $form->field($model, 'name')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
@@ -62,8 +62,18 @@ use common\models\User;
         'relation'          => [
             'form_id' => 'id'
         ],
+
+        'sort'              => [
+            'defaultOrder' =>
+            [
+                'priority' => SORT_DESC
+            ]
+        ],
+
         'controllerRoute'   => 'form/admin-form-field',
         'gridViewOptions'   => [
+
+            'sortable' => true,
             'columns' => [
                 //['class' => 'yii\grid\SerialColumn'],
                 'attribute',
@@ -72,7 +82,20 @@ use common\models\User;
             ],
         ],
     ]); ?>
+
+
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="" style="border: 1px solid rgba(32, 168, 216, 0.23); padding: 10px; margin-top: 10px;">
+            <h2>Вот так будет выглядеть форма:</h2>
+            <hr />
+            <?= $model->render(); ?>
+        </div>
+
+    </div>
+</div>
