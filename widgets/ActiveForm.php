@@ -35,4 +35,63 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
 
         echo \yii\helpers\Html::hiddenInput(Form::FROM_PARAM_ID_NAME, $this->modelForm->id);
     }
+
+
+    public function run()
+    {
+        parent::run();
+
+        $this->view->registerJs(<<<JS
+
+        $('#{$this->id}').on('beforeSubmit', function (event, attribute, message) {
+            return false;
+        });
+
+        $('#{$this->id}').on('afterValidate', function (event, attribute, message) {
+
+            var Jform = $(this);
+            var ajax = sx.ajax.preparePostQuery($(this).attr('action'), $(this).serialize());
+
+            new sx.classes.AjaxHandlerBlocker(ajax, {
+                'wrapper': '#' + $(this).attr('id')
+            });
+            //new sx.classes.AjaxHandlerNoLoader(ajax); //отключение глобального загрузчика
+            new sx.classes.AjaxHandlerNotifyErrors(ajax, {
+                'error': "Не удалось отправить форму",
+            }); //отключение глобального загрузчика
+
+            ajax.onError(function(e, data)
+                {
+
+                })
+                .onSuccess(function(e, data)
+                {
+                    var response = data.response;
+                    if (response.success == true)
+                    {
+                        $('input', Jform).each(function(i,s)
+                        {
+                            if ($(this).attr('name') != '_csrf' && $(this).attr('name') != 'sx-auto-form')
+                            {
+                                $(this).val('');
+                            }
+                        });
+
+                        sx.notify.success(response.message);
+                    } else
+                    {
+                        sx.notify.error(response.message);
+                    }
+
+                })
+                .execute();
+
+            return false;
+        });
+
+
+JS
+);
+    }
+
 }

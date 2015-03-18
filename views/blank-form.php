@@ -12,7 +12,8 @@ use skeeks\modules\cms\form\widgets\ActiveForm;
 ?>
 <?php $form = ActiveForm::begin([
     'modelForm'                 => $model->modelForm,
-]); ?>
+]);
+?>
 
 <? if ($fields) : ?>
     <? foreach ($fields as $formField) : ?>

@@ -43,7 +43,33 @@ class BackendController extends Controller
      */
     public function actionSubmit()
     {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+        {
+            \Yii::$app->response->format = Response::FORMAT_JSON;
 
+            $response = [
+                'success' => false,
+                'message' => 'Произошла ошибка',
+            ];
+
+            if ($formId = \Yii::$app->request->post(Form::FROM_PARAM_ID_NAME))
+            {
+                /**
+                 * @var $modelForm Form
+                 */
+                $modelForm = Form::find()->where(['id' => $formId])->one();
+
+                $model = $modelForm->createValidateModel();
+
+                if ($model->load(\Yii::$app->request->post()) && $model->validate())
+                {
+                    $response['success'] = true;
+                    $response['message'] = 'Успешно отправлена';
+                }
+
+                return $response;
+            }
+        }
     }
 
     /**
