@@ -31,9 +31,27 @@ class AdminFormSendMessageController extends AdminModelEditorSmartController
         $this->enableScenarios          = true;
 
         $this->gridColumns = [
-            'form_id',
+            [
+                'class'     => \yii\grid\DataColumn::className(),
+                'value'     => function(FormSendMessage $model)
+                {
+
+                    if ($form = Form::find()->where(['id' => $model->form_id])->one())
+                    {
+                        return $form->name;
+                    }
+
+                },
+                'attribute' => 'form_id',
+                'format' => 'html'
+            ],
+
             ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
-            ['class' => \skeeks\cms\grid\CreatedByColumn::className()]
+            ['class' => \skeeks\cms\grid\CreatedByColumn::className()],
+            'page_url',
+            'ip'
+
+
         ];
 
         parent::init();

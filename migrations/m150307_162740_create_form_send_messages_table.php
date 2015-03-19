@@ -34,7 +34,8 @@ class m150307_162740_create_form_send_messages_table extends Migration
 
             'processed_by'          => Schema::TYPE_INTEGER . ' NULL', //пользователь который принял заявку
 
-            'data'                  => Schema::TYPE_TEXT . ' NULL', //Данные с формы в серилизованном виде
+            'data_values'         => Schema::TYPE_TEXT . ' NULL', //Данные с формы в серилизованном виде
+            'data_labels'         => Schema::TYPE_TEXT . ' NULL', //Данные с формы в серилизованном виде
 
             'emails'                => Schema::TYPE_TEXT . ' NULL', //email на которые были отправлены уведомления
             'phones'                => Schema::TYPE_TEXT . ' NULL', //Телефоны на которые были отправлены уведомления

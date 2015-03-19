@@ -94,7 +94,7 @@ class Form extends Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getFormEmails()
+    public function findFormEmails()
     {
         return $this->hasMany(FormEmail::className(), ['form_id' => 'id']);
     }

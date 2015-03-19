@@ -215,8 +215,21 @@ class FormField extends Core
     }
 
 
+    /**
+     * @return string
+     */
     public function normalName()
     {
-        return $this->
+        if ($this->name)
+        {
+            return (string) $this->name;
+        }
+
+        if ($this->label)
+        {
+            return (string) $this->label;
+        }
+
+        return (string) $this->attribute;
     }
 }

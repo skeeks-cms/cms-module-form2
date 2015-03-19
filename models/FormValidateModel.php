@@ -52,7 +52,7 @@ class FormValidateModel extends Model
     /**
      * @return array
      */
-    public function getValues()
+    public function attributeValues()
     {
         $result = parent::rules();
 
@@ -66,26 +66,7 @@ class FormValidateModel extends Model
 
         return $result;
     }
-    /**
-     * @return array
-     */
-    public function getFieldsValues()
-    {
-        $result = parent::rules();
 
-        foreach ($this->modelForm->fields() as $field)
-        {
-            if ($this->getAttribute($field->attribute))
-            {
-                $result[$field->attribute] = [
-                    'field' => $field,
-                    'value' => $this->getAttribute($field->attribute)
-                ];
-            }
-        }
-
-        return $result;
-    }
 
     /**
      * @var array attribute values indexed by attribute names
@@ -251,7 +232,7 @@ class FormValidateModel extends Model
 
         foreach ($this->modelForm->fields() as $field)
         {
-            $result[$field->attribute] = $field->label;
+            $result[$field->attribute] = $field->normalName();
         }
 
         return $result;

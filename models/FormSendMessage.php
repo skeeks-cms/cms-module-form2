@@ -15,6 +15,8 @@ use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "{{%form_send_message}}".
@@ -64,7 +66,7 @@ class FormSendMessage extends Core
             Serialize::className() =>
             [
                 'class' => Serialize::className(),
-                'fields' => ['data', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request']
+                'fields' => ['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request']
             ],
 
             Implode::className() =>
@@ -82,7 +84,7 @@ class FormSendMessage extends Core
     {
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'processed_by', 'status', 'form_id'], 'integer'],
-            [['data', 'emails', 'phones', 'email_message', 'phone_message', 'data_server', 'data_session', 'data_cookie', 'data_request', 'additional_data'], 'safe'],
+            [['emails', 'phones', 'email_message', 'phone_message', 'data_server', 'data_session', 'data_cookie', 'data_request', 'additional_data', 'data_labels', 'data_values'], 'safe'],
             [['ip'], 'string', 'max' => 32],
             [['page_url'], 'string', 'max' => 500],
             [['form_id'], 'required'],
@@ -148,8 +150,45 @@ class FormSendMessage extends Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getForm()
+    public function findForm()
     {
-        return $this->hasOne(FormForm::className(), ['id' => 'form_id']);
+        return $this->hasOne(Form::className(), ['id' => 'form_id']);
+    }
+
+
+
+    /**
+     * Уведомить всех кого надо и как надо
+     */
+    public function notify()
+    {
+        /**
+         * @var Form $form
+         */
+        $form = $this->findForm()->one();
+
+        if ($form)
+        {
+            $emails = $form->findFormEmails()->all();
+
+            if ($emails)
+            {
+                foreach ($emails as $formEmail)
+                {
+                    //\Yii::$app->mailer->setViewPath(\Yii::$app->getModule('form')->basePath . '/mail');
+
+
+                        \Yii::$app->mailer->compose('@skeeks/modules/cms/form/mail/send-message', [
+                            'form'              => $form,
+                            'formSendMessage'   => $this
+                        ])
+                        ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                        ->setTo($formEmail->value)
+                        ->setSubject("Отправка формы «{$form->name}» #" . $this->id)
+                        ->send();
+
+                }
+            }
+        }
     }
 }
