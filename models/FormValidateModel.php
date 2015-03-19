@@ -50,10 +50,47 @@ class FormValidateModel extends Model
 
 
     /**
+     * @return array
+     */
+    public function getValues()
+    {
+        $result = parent::rules();
+
+        foreach ($this->modelForm->fields() as $field)
+        {
+            if ($this->getAttribute($field->attribute))
+            {
+                $result[$field->attribute] = $this->getAttribute($field->attribute);
+            }
+        }
+
+        return $result;
+    }
+    /**
+     * @return array
+     */
+    public function getFieldsValues()
+    {
+        $result = parent::rules();
+
+        foreach ($this->modelForm->fields() as $field)
+        {
+            if ($this->getAttribute($field->attribute))
+            {
+                $result[$field->attribute] = [
+                    'field' => $field,
+                    'value' => $this->getAttribute($field->attribute)
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * @var array attribute values indexed by attribute names
      */
     private $_attributes = [];
-    private $_related = [];
 
 
     public function rules()
@@ -85,15 +122,9 @@ class FormValidateModel extends Model
         } elseif ($this->hasAttribute($name)) {
             return null;
         } else {
-            if (isset($this->_related[$name]) || array_key_exists($name, $this->_related)) {
-                return $this->_related[$name];
-            }
+
             $value = parent::__get($name);
-            if ($value instanceof ActiveQueryInterface) {
-                return $this->_related[$name] = $value->findFor($name, $this);
-            } else {
-                return $value;
-            }
+            return $value;
         }
     }
 
@@ -137,8 +168,6 @@ class FormValidateModel extends Model
     {
         if ($this->hasAttribute($name)) {
             unset($this->_attributes[$name]);
-        } elseif (array_key_exists($name, $this->_related)) {
-            unset($this->_related[$name]);
         } elseif ($this->getRelation($name, false) === null) {
             parent::__unset($name);
         }

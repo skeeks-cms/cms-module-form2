@@ -26,8 +26,29 @@ class AdminFormSendMessageController extends AdminModelEditorSmartController
         $this->_label                   = "Сообщения с форм";
         $this->_modelShowAttribute      = "id";
         $this->_modelClassName          = FormSendMessage::className();
+
         $this->modelValidate            = true;
         $this->enableScenarios          = true;
+
+        $this->gridColumns = [
+            'form_id',
+            ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
+            ['class' => \skeeks\cms\grid\CreatedByColumn::className()]
+        ];
+
         parent::init();
+    }
+
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+
+        unset($behaviors[self::BEHAVIOR_ACTION_MANAGER]['actions']['create']);
+
+        return $behaviors;
     }
 }

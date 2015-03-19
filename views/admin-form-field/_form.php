@@ -43,7 +43,9 @@ use common\models\User;
 
 <? if (!$model->isNewRecord) : ?>
     <?= $form->field($model, 'attribute')->textInput(); ?>
-    <?= $form->field($model, 'label')->textInput(); ?>
+
+    <?= $form->field($model, 'name')->textInput()->hint('В момент отправки данных формы, будет использоваться это название.'); ?>
+    <?= $form->field($model, 'label')->textInput()->hint('В момент отправки данных формы, будет использоваться это название.');; ?>
     <?= $form->field($model, 'hint')->textInput(); ?>
     <?= $form->field($model, 'rules')->widget(
         \skeeks\widget\chosen\Chosen::className(),

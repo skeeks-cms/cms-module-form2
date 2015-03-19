@@ -20,7 +20,7 @@ return [
 
             [
                 "label" => "Сообщения с форм",
-                "url"   => ["form/admin-message"]
+                "url"   => ["form/admin-form-send-message"]
             ],
 
         ]
