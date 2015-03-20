@@ -69,7 +69,7 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
                     var response = data.response;
                     if (response.success == true)
                     {
-                        $('input', Jform).each(function(i,s)
+                        $('input, select, textarea', Jform).each(function(i,s)
                         {
                             if ($(this).attr('name') != '_csrf' && $(this).attr('name') != 'sx-auto-form')
                             {

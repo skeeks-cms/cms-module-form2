@@ -32,6 +32,8 @@ class m150307_162735_create_form_field_table extends Migration
             'created_at'            => Schema::TYPE_INTEGER . ' NULL',
             'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
 
+            'name'                  => Schema::TYPE_STRING . '(255) NULL',
+
             'label'                 => Schema::TYPE_STRING . '(255) NULL',
             'hint'                  => Schema::TYPE_TEXT . ' NULL',
 
@@ -53,6 +55,7 @@ class m150307_162735_create_form_field_table extends Migration
         $this->execute("ALTER TABLE {{%form_field}} ADD INDEX(created_at);");
         $this->execute("ALTER TABLE {{%form_field}} ADD INDEX(updated_at);");
 
+        $this->execute("ALTER TABLE {{%form_field}} ADD INDEX(name);");
         $this->execute("ALTER TABLE {{%form_field}} ADD INDEX(label);");
         $this->execute("ALTER TABLE {{%form_field}} ADD INDEX(element);");
         $this->execute("ALTER TABLE {{%form_field}} ADD INDEX(priority);");

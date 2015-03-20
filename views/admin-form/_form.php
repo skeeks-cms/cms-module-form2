@@ -76,7 +76,7 @@ use common\models\User;
             'sortable' => true,
             'columns' => [
                 //['class' => 'yii\grid\SerialColumn'],
-                'attribute',
+                'name',
                 'label',
                 'hint',
             ],

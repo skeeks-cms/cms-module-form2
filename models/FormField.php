@@ -70,11 +70,21 @@ class FormField extends Core
             [['priority'], 'integer'],
             [['rules'], 'safe'],
             [[ 'form_id', 'element'], 'required'],
+
             ['attribute', 'default', 'value' => function(FormField $model, $attribute)
             {
                 return "sx_field_" . md5(rand(1, 10) . time());
             }],
-            [['label', 'attribute'], 'string', 'max' => 255],
+
+            ['name', 'default', 'value' => function(FormField $model, $attribute)
+            {
+                if (!$model->$attribute)
+                {
+                    return $model->label;
+                }
+            }],
+
+            [['label', 'attribute', 'name'], 'string', 'max' => 255],
             [['attribute', 'form_id'], 'unique', 'targetAttribute' => ['attribute', 'form_id'], 'message' => 'Этот элемент уже привязан к форме']
 
         ]);
@@ -102,7 +112,8 @@ class FormField extends Core
             'form_id'       => \Yii::t('app', 'Форма'),
             'attribute'       => \Yii::t('app', 'Уникальный код (необязательно)'),
             'hint'       => \Yii::t('app', 'Небольшая подсказка элемента'),
-            'label'       => \Yii::t('app', 'Название'),
+            'name'       => \Yii::t('app', 'Название'),
+            'label'       => \Yii::t('app', 'Label элемента'),
         ]);
     }
 
@@ -201,5 +212,24 @@ class FormField extends Core
         }
 
         return '';
+    }
+
+
+    /**
+     * @return string
+     */
+    public function normalName()
+    {
+        if ($this->name)
+        {
+            return (string) $this->name;
+        }
+
+        if ($this->label)
+        {
+            return (string) $this->label;
+        }
+
+        return (string) $this->attribute;
     }
 }

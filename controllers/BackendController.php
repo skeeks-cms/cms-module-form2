@@ -8,6 +8,8 @@
 namespace skeeks\modules\cms\form\controllers;
 use skeeks\cms\base\Controller;
 use skeeks\modules\cms\form\models\Form;
+use skeeks\modules\cms\form\models\FormField;
+use skeeks\modules\cms\form\models\FormSendMessage;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
@@ -63,8 +65,28 @@ class BackendController extends Controller
 
                 if ($model->load(\Yii::$app->request->post()) && $model->validate())
                 {
-                    $response['success'] = true;
-                    $response['message'] = 'Успешно отправлена';
+                    //Все проверки прошли, формируем модель отправленного сообщения и сохраняем ее
+                    $modelFormSendMessage = new FormSendMessage();
+
+                    $modelFormSendMessage->data_values     = $model->attributeValues();
+                    $modelFormSendMessage->data_labels     = $model->attributeLabels();
+
+                    $modelFormSendMessage->page_url = \Yii::$app->request->referrer;
+                    $modelFormSendMessage->form_id  = $formId;
+
+                    if ($modelFormSendMessage->save())
+                    {
+                        $modelFormSendMessage->notify();
+
+                        $response['success'] = true;
+                        $response['message'] = 'Успешно отправлена';
+                    } else
+                    {
+                        $response['message'] = 'Не удалось сохранить сообщение в базу';
+                    }
+                } else
+                {
+                    $response['message'] = 'Форма заполнена неправильно';
                 }
 
                 return $response;

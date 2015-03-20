@@ -8,14 +8,43 @@
 namespace skeeks\modules\cms\form\models;
 
 use skeeks\cms\base\db\ActiveRecord;
+use skeeks\cms\helpers\Request;
 use skeeks\cms\models\behaviors\HasDescriptionsBehavior;
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasStatus;
 use skeeks\cms\models\behaviors\Implode;
+use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
- * Class FormSendMessage
- * @package skeeks\modules\cms\form\models
+ * This is the model class for table "{{%form_send_message}}".
+ *
+ * @property integer $id
+ * @property integer $created_by
+ * @property integer $updated_by
+ * @property integer $created_at
+ * @property integer $updated_at
+ * @property integer $processed_by
+ * @property string $data
+ * @property string $emails
+ * @property string $phones
+ * @property string $email_message
+ * @property string $phone_message
+ * @property integer $status
+ * @property integer $form_id
+ * @property string $ip
+ * @property string $page_url
+ * @property string $data_server
+ * @property string $data_session
+ * @property string $data_cookie
+ * @property string $additional_data
+ *
+ * @property CmsUser $processedBy
+ * @property CmsUser $createdBy
+ * @property FormForm $form
+ * @property CmsUser $updatedBy
  */
 class FormSendMessage extends Core
 {
@@ -32,7 +61,20 @@ class FormSendMessage extends Core
      */
     public function behaviors()
     {
-        return array_merge(parent::behaviors(), []);
+        return array_merge(parent::behaviors(), [
+
+            Serialize::className() =>
+            [
+                'class' => Serialize::className(),
+                'fields' => ['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request']
+            ],
+
+            Implode::className() =>
+            [
+                'class' => Implode::className(),
+                'fields' => ['emails', 'phones']
+            ]
+        ]);
     }
 
     /**
@@ -41,8 +83,37 @@ class FormSendMessage extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'form_id'], 'integer'],
-            [['data', 'additional_data'], 'string']
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'processed_by', 'status', 'form_id'], 'integer'],
+            [['emails', 'phones', 'email_message', 'phone_message', 'data_server', 'data_session', 'data_cookie', 'data_request', 'additional_data', 'data_labels', 'data_values'], 'safe'],
+            [['ip'], 'string', 'max' => 32],
+            [['page_url'], 'string', 'max' => 500],
+            [['form_id'], 'required'],
+
+            ['data_request', 'default', 'value' => function(FormSendMessage $model, $attribute)
+            {
+                return $_REQUEST;
+            }],
+
+            ['data_server', 'default', 'value' => function(FormSendMessage $model, $attribute)
+            {
+                return $_SERVER;
+            }],
+
+            ['data_cookie', 'default', 'value' => function(FormSendMessage $model, $attribute)
+            {
+                return $_COOKIE;
+            }],
+
+            ['data_session', 'default', 'value' => function(FormSendMessage $model, $attribute)
+            {
+                \Yii::$app->session->open();
+                return $_SESSION;
+            }],
+
+            ['ip', 'default', 'value' => function(FormSendMessage $model, $attribute)
+            {
+                return Request::getRealUserIp();
+            }],
         ]);
     }
 
@@ -68,4 +139,56 @@ class FormSendMessage extends Core
         ]);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProcessedBy()
+    {
+        return $this->hasOne(CmsUser::className(), ['id' => 'processed_by']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function findForm()
+    {
+        return $this->hasOne(Form::className(), ['id' => 'form_id']);
+    }
+
+
+
+    /**
+     * Уведомить всех кого надо и как надо
+     */
+    public function notify()
+    {
+        /**
+         * @var Form $form
+         */
+        $form = $this->findForm()->one();
+
+        if ($form)
+        {
+            $emails = $form->findFormEmails()->all();
+
+            if ($emails)
+            {
+                foreach ($emails as $formEmail)
+                {
+                    //\Yii::$app->mailer->setViewPath(\Yii::$app->getModule('form')->basePath . '/mail');
+
+
+                        \Yii::$app->mailer->compose('@skeeks/modules/cms/form/mail/send-message', [
+                            'form'              => $form,
+                            'formSendMessage'   => $this
+                        ])
+                        ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                        ->setTo($formEmail->value)
+                        ->setSubject("Отправка формы «{$form->name}» #" . $this->id)
+                        ->send();
+
+                }
+            }
+        }
+    }
 }

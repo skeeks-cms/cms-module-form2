@@ -32,10 +32,30 @@ class m150307_162740_create_form_send_messages_table extends Migration
             'created_at'            => Schema::TYPE_INTEGER . ' NULL',
             'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
 
-            'data'                  => Schema::TYPE_TEXT . ' NULL',
-            'additional_data'       => Schema::TYPE_TEXT . ' NULL',
+            'processed_by'          => Schema::TYPE_INTEGER . ' NULL', //пользователь который принял заявку
+
+            'data_values'         => Schema::TYPE_TEXT . ' NULL', //Данные с формы в серилизованном виде
+            'data_labels'         => Schema::TYPE_TEXT . ' NULL', //Данные с формы в серилизованном виде
+
+            'emails'                => Schema::TYPE_TEXT . ' NULL', //email на которые были отправлены уведомления
+            'phones'                => Schema::TYPE_TEXT . ' NULL', //Телефоны на которые были отправлены уведомления
+
+            'email_message'         => Schema::TYPE_TEXT . ' NULL', //Телефоны на которые были отправлены уведомления
+            'phone_message'         => Schema::TYPE_TEXT . ' NULL', //Телефоны на которые были отправлены уведомления
+
+            'status'                => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10', //статус, активна некативна, удалено
 
             'form_id'               => Schema::TYPE_INTEGER . '(255) NULL',
+
+            'ip'                    => Schema::TYPE_STRING . '(32) NULL',
+            'page_url'              => Schema::TYPE_STRING . '(500) NULL',
+
+            'data_server'           => Schema::TYPE_TEXT . ' NULL',
+            'data_session'          => Schema::TYPE_TEXT . ' NULL',
+            'data_cookie'           => Schema::TYPE_TEXT . ' NULL',
+            'data_request'          => Schema::TYPE_TEXT . ' NULL',
+            'additional_data'       => Schema::TYPE_TEXT . ' NULL',
+
 
         ], $tableOptions);
 
@@ -46,6 +66,10 @@ class m150307_162740_create_form_send_messages_table extends Migration
         $this->execute("ALTER TABLE {{%form_send_message}} ADD INDEX(updated_at);");
 
         $this->execute("ALTER TABLE {{%form_send_message}} ADD INDEX(form_id);");
+        $this->execute("ALTER TABLE {{%form_send_message}} ADD INDEX(processed_by);");
+        $this->execute("ALTER TABLE {{%form_send_message}} ADD INDEX(status);");
+        $this->execute("ALTER TABLE {{%form_send_message}} ADD INDEX(ip);");
+        $this->execute("ALTER TABLE {{%form_send_message}} ADD INDEX(page_url);");
 
         $this->execute("ALTER TABLE {{%form_send_message}} COMMENT = 'Сообщения с форм';");
 
@@ -63,13 +87,20 @@ class m150307_162740_create_form_send_messages_table extends Migration
             'form_send_message_form_id', "{{%form_send_message}}",
             'form_id', '{{%form_form}}', 'id', 'SET NULL', 'SET NULL'
         );
+
+
+        $this->addForeignKey(
+            'form_send_message_processed_by', "{{%form_send_message}}",
+            'processed_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'
+        );
     }
 
     public function down()
     {
         $this->dropForeignKey("form_send_message_created_by", "{{%form_send_message}}");
         $this->dropForeignKey("form_send_message_updated_by", "{{%form_send_message}}");
-        
+        $this->dropForeignKey("form_send_message_processed_by", "{{%form_send_message}}");
+
         $this->dropForeignKey("form_send_message_form_id", "{{%form_send_message}}");
 
         $this->dropTable("{{%form_send_message}}");
