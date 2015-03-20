@@ -84,6 +84,9 @@ class BackendController extends Controller
                     {
                         $response['message'] = 'Не удалось сохранить сообщение в базу';
                     }
+                } else
+                {
+                    $response['message'] = 'Форма заполнена неправильно';
                 }
 
                 return $response;
