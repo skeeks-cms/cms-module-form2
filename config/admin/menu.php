@@ -10,17 +10,20 @@ return [
     [
         'label'     => 'Конструктор форм',
         'priority'  => 0,
+        "img"       => ['\skeeks\modules\cms\form\assets\FormAsset', 'icons/forms.png'],
 
         'items' =>
         [
             [
                 "label" => "Формы",
-                "url"   => ["form/admin-form"]
+                "url"   => ["form/admin-form"],
+                "img"       => ['\skeeks\modules\cms\form\assets\FormAsset', 'icons/forms.png'],
             ],
 
             [
                 "label" => "Сообщения с форм",
-                "url"   => ["form/admin-form-send-message"]
+                "url"   => ["form/admin-form-send-message"],
+                "img"       => ['\skeeks\modules\cms\form\assets\FormAsset', 'icons/form-submits.png'],
             ],
 
         ]
