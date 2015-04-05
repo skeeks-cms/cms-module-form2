@@ -64,7 +64,7 @@ class FormField extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'form_id'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'form_id', 'active'], 'integer'],
             [['hint'], 'string'],
             [['element_config'], 'safe'],
             [['priority'], 'integer'],
@@ -114,6 +114,7 @@ class FormField extends Core
             'hint'       => \Yii::t('app', 'Небольшая подсказка элемента'),
             'name'       => \Yii::t('app', 'Название'),
             'label'       => \Yii::t('app', 'Label элемента'),
+            'active'       => \Yii::t('app', 'Активность'),
         ]);
     }
 

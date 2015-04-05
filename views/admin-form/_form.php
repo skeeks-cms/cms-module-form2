@@ -76,9 +76,14 @@ use common\models\User;
             'sortable' => true,
             'columns' => [
                 //['class' => 'yii\grid\SerialColumn'],
+                'attribute',
                 'name',
                 'label',
                 'hint',
+                [
+                    'class' => \skeeks\cms\grid\BooleanColumn::className(),
+                    'attribute' => 'active'
+                ],
             ],
         ],
     ]); ?>
