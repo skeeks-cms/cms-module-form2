@@ -83,6 +83,14 @@ class ActiveForm extends \skeeks\cms\base\widgets\ActiveForm
                         sx.notify.error(response.message);
                     }
 
+                    if (data.redirect)
+                    {
+                        _.delay(function()
+                        {
+                            window.location.href = data.redirect;
+                        }, 200);
+                    }
+
                 })
                 .execute();
 
