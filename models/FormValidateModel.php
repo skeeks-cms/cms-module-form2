@@ -237,4 +237,22 @@ class FormValidateModel extends Model
 
         return $result;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabelsValues()
+    {
+        $result = [];
+
+        foreach ($this->modelForm->fields() as $field)
+        {
+            if ($this->getAttribute($field->attribute))
+            {
+                $result[$field->normalName()] = $this->getAttribute($field->attribute);
+            }
+        }
+
+        return $result;
+    }
 }

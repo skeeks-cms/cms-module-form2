@@ -182,7 +182,7 @@ class FormSendMessage extends Core
                             'form'              => $form,
                             'formSendMessage'   => $this
                         ])
-                        ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->name])
                         ->setTo($formEmail->value)
                         ->setSubject("Отправка формы «{$form->name}» #" . $this->id)
                         ->send();
