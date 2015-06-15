@@ -12,7 +12,7 @@
 1) Стандартная установка через composer
 
 ```
-php composer.phar require --prefer-dist skeeks/cms-module-form "*"
+php composer.phar require --prefer-dist skeeks/cms-module-form2 "*"
 ```
 
 or add

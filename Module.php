@@ -20,12 +20,12 @@ class Module extends CmsModule
     /**
      * @return array
      */
-    protected function _descriptor()
+    static public function descriptorConfig()
     {
-        return array_merge(parent::_descriptor(), [
-            "version"       => "1.0.3",
+        return array_merge(parent::descriptorConfig(), [
+            "version"               => file_get_contents(__DIR__ . "/VERSION"),
 
-            "name"          => "Модуль конструктор форм",
+            "name"          => "Конструктор форм",
             "description"   => "Модуль прорабатывает модель данных игрового портала. Поставляет модели Игра, Игровой жанр, Игровая платформа, Игровая компания (разработчик, издатель)",
         ]);
     }
