@@ -27,6 +27,7 @@ use Yii;
  * @property string $user_ids
  *
  * @property Form2FormSend[] $form2FormSends
+ * @property Form2FormProperty[] $form2FormProperties
  */
 class Form2Form extends Core
 {
@@ -81,5 +82,14 @@ class Form2Form extends Core
     {
         return $this->hasMany(Form2FormSend::className(), ['form_id' => 'id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getForm2FormProperties()
+    {
+        return $this->hasMany(Form2FormProperty::className(), ['form_id' => 'id']);
+    }
+
 
 }

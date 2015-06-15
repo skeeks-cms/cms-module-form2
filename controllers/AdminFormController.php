@@ -7,8 +7,11 @@
  */
 namespace skeeks\modules\cms\form2\controllers;
 
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
+use skeeks\cms\modules\admin\actions\modelEditor\ModelEditorGridAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\modules\cms\form2\models\Form2Form;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminFormController
@@ -23,6 +26,24 @@ class AdminFormController extends AdminModelEditorController
         $this->modelClassName           = Form2Form::className();
 
         parent::init();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(),
+            [
+                'view' =>
+                [
+                    'class' => AdminOneModelEditAction::className(),
+                    'name' => 'Результат',
+                    "icon" => "glyphicon glyphicon-eye-open",
+                    "priority" => 0,
+                ],
+            ]
+        );
     }
 
 }

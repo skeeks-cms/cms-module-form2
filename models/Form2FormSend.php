@@ -137,4 +137,16 @@ class Form2FormSend extends RelatedElementModel
     {
         return $this->hasOne(Form2Form::className(), ['id' => 'form_id']);
     }
+
+
+    /**
+     *
+     * Все возможные свойства связанные с моделью
+     *
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function getRelatedProperties()
+    {
+        return $this->form->form2FormProperties;
+    }
 }
