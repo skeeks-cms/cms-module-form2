@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 15.06.2015
  */
+die;
 return [
     'components' =>
     [],

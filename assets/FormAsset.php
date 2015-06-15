@@ -2,7 +2,7 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (—ÍËÍ—)
+ * @copyright 2010 SkeekS (–°–∫–∏–∫–°)
  * @date 15.06.2015
  */
 

@@ -2,7 +2,7 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (ÑêèêÑ)
+ * @copyright 2010 SkeekS (Ð¡ÐºÐ¸ÐºÐ¡)
  * @date 07.03.2015
  */
 use yii\db\Schema;
@@ -52,7 +52,7 @@ class m150615_162718_create_table__form2_form extends Migration
         $this->execute("ALTER TABLE {{%form2_form}} ADD INDEX(name);");
         $this->execute("ALTER TABLE {{%form2_form}} ADD UNIQUE(code);");
 
-        $this->execute("ALTER TABLE {{%form2_form}} COMMENT = 'Ôîðìû';");
+        $this->execute("ALTER TABLE {{%form2_form}} COMMENT = 'Ð¤Ð¾Ñ€Ð¼Ñ‹';");
 
         $this->addForeignKey(
             'form2_form_created_by', "{{%form2_form}}",

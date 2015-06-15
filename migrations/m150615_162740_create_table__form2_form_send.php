@@ -2,7 +2,7 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (ÑêèêÑ)
+ * @copyright 2010 SkeekS (Ð¡ÐºÐ¸ÐºÐ¡)
  * @date 07.03.2015
  */
 use yii\db\Schema;
@@ -32,19 +32,19 @@ class m150615_162740_create_table__form2_form_send extends Migration
             'created_at'            => Schema::TYPE_INTEGER . ' NULL',
             'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
 
-            'processed_by'          => Schema::TYPE_INTEGER . ' NULL', //ïîëüçîâàòåëü êîòîðûé ïðèíÿë çàÿâêó
+            'processed_by'          => Schema::TYPE_INTEGER . ' NULL', //Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒ ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ð¹ Ð¿Ñ€Ð¸Ð½ÑÐ» Ð·Ð°ÑÐ²ÐºÑƒ
 
-            'data_values'           => Schema::TYPE_TEXT . ' NULL', //Äàííûå ñ ôîðìû â ñåðèëèçîâàííîì âèäå
-            'data_labels'           => Schema::TYPE_TEXT . ' NULL', //Äàííûå ñ ôîðìû â ñåðèëèçîâàííîì âèäå
+            'data_values'           => Schema::TYPE_TEXT . ' NULL', //Ð”Ð°Ð½Ð½Ñ‹Ðµ Ñ Ñ„Ð¾Ñ€Ð¼Ñ‹ Ð² ÑÐµÑ€Ð¸Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ð½Ð¾Ð¼ Ð²Ð¸Ð´Ðµ
+            'data_labels'           => Schema::TYPE_TEXT . ' NULL', //Ð”Ð°Ð½Ð½Ñ‹Ðµ Ñ Ñ„Ð¾Ñ€Ð¼Ñ‹ Ð² ÑÐµÑ€Ð¸Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ð½Ð¾Ð¼ Ð²Ð¸Ð´Ðµ
 
-            'emails'                => Schema::TYPE_TEXT . ' NULL', //email íà êîòîðûå áûëè îòïðàâëåíû óâåäîìëåíèÿ
-            'phones'                => Schema::TYPE_TEXT . ' NULL', //Òåëåôîíû íà êîòîðûå áûëè îòïðàâëåíû óâåäîìëåíèÿ
+            'emails'                => Schema::TYPE_TEXT . ' NULL', //email Ð½Ð° ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð±Ñ‹Ð»Ð¸ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ñ‹ ÑƒÐ²ÐµÐ´Ð¾Ð¼Ð»ÐµÐ½Ð¸Ñ
+            'phones'                => Schema::TYPE_TEXT . ' NULL', //Ð¢ÐµÐ»ÐµÑ„Ð¾Ð½Ñ‹ Ð½Ð° ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð±Ñ‹Ð»Ð¸ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ñ‹ ÑƒÐ²ÐµÐ´Ð¾Ð¼Ð»ÐµÐ½Ð¸Ñ
             'user_ids'              => Schema::TYPE_TEXT . ' NULL', //
 
-            'email_message'         => Schema::TYPE_TEXT . ' NULL', //Òåëåôîíû íà êîòîðûå áûëè îòïðàâëåíû óâåäîìëåíèÿ
-            'phone_message'         => Schema::TYPE_TEXT . ' NULL', //Òåëåôîíû íà êîòîðûå áûëè îòïðàâëåíû óâåäîìëåíèÿ
+            'email_message'         => Schema::TYPE_TEXT . ' NULL', //Ð¢ÐµÐ»ÐµÑ„Ð¾Ð½Ñ‹ Ð½Ð° ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð±Ñ‹Ð»Ð¸ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ñ‹ ÑƒÐ²ÐµÐ´Ð¾Ð¼Ð»ÐµÐ½Ð¸Ñ
+            'phone_message'         => Schema::TYPE_TEXT . ' NULL', //Ð¢ÐµÐ»ÐµÑ„Ð¾Ð½Ñ‹ Ð½Ð° ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð±Ñ‹Ð»Ð¸ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ñ‹ ÑƒÐ²ÐµÐ´Ð¾Ð¼Ð»ÐµÐ½Ð¸Ñ
 
-            'status'                => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10', //ñòàòóñ, àêòèâíà íåêàòèâíà, óäàëåíî
+            'status'                => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10', //ÑÑ‚Ð°Ñ‚ÑƒÑ, Ð°ÐºÑ‚Ð¸Ð²Ð½Ð° Ð½ÐµÐºÐ°Ñ‚Ð¸Ð²Ð½Ð°, ÑƒÐ´Ð°Ð»ÐµÐ½Ð¾
 
             'form_id'               => Schema::TYPE_INTEGER . '(255) NULL',
 
@@ -72,7 +72,7 @@ class m150615_162740_create_table__form2_form_send extends Migration
         $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(ip);");
         $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(page_url);");
 
-        $this->execute("ALTER TABLE {{%form2_form_send}} COMMENT = 'Ñîîáùåíèÿ ñ ôîðì';");
+        $this->execute("ALTER TABLE {{%form2_form_send}} COMMENT = 'Ð¡Ð¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ñ Ñ Ñ„Ð¾Ñ€Ð¼';");
 
         $this->addForeignKey(
             'form2_form_send_created_by', "{{%form2_form_send}}",
