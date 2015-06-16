@@ -8,6 +8,7 @@
 namespace skeeks\modules\cms\form2\controllers;
 
 use skeeks\cms\base\Controller;
+use skeeks\cms\helpers\Request;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\models\User;
@@ -67,6 +68,7 @@ class BackendController extends Controller
                 $modelForm                  = $modelClass::find()->where(['id' => $modelValue])->one();
                 $modelFormSend              = $modelForm->createModelFormSend();
                 $modelFormSend->site_code   = \Yii::$app->cms->site->code;
+                $modelFormSend->ip          = Request::getRealUserIp();
 
                 $validateModel = $modelFormSend->relatedPropertiesModel;
 

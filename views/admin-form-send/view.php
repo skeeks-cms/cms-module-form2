@@ -11,12 +11,50 @@ $model = $action->controller->model;
 <? $form = ActiveForm::begin(); ?>
 
 <?= $form->fieldSet('Данные с формы'); ?>
-    <? foreach($model->relatedPropertiesModel->attributeLabels() as $code => $label) : ?>
-        <p><b><?= $label; ?>:</b> <?= $model->relatedPropertiesModel->getAttribute($code); ?></p>
-    <? endforeach; ?>
+    <?= \yii\widgets\DetailView::widget([
+        'model'         => $model->relatedPropertiesModel,
+        'attributes'    => array_keys($model->relatedPropertiesModel->attributeLabels())
+    ])?>
 <?= $form->fieldSetEnd(); ?>
+
 <?= $form->fieldSet('Дополнительная информация'); ?>
-    <p><b>Дата и время отправки:</b> <?= \Yii::$app->formatter->asDatetime($model->created_at, 'medium'); ?> (<?= \Yii::$app->formatter->asRelativeTime($model->created_at); ?>)</p>
+    <?= \yii\widgets\DetailView::widget([
+        'model'         => $model,
+        'attributes'    =>
+        [
+            [
+                'attribute'     => 'id',
+                'label'         => 'Номер сообщения',
+            ],
+
+            [
+                'attribute' => 'created_at',
+                'value' => \Yii::$app->formatter->asDatetime($model->created_at, 'medium') . "(" . \Yii::$app->formatter->asRelativeTime($model->created_at) . ")",
+            ],
+
+            [
+                'format' => 'raw',
+                'label' => 'Отправлено с сайта',
+                'value' => "<a href=\"{$model->site->url}\" target=\"_blank\" data-pjax=\"0\">{$model->site->name}</a>",
+            ],
+
+            [
+                'format' => 'raw',
+                'label' => 'Отправил пользователь',
+                'value' => "{$model->createdBy->getDisplayName()} ({$model->createdBy->username})",
+            ],
+
+            [
+                'attribute' => 'ip',
+                'label' => 'Ip адрес отправителя',
+            ]
+        ]
+    ]); ?>
+
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Управление'); ?>
+
 <?= $form->fieldSetEnd(); ?>
 
 <? ActiveForm::end(); ?>

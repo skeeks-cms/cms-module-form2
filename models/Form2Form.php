@@ -7,6 +7,7 @@
  */
 namespace skeeks\modules\cms\form2\models;
 
+use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\Core;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
@@ -32,12 +33,27 @@ use Yii;
  */
 class Form2Form extends Core
 {
+
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
         return '{{%form2_form}}';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            Implode::className() =>
+            [
+                'class' => Implode::className(),
+                'fields' => ['emails', 'phones', 'user_ids']
+            ],
+        ]);
     }
 
     /**
@@ -70,8 +86,8 @@ class Form2Form extends Core
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
             'code' => Yii::t('app', 'Code'),
-            'emails' => Yii::t('app', 'Emails'),
-            'phones' => Yii::t('app', 'Phones'),
+            'emails' => Yii::t('app', 'Email адреса'),
+            'phones' => Yii::t('app', 'Телефоны'),
             'user_ids' => Yii::t('app', 'User Ids'),
         ]);
     }
