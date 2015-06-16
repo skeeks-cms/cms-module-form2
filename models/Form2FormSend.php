@@ -9,6 +9,7 @@ namespace skeeks\modules\cms\form2\models;
 
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Core;
 use skeeks\cms\models\User;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
@@ -24,10 +25,12 @@ use Yii;
  * @property integer $updated_by
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer processed_at
  * @property integer $processed_by
  * @property string $data_values
  * @property string $data_labels
  * @property string $emails
+ * @property string $site_code
  * @property string $phones
  * @property string $user_ids
  * @property string $email_message
@@ -47,9 +50,21 @@ use Yii;
  *
  * @property Form2FormSendProperty[]    relatedElementProperties
  * @property Form2FormProperty[]        relatedProperties
+ * @property CmsSite                    $site
  */
 class Form2FormSend extends RelatedElementModel
 {
+    const STATUS_NEW        = 0;
+    const STATUS_PROCESSED  = 5;
+    const STATUS_EXECUTED   = 10;
+
+    static public $statuses =
+    [
+        self::STATUS_NEW          => "Новое сообщение",
+        self::STATUS_PROCESSED    => "В обработке",
+        self::STATUS_EXECUTED     => "Завершено",
+    ];
+
     use HasRelatedPropertiesTrait;
 
     /**
@@ -83,10 +98,11 @@ class Form2FormSend extends RelatedElementModel
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'processed_by', 'status', 'form_id'], 'integer'],
-            [['data_values', 'data_labels', 'emails', 'phones', 'user_ids', 'email_message', 'phone_message', 'data_server', 'data_session', 'data_cookie', 'data_request', 'additional_data'], 'string'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'processed_by', 'processed_at', 'status', 'form_id'], 'integer'],
+            [['data_values', 'data_labels', 'emails', 'phones', 'user_ids', 'email_message', 'phone_message', 'data_server', 'data_session', 'data_cookie', 'data_request', 'additional_data', 'site_code'], 'string'],
             [['ip'], 'string', 'max' => 32],
-            [['page_url'], 'string', 'max' => 500]
+            [['page_url'], 'string', 'max' => 500],
+            [['status'], 'in', 'range' => array_keys(self::$statuses)]
         ]);
     }
 
@@ -109,7 +125,7 @@ class Form2FormSend extends RelatedElementModel
             'user_ids' => Yii::t('app', 'User Ids'),
             'email_message' => Yii::t('app', 'Email Message'),
             'phone_message' => Yii::t('app', 'Phone Message'),
-            'status' => Yii::t('app', 'Status'),
+            'status' => Yii::t('app', 'Статус'),
             'form_id' => Yii::t('app', 'Форма'),
             'ip' => Yii::t('app', 'Ip'),
             'page_url' => Yii::t('app', 'Page Url'),
@@ -118,6 +134,8 @@ class Form2FormSend extends RelatedElementModel
             'data_cookie' => Yii::t('app', 'Data Cookie'),
             'data_request' => Yii::t('app', 'Data Request'),
             'additional_data' => Yii::t('app', 'Additional Data'),
+            'site_code' => Yii::t('app', 'Site'),
+            'processed_at' => Yii::t('app', 'Processed At'),
         ]);
     }
 
@@ -138,6 +156,14 @@ class Form2FormSend extends RelatedElementModel
         return $this->hasOne(Form2Form::className(), ['id' => 'form_id']);
     }
 
+    /**
+     * @return CmsSite
+     */
+    public function getSite()
+    {
+        //return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+        return CmsSite::getByCode($this->site_code);
+    }
 
     /**
      *

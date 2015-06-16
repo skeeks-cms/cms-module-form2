@@ -14,17 +14,39 @@ $modelHasRelatedProperties = $widget->modelForm->createModelFormSend();
 ?>
     <?php $form = ActiveForm::begin([
         'modelForm'                                 => $widget->modelForm,
+        'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
+            function(jForm, ajax)
+            {
+                var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
+                    'blockerSelector' : '#' + jForm.attr('id'),
+                    'enableBlocker' : true,
+                });
+
+                handler.bind('success', function(response)
+                {
+                    $('input, textarea', jForm).each(function(value, key)
+                    {
+                        var name = $(this).attr('name');
+                        if (name != '_csrf' && name != 'sx-model-value' && name != 'sx-model')
+                        {
+                            $(this).val('');
+                        }
+                    });
+                });
+            }
+JS
+),
     ]);
 ?>
 
 <? if ($properties = $modelHasRelatedProperties->relatedProperties) : ?>
     <? foreach ($properties as $property) : ?>
-        <?= $property->renderActiveForm($form, $modelHasRelatedProperties)?>
+        <?= $property->renderActiveForm($form, $modelHasRelatedProperties); ?>
     <? endforeach; ?>
 <? endif; ?>
 
-<?= \yii\helpers\Html::submitButton("" . \Yii::t('app', 'Отправить'), [
-    'class' => 'btn btn-primary',
+<?= \yii\helpers\Html::submitButton("" . \Yii::t('app', $widget->btnSubmit), [
+    'class' => $widget->btnSubmitClass,
 ]); ?>
 
 <?php ActiveForm::end(); ?>

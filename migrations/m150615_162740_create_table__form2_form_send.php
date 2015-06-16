@@ -33,6 +33,7 @@ class m150615_162740_create_table__form2_form_send extends Migration
             'updated_at'            => Schema::TYPE_INTEGER . ' NULL',
 
             'processed_by'          => Schema::TYPE_INTEGER . ' NULL', //пользователь который принял заявку
+            'processed_at'          => Schema::TYPE_INTEGER . ' NULL', //пользователь который принял заявку
 
             'data_values'           => Schema::TYPE_TEXT . ' NULL', //Данные с формы в серилизованном виде
             'data_labels'           => Schema::TYPE_TEXT . ' NULL', //Данные с формы в серилизованном виде
@@ -44,7 +45,7 @@ class m150615_162740_create_table__form2_form_send extends Migration
             'email_message'         => Schema::TYPE_TEXT . ' NULL', //Телефоны на которые были отправлены уведомления
             'phone_message'         => Schema::TYPE_TEXT . ' NULL', //Телефоны на которые были отправлены уведомления
 
-            'status'                => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 10', //статус, активна некативна, удалено
+            'status'                => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0', //статус, активна некативна, удалено
 
             'form_id'               => Schema::TYPE_INTEGER . '(255) NULL',
 
@@ -57,6 +58,8 @@ class m150615_162740_create_table__form2_form_send extends Migration
             'data_request'          => Schema::TYPE_TEXT . ' NULL',
             'additional_data'       => Schema::TYPE_TEXT . ' NULL',
 
+            'site_code'             => "CHAR(15) NULL",
+
 
         ], $tableOptions);
 
@@ -68,11 +71,18 @@ class m150615_162740_create_table__form2_form_send extends Migration
 
         $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(form_id);");
         $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(processed_by);");
+        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(processed_at);");
         $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(status);");
         $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(ip);");
         $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(page_url);");
+        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(site_code);");
 
         $this->execute("ALTER TABLE {{%form2_form_send}} COMMENT = 'Сообщения с форм';");
+
+        $this->addForeignKey(
+            'form2_form_send_site_code_fk', "{{%form2_form_send}}",
+            'site_code', '{{%cms_site}}', 'code', 'SET NULL', 'SET NULL'
+        );
 
         $this->addForeignKey(
             'form2_form_send_created_by', "{{%form2_form_send}}",
@@ -94,6 +104,8 @@ class m150615_162740_create_table__form2_form_send extends Migration
             'form2_form_send_processed_by', "{{%form2_form_send}}",
             'processed_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'
         );
+
+
     }
 
     public function down()

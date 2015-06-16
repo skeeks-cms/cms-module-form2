@@ -21,7 +21,27 @@
             'controller'    => $controller
         ],
 
-        'id',
+        [
+            'attribute' => 'status',
+            'class' => \yii\grid\DataColumn::className(),
+            'filter' => \skeeks\modules\cms\form2\models\Form2FormSend::$statuses,
+            'format' => 'raw',
+            'value' => function(\skeeks\modules\cms\form2\models\Form2FormSend $model)
+            {
+                if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_NEW)
+                {
+                    $class = "danger";
+                } else if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_NEW)
+                {
+                    $class = "warning";
+                } else if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_NEW)
+                {
+                    $class = "success";
+                }
+
+                return '<span class="label label-' . $class . '">' . \yii\helpers\ArrayHelper::getValue(\skeeks\modules\cms\form2\models\Form2FormSend::$statuses, $model->status) . '</span>';
+            }
+        ],
 
         [
             'attribute' => 'form_id',
@@ -40,7 +60,21 @@
         [
             'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
             'label' => 'Отправлена'
-        ]
+        ],
+
+        [
+            'attribute' => 'site_code',
+            'class' => \yii\grid\DataColumn::className(),
+            'filter' => \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\models\CmsSite::find()->all(),
+                'code',
+                'name'
+            ),
+            'value' => function(\skeeks\modules\cms\form2\models\Form2FormSend $model)
+            {
+                return $model->site->name;
+            }
+        ],
 
     ],
 ]); ?>

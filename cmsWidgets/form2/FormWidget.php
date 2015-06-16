@@ -32,12 +32,17 @@ class FormWidget extends WidgetRenderable
     public $form_id;
     public $form_code;
 
+    public $btnSubmit = "Отправить";
+    public $btnSubmitClass = 'btn btn-primary';
+
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
         [
             'form_id'   => 'Форма',
-            'form_code' => 'Код формы'
+            'form_code' => 'Код формы',
+            'btnSubmit' => 'Надпись на кнопке отправить',
+            'btnSubmitClass' => 'CSS Класс кнопки отправить'
         ]);
     }
 
@@ -46,7 +51,9 @@ class FormWidget extends WidgetRenderable
         return ArrayHelper::merge(parent::rules(),
         [
             ['form_id', 'integer'],
-            ['form_code', 'string']
+            ['form_code', 'string'],
+            ['btnSubmit', 'string'],
+            ['btnSubmitClass', 'string'],
         ]);
     }
 
