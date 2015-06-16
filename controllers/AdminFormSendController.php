@@ -7,9 +7,11 @@
  */
 namespace skeeks\modules\cms\form2\controllers;
 
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\modules\cms\form2\models\Form2Form;
 use skeeks\modules\cms\form2\models\Form2FormSend;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminFormController
@@ -26,4 +28,27 @@ class AdminFormSendController extends AdminModelEditorController
         parent::init();
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        $actions = ArrayHelper::merge(parent::actions(),
+        [
+            'view' =>
+            [
+                'class' => AdminOneModelEditAction::className(),
+                'name' => 'Смотреть',
+                "icon" => "glyphicon glyphicon-eye-open",
+                "priority" => 0,
+            ],
+        ]);
+
+        ArrayHelper::remove($actions, 'create');
+        ArrayHelper::remove($actions, 'system');
+        ArrayHelper::remove($actions, 'related-properties');
+        ArrayHelper::remove($actions, 'update');
+
+        return $actions;
+    }
 }

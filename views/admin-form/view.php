@@ -10,6 +10,8 @@ use common\models\User;
 /* @var $action \skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction */
 ?>
 
-<?= (new \skeeks\modules\cms\form2\models\Form2FormSend([
-    'form_id' => $action->controller->model->id
-]))->renderRelatedPropertiesForm(); ?>
+<?=
+    \skeeks\modules\cms\form2\cmsWidgets\form2\FormWidget::widget([
+        'form_id' => $action->controller->model->id
+    ]);
+?>

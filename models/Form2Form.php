@@ -8,6 +8,7 @@
 namespace skeeks\modules\cms\form2\models;
 
 use skeeks\cms\models\Core;
+use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use Yii;
 
@@ -91,5 +92,20 @@ class Form2Form extends Core
         return $this->hasMany(Form2FormProperty::className(), ['form_id' => 'id']);
     }
 
+
+    /**
+     * @return Form2FormSend
+     */
+    public function createModelFormSend()
+    {
+        if ($this->isNewRecord)
+        {
+            throw new InvalidParamException;
+        }
+
+        return new \skeeks\modules\cms\form2\models\Form2FormSend([
+            'form_id' => (int) $this->id
+        ]);
+    }
 
 }

@@ -86,7 +86,7 @@ class m150615_162740_create_table__form2_form_send extends Migration
         
         $this->addForeignKey(
             'form2_form_send_form_id', "{{%form2_form_send}}",
-            'form_id', '{{%form2_form}}', 'id', 'SET NULL', 'SET NULL'
+            'form_id', '{{%form2_form}}', 'id', 'CASCADE', 'CASCADE'
         );
 
 

@@ -110,7 +110,7 @@ class Form2FormSend extends RelatedElementModel
             'email_message' => Yii::t('app', 'Email Message'),
             'phone_message' => Yii::t('app', 'Phone Message'),
             'status' => Yii::t('app', 'Status'),
-            'form_id' => Yii::t('app', 'Form ID'),
+            'form_id' => Yii::t('app', 'Форма'),
             'ip' => Yii::t('app', 'Ip'),
             'page_url' => Yii::t('app', 'Page Url'),
             'data_server' => Yii::t('app', 'Data Server'),

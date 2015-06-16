@@ -22,6 +22,25 @@
         ],
 
         'id',
-        'form_id',
+
+        [
+            'attribute' => 'form_id',
+            'class' => \yii\grid\DataColumn::className(),
+            'filter' => \yii\helpers\ArrayHelper::map(
+                \skeeks\modules\cms\form2\models\Form2Form::find()->all(),
+                'id',
+                'name'
+            ),
+            'value' => function(\skeeks\modules\cms\form2\models\Form2FormSend $model)
+            {
+                return $model->form->name;
+            }
+        ],
+
+        [
+            'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+            'label' => 'Отправлена'
+        ]
+
     ],
 ]); ?>
