@@ -7,7 +7,10 @@
  */
 namespace skeeks\modules\cms\form2\models;
 
+use skeeks\cms\helpers\Request;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
+use skeeks\cms\models\behaviors\Implode;
+use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Core;
@@ -89,6 +92,19 @@ class Form2FormSend extends RelatedElementModel
                 'relatedElementPropertyClassName'   => Form2FormSendProperty::className(),
                 'relatedPropertyClassName'          => Form2FormProperty::className(),
             ],
+
+            Serialize::className() =>
+            [
+                'class' => Serialize::className(),
+                'fields' => ['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request']
+            ],
+
+            Implode::className() =>
+            [
+                'class' => Implode::className(),
+                'fields' => ['emails', 'phones', 'user_ids']
+            ],
+
         ]);
     }
 
@@ -99,10 +115,37 @@ class Form2FormSend extends RelatedElementModel
     {
         return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'processed_by', 'processed_at', 'status', 'form_id'], 'integer'],
-            [['data_values', 'data_labels', 'emails', 'phones', 'user_ids', 'email_message', 'phone_message', 'data_server', 'data_session', 'data_cookie', 'data_request', 'additional_data', 'site_code'], 'string'],
+            [['email_message', 'phone_message', 'site_code'], 'string'],
+            [['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request', 'emails', 'phones', 'user_ids'], 'safe'],
             [['ip'], 'string', 'max' => 32],
             [['page_url'], 'string', 'max' => 500],
-            [['status'], 'in', 'range' => array_keys(self::$statuses)]
+            [['status'], 'in', 'range' => array_keys(self::$statuses)],
+
+            ['data_request', 'default', 'value' => function(self $model, $attribute)
+            {
+                return $_REQUEST;
+            }],
+
+            ['data_server', 'default', 'value' => function(self $model, $attribute)
+            {
+                return $_SERVER;
+            }],
+
+            ['data_cookie', 'default', 'value' => function(self $model, $attribute)
+            {
+                return $_COOKIE;
+            }],
+
+            ['data_session', 'default', 'value' => function(self $model, $attribute)
+            {
+                \Yii::$app->session->open();
+                return $_SESSION;
+            }],
+
+            ['ip', 'default', 'value' => function(self $model, $attribute)
+            {
+                return Request::getRealUserIp();
+            }],
         ]);
     }
 
@@ -117,7 +160,7 @@ class Form2FormSend extends RelatedElementModel
             'updated_by' => Yii::t('app', 'Updated By'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'processed_by' => Yii::t('app', 'Processed By'),
+            'processed_by' => Yii::t('app', 'Кто обработал'),
             'data_values' => Yii::t('app', 'Data Values'),
             'data_labels' => Yii::t('app', 'Data Labels'),
             'emails' => Yii::t('app', 'Emails'),
@@ -135,7 +178,7 @@ class Form2FormSend extends RelatedElementModel
             'data_request' => Yii::t('app', 'Data Request'),
             'additional_data' => Yii::t('app', 'Additional Data'),
             'site_code' => Yii::t('app', 'Site'),
-            'processed_at' => Yii::t('app', 'Processed At'),
+            'processed_at' => Yii::t('app', 'Когда обратали'),
         ]);
     }
 
@@ -174,5 +217,32 @@ class Form2FormSend extends RelatedElementModel
     public function getRelatedProperties()
     {
         return $this->form->form2FormProperties;
+    }
+
+
+
+    /**
+     * Уведомить всех кого надо и как надо
+     */
+    public function notify()
+    {
+        if ($this->form)
+        {
+            if ($this->form->emails)
+            {
+                foreach ($this->form->emails as $email)
+                {
+                    \Yii::$app->mailer->compose('@skeeks/modules/cms/form2/mail/send-message', [
+                        'form'              => $this->form,
+                        'formSend'          => $this
+                    ])
+                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
+                    ->setTo($email)
+                    ->setSubject("Отправка формы «{$this->form->name}» #" . $this->id)
+                    ->send();
+
+                }
+            }
+        }
     }
 }

@@ -23,5 +23,50 @@
 
         'name',
         'code',
+
+        [
+            'attribute' => 'emails',
+            'class' => \yii\grid\DataColumn::className(),
+            'format' => 'raw',
+            'value' => function(\skeeks\modules\cms\form2\models\Form2Form $model)
+            {
+                return implode(", ", $model->emails);
+            }
+        ],
+
+        [
+            'attribute' => 'phones',
+            'class' => \yii\grid\DataColumn::className(),
+            'format' => 'raw',
+            'value' => function(\skeeks\modules\cms\form2\models\Form2Form $model)
+            {
+                return implode(", ", $model->phones);
+            }
+        ],
+
+        [
+            'label' => "Количество полей в форме",
+            'class' => \yii\grid\DataColumn::className(),
+            'format' => 'raw',
+            'value' => function(\skeeks\modules\cms\form2\models\Form2Form $model)
+            {
+                return count($model->createModelFormSend()->relatedPropertiesModel->attributeLabels());
+            }
+        ],
+
+        [
+            'label' => "Количество сообщений",
+            'class' => \yii\grid\DataColumn::className(),
+            'format' => 'raw',
+            'value' => function(\skeeks\modules\cms\form2\models\Form2Form $model)
+            {
+                return \yii\helpers\Html::a(count($model->form2FormSends), \skeeks\cms\helpers\UrlHelper::construct('/form2/admin-form-send', [
+                    'Form2FormSend' =>
+                    [
+                        'form_id' => $model->id
+                    ]
+                ])->enableAdmin()->toString());
+            }
+        ],
     ],
 ]); ?>

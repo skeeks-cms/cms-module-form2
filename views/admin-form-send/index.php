@@ -31,10 +31,10 @@
                 if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_NEW)
                 {
                     $class = "danger";
-                } else if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_NEW)
+                } else if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_PROCESSED)
                 {
                     $class = "warning";
-                } else if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_NEW)
+                } else if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_EXECUTED)
                 {
                     $class = "success";
                 }
@@ -42,6 +42,19 @@
                 return '<span class="label label-' . $class . '">' . \yii\helpers\ArrayHelper::getValue(\skeeks\modules\cms\form2\models\Form2FormSend::$statuses, $model->status) . '</span>';
             }
         ],
+
+
+        [
+            'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
+            'attribute' => 'processed_at'
+        ],
+
+        [
+            'class' => \skeeks\cms\grid\UserColumnData::className(),
+            'attribute' => 'processed_by'
+        ],
+
+
 
         [
             'attribute' => 'form_id',

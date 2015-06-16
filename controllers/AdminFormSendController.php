@@ -35,9 +35,8 @@ class AdminFormSendController extends AdminModelEditorController
     {
         $actions = ArrayHelper::merge(parent::actions(),
         [
-            'view' =>
+            'update' =>
             [
-                'class' => AdminOneModelEditAction::className(),
                 'name' => 'Смотреть',
                 "icon" => "glyphicon glyphicon-eye-open",
                 "priority" => 0,
@@ -47,7 +46,6 @@ class AdminFormSendController extends AdminModelEditorController
         ArrayHelper::remove($actions, 'create');
         ArrayHelper::remove($actions, 'system');
         ArrayHelper::remove($actions, 'related-properties');
-        ArrayHelper::remove($actions, 'update');
 
         return $actions;
     }

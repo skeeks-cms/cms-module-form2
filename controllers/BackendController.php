@@ -64,13 +64,20 @@ class BackendController extends Controller
                  * @var RelatedElementModel $modelForm
                  * @var Form2FormSend $modelFormSend
                  * @var RelatedPropertiesModel $validateModel
+                 * @var Form2Form $modelForm
                  */
                 $modelForm                  = $modelClass::find()->where(['id' => $modelValue])->one();
                 $modelFormSend              = $modelForm->createModelFormSend();
                 $modelFormSend->site_code   = \Yii::$app->cms->site->code;
-                $modelFormSend->ip          = Request::getRealUserIp();
+                $modelFormSend->page_url    = \Yii::$app->request->referrer;
 
                 $validateModel = $modelFormSend->relatedPropertiesModel;
+
+                $modelFormSend->data_values     = $validateModel->attributeValues();
+                $modelFormSend->data_labels     = $validateModel->attributeLabels();
+                $modelFormSend->emails          = $modelForm->emails;
+                $modelFormSend->phones          = $modelForm->phones;
+
 
                 if ($validateModel->load(\Yii::$app->request->post()) && $validateModel->validate())
                 {
@@ -82,6 +89,8 @@ class BackendController extends Controller
                     }
 
                     $validateModel->save();
+
+                    $modelFormSend->notify();
 
                     $rr->success = true;
                     $rr->message = 'Успешно отправлена';
