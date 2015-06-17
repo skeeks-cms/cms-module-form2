@@ -3,19 +3,19 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010 SkeekS (СкикС)
- * @date 12.03.2015
+ * @date 15.06.2015
  */
 
-namespace skeeks\modules\cms\form\assets;
-use skeeks\cms\base\AssetBundle;
+namespace skeeks\modules\cms\form2\assets;
+use yii\web\AssetBundle;
 
 /**
- * Class SliderAsset
- * @package skeeks\modules\cms\slider\assets
+ * Class FormAsset
+ * @package skeeks\modules\cms\form2\assets
  */
 class FormAsset extends AssetBundle
 {
-    public $sourcePath = '@vendor/skeeks/cms-module-form/assets';
+    public $sourcePath = '@vendor/skeeks/cms-module-form2/assets';
 
     public $css = [];
     public $js = [];

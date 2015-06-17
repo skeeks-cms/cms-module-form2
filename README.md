@@ -1,37 +1,30 @@
 Модуль для SkeekS cms
 ===================================
 
-Игформация о модуле
+Информация о модуле
 -------------------
+
+Модуль предоставляет возможность собирать различные формы через админ панель. Управлять порядком элемнтов формы, и их видом.
+Настраивать кого уведомлять.
 
 Установка
 ------------
 
-Модуль в планах на разработку. Пока - пустышка.
 
-1) Стандартная установка через composer
-
-```
-php composer.phar require --prefer-dist skeeks/cms-module-form "*"
-```
-
-or add
+1) Добавить в `composer.json` файл проекта.
 
 ```
-"skeeks/cms-module-form": "*"
+"skeeks/cms-module-form2": "*"
 ```
 
-to the require section of your `composer.json` file.
-
-
-2) Установка миграций
+2) Запуск миграций и необходимых установок.
 
 ```
-php yii migrate @skeeks\modules\cms\form\migrations
+php yii cms/update
 ```
 
 
 
 > [![skeeks!](https://gravatar.com/userimage/74431132/13d04d83218593564422770b616e5622.jpg)](http://www.skeeks.com)  
-<i>Web development has never been so fun!</i>  
-[www.skeeks.com](http://www.skeeks.com)
+<i>Быстро, просто, эффективно</i>
+[cms.skeeks.com](http://cms.skeeks.com)

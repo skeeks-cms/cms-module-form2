@@ -6,24 +6,24 @@
  * @date 12.03.2015
  */
 return [
-    'form' =>
+
+    'form2' =>
     [
         'label'     => 'Конструктор форм',
-        'priority'  => 0,
-        "img"       => ['\skeeks\modules\cms\form\assets\FormAsset', 'icons/forms.png'],
+        "img"       => ['\skeeks\modules\cms\form2\assets\FormAsset', 'icons/forms.png'],
 
         'items' =>
         [
             [
                 "label" => "Формы",
-                "url"   => ["form/admin-form"],
-                "img"       => ['\skeeks\modules\cms\form\assets\FormAsset', 'icons/forms.png'],
+                "url"   => ["form2/admin-form"],
+                "img"       => ['\skeeks\modules\cms\form2\assets\FormAsset', 'icons/forms.png'],
             ],
 
             [
                 "label" => "Сообщения с форм",
-                "url"   => ["form/admin-form-send-message"],
-                "img"       => ['\skeeks\modules\cms\form\assets\FormAsset', 'icons/form-submits.png'],
+                "url"   => ["form2/admin-form-send"],
+                "img"       => ['\skeeks\modules\cms\form2\assets\FormAsset', 'icons/form-submits.png'],
             ],
 
         ]

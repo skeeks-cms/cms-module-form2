@@ -3,13 +3,20 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010 SkeekS (СкикС)
- * @date 15.03.2015
+ * @date 15.05.2015
  */
-namespace skeeks\modules\cms\form\controllers;
+namespace skeeks\modules\cms\form2\controllers;
+
 use skeeks\cms\base\Controller;
-use skeeks\modules\cms\form\models\Form;
-use skeeks\modules\cms\form\models\FormField;
-use skeeks\modules\cms\form\models\FormSendMessage;
+use skeeks\cms\helpers\Request;
+use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\forms\PasswordChangeForm;
+use skeeks\cms\models\User;
+use skeeks\cms\relatedProperties\models\RelatedElementModel;
+use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
+use skeeks\modules\cms\form2\models\Form2Form;
+use skeeks\modules\cms\form2\models\Form2FormSend;
+use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
@@ -17,7 +24,7 @@ use yii\widgets\ActiveForm;
 
 /**
  * Class BackendController
- * @package skeeks\modules\cms\form\controllers
+ * @package skeeks\modules\cms\form2\controllers
  */
 class BackendController extends Controller
 {
@@ -31,8 +38,8 @@ class BackendController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'validate' => ['post'],
-                    'submit' => ['post'],
+                    'validate'  => ['post'],
+                    'submit'    => ['post'],
                 ],
             ],
         ]);
@@ -45,51 +52,56 @@ class BackendController extends Controller
      */
     public function actionSubmit()
     {
+        $rr = new RequestResponse();
+
         if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
         {
-            \Yii::$app->response->format = Response::FORMAT_JSON;
-
-            $response = [
-                'success' => false,
-                'message' => 'Произошла ошибка',
-            ];
-
-            if ($formId = \Yii::$app->request->post(Form::FROM_PARAM_ID_NAME))
+            if (\Yii::$app->request->post('sx-model') && \Yii::$app->request->post('sx-model-value'))
             {
+                $modelClass = \Yii::$app->request->post('sx-model');
+                $modelValue = \Yii::$app->request->post('sx-model-value');
                 /**
-                 * @var $modelForm Form
+                 * @var RelatedElementModel $modelForm
+                 * @var Form2FormSend $modelFormSend
+                 * @var RelatedPropertiesModel $validateModel
+                 * @var Form2Form $modelForm
                  */
-                $modelForm = Form::find()->where(['id' => $formId])->one();
+                $modelForm                  = $modelClass::find()->where(['id' => $modelValue])->one();
+                $modelFormSend              = $modelForm->createModelFormSend();
+                $modelFormSend->site_code   = \Yii::$app->cms->site->code;
+                $modelFormSend->page_url    = \Yii::$app->request->referrer;
 
-                $model = $modelForm->createValidateModel();
+                $validateModel = $modelFormSend->relatedPropertiesModel;
 
-                if ($model->load(\Yii::$app->request->post()) && $model->validate())
+                $modelFormSend->data_values     = $validateModel->attributeValues();
+                $modelFormSend->data_labels     = $validateModel->attributeLabels();
+                $modelFormSend->emails          = $modelForm->emails;
+                $modelFormSend->phones          = $modelForm->phones;
+
+
+                if ($validateModel->load(\Yii::$app->request->post()) && $validateModel->validate())
                 {
-                    //Все проверки прошли, формируем модель отправленного сообщения и сохраняем ее
-                    $modelFormSendMessage = new FormSendMessage();
-
-                    $modelFormSendMessage->data_values     = $model->attributeValues();
-                    $modelFormSendMessage->data_labels     = $model->attributeLabels();
-
-                    $modelFormSendMessage->page_url = \Yii::$app->request->referrer;
-                    $modelFormSendMessage->form_id  = $formId;
-
-                    if ($modelFormSendMessage->save())
+                    if (!$modelFormSend->save())
                     {
-                        $modelFormSendMessage->notify();
-
-                        $response['success'] = true;
-                        $response['message'] = 'Успешно отправлена';
-                    } else
-                    {
-                        $response['message'] = 'Не удалось сохранить сообщение в базу';
+                        $rr->success = false;
+                        $rr->message = 'Не удалось отправить форму';
+                        return (array) $rr;
                     }
+
+                    $validateModel->save();
+
+                    $modelFormSend->notify();
+
+                    $rr->success = true;
+                    $rr->message = 'Успешно отправлена';
+
                 } else
                 {
-                    $response['message'] = 'Форма заполнена неправильно';
+                    $rr->success = false;
+                    $rr->message = 'Проверьте правильность заполнения полей формы';
                 }
 
-                return $response;
+                return (array) $rr;
             }
         }
     }
@@ -100,20 +112,30 @@ class BackendController extends Controller
      */
     public function actionValidate()
     {
+        $rr = new RequestResponse();
+
         if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
         {
-            if ($formId = \Yii::$app->request->post(Form::FROM_PARAM_ID_NAME))
+            if (\Yii::$app->request->post('sx-model') && \Yii::$app->request->post('sx-model-value'))
             {
+                $modelClass = \Yii::$app->request->post('sx-model');
+                $modelValue = \Yii::$app->request->post('sx-model-value');
+
                 /**
-                 * @var $modelForm Form
+                 * @var $modelForm Form2Form
                  */
-                $modelForm = Form::find()->where(['id' => $formId])->one();
+                $modelForm = $modelClass::find()->where(['id' => $modelValue])->one();
+                $modelHasRelatedProperties = $modelForm->createModelFormSend();
 
-                $model = $modelForm->createValidateModel();
+                if (method_exists($modelHasRelatedProperties, "createPropertiesValidateModel"))
+                {
+                    $model = $modelHasRelatedProperties->createPropertiesValidateModel();
+                } else
+                {
+                    $model = $modelHasRelatedProperties->getRelatedPropertiesModel();
+                }
 
-                $model->load(\Yii::$app->request->post());
-                \Yii::$app->response->format = Response::FORMAT_JSON;
-                return ActiveForm::validate($model);
+                return $rr->ajaxValidateForm($model);
             }
         }
     }

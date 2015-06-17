@@ -3,29 +3,26 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
  * @copyright 2010 SkeekS (СкикС)
- * @date 07.03.2015
+ * @date 15.06.2015
  */
-namespace skeeks\modules\cms\form;
-
-use skeeks\cms\base\Module as CmsModule;
-
+namespace skeeks\modules\cms\form2;
 /**
  * Class Module
- * @package skeeks\modules\cms\form
+ * @package skeeks\modules\cms\form2
  */
-class Module extends CmsModule
+class Module extends \skeeks\cms\base\Module
 {
-    public $controllerNamespace = 'skeeks\modules\cms\form\controllers';
+    public $controllerNamespace = 'skeeks\modules\cms\form2\controllers';
 
     /**
      * @return array
      */
-    protected function _descriptor()
+    static public function descriptorConfig()
     {
-        return array_merge(parent::_descriptor(), [
-            "version"       => "1.0.3",
+        return array_merge(parent::descriptorConfig(), [
+            "version"               => file_get_contents(__DIR__ . "/VERSION"),
 
-            "name"          => "Модуль конструктор форм",
+            "name"          => "Конструктор форм",
             "description"   => "Модуль прорабатывает модель данных игрового портала. Поставляет модели Игра, Игровой жанр, Игровая платформа, Игровая компания (разработчик, издатель)",
         ]);
     }

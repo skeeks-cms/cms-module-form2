@@ -1,15 +1,14 @@
 {
-    "name": "skeeks/cms-module-form",
-    "description": "Модуль конструктор форм SkeekS cms",
+    "name": "skeeks/cms-module-form2",
+    "description": "Конструктор форм SkeekS cms",
     "keywords": ["module", "cms", "skeeks", "sx", "app", "yii2"],
     "homepage": "http://www.skeeks.com/",
     "type": "yii2-extension",
     "license": "BSD-3-Clause",
     "support": {
-        "issues": "http://www.skeeks.com/",
-        "wiki": "http://git.skeeks.com/skeeks/cms-module-form/tree/master/docs/guide-ru",
-        "wiki-cms": "http://git.skeeks.com/skeeks/cms/tree/master/docs/guide-ru",
-        "source": "http://git.skeeks.com/skeeks/cms-module-form"
+        "issues": "http://cms.skeeks.com",
+        "wiki": "http://git.skeeks.com/skeeks/cms/wikis/home",
+        "source": "http://git.skeeks.com/skeeks/cms"
     },
     "authors": [
         {
@@ -23,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "skeeks\\modules\\cms\\form\\": ""
+            "skeeks\\modules\\cms\\form2\\": ""
         }
     }
 }

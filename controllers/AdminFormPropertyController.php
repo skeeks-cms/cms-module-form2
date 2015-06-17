@@ -7,23 +7,23 @@
  */
 namespace skeeks\modules\cms\form2\controllers;
 
-use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
-use skeeks\cms\modules\admin\actions\modelEditor\ModelEditorGridAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
+use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\modules\cms\form2\models\Form2Form;
+use skeeks\modules\cms\form2\models\Form2FormProperty;
 use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminFormController
  * @package skeeks\cms\controllers
  */
-class AdminFormController extends AdminModelEditorController
+class AdminFormPropertyController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                     = "Управление формами";
-        $this->modelShowAttribute       = "name";
-        $this->modelClassName           = Form2Form::className();
+        $this->name                   = "Управление свойствами";
+        $this->modelShowAttribute      = "name";
+        $this->modelClassName          = Form2FormProperty::className();
 
         parent::init();
     }
@@ -35,15 +35,11 @@ class AdminFormController extends AdminModelEditorController
     {
         return ArrayHelper::merge(parent::actions(),
             [
-                'view' =>
+                "update" =>
                 [
-                    'class' => AdminOneModelEditAction::className(),
-                    'name' => 'Результат',
-                    "icon" => "glyphicon glyphicon-eye-open",
-                    "priority" => 0,
+                    "modelScenario" => RelatedPropertyModel::SCENARIO_UPDATE_CONFIG,
                 ],
             ]
         );
     }
-
 }
