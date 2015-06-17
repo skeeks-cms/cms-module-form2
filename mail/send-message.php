@@ -26,19 +26,34 @@ use skeeks\cms\mail\helpers\Html;
 <?= Html::endTag('h3'); ?>
 
 <?= Html::beginTag('p'); ?>
-<?/* foreach((array) $form->fields() as $formField) : */?><!--
-    <?/* if ($value = \yii\helpers\ArrayHelper::getValue((array) $formSend->data_values, $formField->attribute)) : */?>
-            <?/*= Html::beginTag('b'); */?>
-                <?/*= $formField->normalName() */?>:
-            <?/*= Html::endTag('b'); */?>
-            <?/*= Html::encode($value) */?>
-            <br />
-    <?/* endif; */?>
---><?/* endforeach; */?>
+
+
+
+<?
+$attribures = [];
+if ($attrs = $formSend->relatedPropertiesModel->attributeLabels())
+{
+    foreach ($attrs as $code => $value)
+    {
+        $data['attribute']  = $code;
+        $data['format']     = 'raw';
+
+        $value              = $formSend->relatedPropertiesModel->getSmartAttribute($code);
+        $data['value']      = $value;
+        if (is_array($value))
+        {
+            $data['value']      = implode(', ', $value);
+        }
+
+        $attribures[]       = $data;
+    }
+};
+?>
+
 
     <?= \yii\widgets\DetailView::widget([
         'model'         => $formSend->relatedPropertiesModel,
-        'attributes'    => array_keys($formSend->relatedPropertiesModel->attributeLabels())
+        'attributes'    => $attribures
     ])?>
 
 <?= Html::endTag('p'); ?>

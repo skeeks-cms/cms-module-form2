@@ -20,10 +20,30 @@ if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_NEW
 
 <? $form = ActiveForm::begin(); ?>
 
+<?
+$attribures = [];
+if ($attrs = $model->relatedPropertiesModel->attributeLabels())
+{
+    foreach ($attrs as $code => $value)
+    {
+        $data['attribute']  = $code;
+        $data['format']     = 'raw';
+
+        $value              = $model->relatedPropertiesModel->getSmartAttribute($code);
+        $data['value']      = $value;
+        if (is_array($value))
+        {
+            $data['value']      = implode(', ', $value);
+        }
+
+        $attribures[]       = $data;
+    }
+};
+?>
 <?= $form->fieldSet('Данные с формы'); ?>
     <?= \yii\widgets\DetailView::widget([
         'model'         => $model->relatedPropertiesModel,
-        'attributes'    => array_keys($model->relatedPropertiesModel->attributeLabels())
+        'attributes'    => $attribures
     ])?>
 <?= $form->fieldSetEnd(); ?>
 
@@ -113,6 +133,62 @@ if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_NEW
             'displayName'
         ))
         ->hint('Если вы обработали это сообщение, измените его статус для удобства'); ?>
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Для разработчиков'); ?>
+
+<div class="sx-block">
+  <h3>Дополнительные данные, которые могут пригодиться в некоторых случаях, разработчикам.</h3>
+  <small>Для удобства просмотра данных, можно воспользоваться сервисом: <a href="http://jsonformatter.curiousconcept.com/#" target="_blank">http://jsonformatter.curiousconcept.com/#</a></small>
+</div>
+<hr />
+
+
+    <?= \yii\widgets\DetailView::widget([
+        'model'         => $model,
+        'attributes'    =>
+        [
+            [
+                'attribute' => 'data_server',
+                'format' => 'raw',
+                'label' => 'SERVER',
+                'value' => "<textarea class='form-control' rows=\"10\">" . \yii\helpers\Json::encode($model->data_server) . "</textarea>"
+            ],
+
+            [
+                'attribute' => 'data_cookie',
+                'format' => 'raw',
+                'label' => 'COOKIE',
+                'value' => "<textarea class='form-control' rows=\"5\">" . \yii\helpers\Json::encode($model->data_cookie) . "</textarea>"
+            ],
+
+            [
+                'attribute' => 'data_session',
+                'format' => 'raw',
+                'label' => 'SESSION',
+                'value' => "<textarea class='form-control' rows=\"5\">" . \yii\helpers\Json::encode($model->data_session) . "</textarea>"
+            ],
+
+            [
+                'attribute' => 'data_request',
+                'format' => 'raw',
+                'label' => 'REQUEST',
+                'value' => "<textarea class='form-control' rows=\"10\">" . \yii\helpers\Json::encode($model->data_request) . "</textarea>"
+            ],
+
+            [
+                'attribute' => 'data_labels',
+                'format' => 'raw',
+                'value' => "<textarea class='form-control' rows=\"10\">" . \yii\helpers\Json::encode($model->data_labels) . "</textarea>"
+            ],
+            [
+                'attribute' => 'data_values',
+                'format' => 'raw',
+                'value' => "<textarea class='form-control' rows=\"10\">" . \yii\helpers\Json::encode($model->data_values) . "</textarea>"
+            ],
+        ]
+    ]); ?>
+
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsStandart($model); ?>

@@ -60,6 +60,7 @@ class m150615_162740_create_table__form2_form_send extends Migration
 
             'site_code'             => "CHAR(15) NULL",
 
+            'comment'               => Schema::TYPE_TEXT . ' NULL',
 
         ], $tableOptions);
 
