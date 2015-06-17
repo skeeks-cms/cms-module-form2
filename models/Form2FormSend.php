@@ -34,6 +34,7 @@ use Yii;
  * @property string $data_labels
  * @property string $emails
  * @property string $site_code
+ * @property string $comment
  * @property string $phones
  * @property string $user_ids
  * @property string $email_message
@@ -119,6 +120,7 @@ class Form2FormSend extends RelatedElementModel
             [['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request', 'emails', 'phones', 'user_ids'], 'safe'],
             [['ip'], 'string', 'max' => 32],
             [['page_url'], 'string', 'max' => 500],
+            [['comment'], 'string'],
             [['status'], 'in', 'range' => array_keys(self::$statuses)],
 
             ['data_request', 'default', 'value' => function(self $model, $attribute)
@@ -179,6 +181,7 @@ class Form2FormSend extends RelatedElementModel
             'additional_data' => Yii::t('app', 'Additional Data'),
             'site_code' => Yii::t('app', 'Site'),
             'processed_at' => Yii::t('app', 'Когда обратали'),
+            'comment' => Yii::t('app', 'Комментарий'),
         ]);
     }
 

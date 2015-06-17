@@ -133,6 +133,9 @@ if ($attrs = $model->relatedPropertiesModel->attributeLabels())
             'displayName'
         ))
         ->hint('Если вы обработали это сообщение, измените его статус для удобства'); ?>
+
+    <?= $form->field($model, 'comment')->textarea(['rows' => 5])->hint('Короткое примечание, личные пометки по этой отправке. Необязательно.'); ?>
+
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Для разработчиков'); ?>
