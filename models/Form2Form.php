@@ -105,7 +105,7 @@ class Form2Form extends Core
      */
     public function getForm2FormProperties()
     {
-        return $this->hasMany(Form2FormProperty::className(), ['form_id' => 'id']);
+        return $this->hasMany(Form2FormProperty::className(), ['form_id' => 'id'])->orderBy(['priority' => SORT_DESC]);
     }
 
 
