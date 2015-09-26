@@ -85,7 +85,7 @@ use common\models\User;
             [
                 'controllerRoute' => 'cms/admin-user-email',
                 'items' => \yii\helpers\ArrayHelper::map(
-                    \skeeks\cms\models\user\UserEmail::find()->all(),
+                    \skeeks\cms\models\CmsUserEmail::find()->all(),
                     'value',
                     'value'
                 ),
@@ -103,7 +103,7 @@ use common\models\User;
             [
                 'controllerRoute' => 'cms/admin-user-phone',
                 'items' => \yii\helpers\ArrayHelper::map(
-                    \skeeks\cms\models\user\UserPhone::find()->all(),
+                    \skeeks\cms\models\CmsUserPhone::find()->all(),
                     'value',
                     'value'
                 ),
