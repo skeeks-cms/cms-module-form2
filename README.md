@@ -1,30 +1,11 @@
-Модуль для SkeekS cms
+Конструктор форм
 ===================================
 
-Информация о модуле
--------------------
+Модуль предоставляет возможность собирать различные формы через админ панель. Управлять порядком элемнтов формы, и их видом. Настраивать кого уведомлять.
 
-Модуль предоставляет возможность собирать различные формы через админ панель. Управлять порядком элемнтов формы, и их видом.
-Настраивать кого уведомлять.
-
-Установка
-------------
-
-
-1) Добавить в `composer.json` файл проекта.
-
-```
-"skeeks/cms-module-form2": "*"
-```
-
-2) Запуск миграций и необходимых установок.
-
-```
-php yii cms/update
-```
-
+[Страница на SkeekS CMS Marketplace](http://marketplace.cms.skeeks.com/solutions/podderjka-klientov/obratnaya-svyaz/12-konstruktor-web-form-2)
 
 
 > [![skeeks!](https://gravatar.com/userimage/74431132/13d04d83218593564422770b616e5622.jpg)](http://www.skeeks.com)  
-<i>Быстро, просто, эффективно</i>
-[cms.skeeks.com](http://cms.skeeks.com)
+<i>Web development has never been so fun!</i>  
+[www.skeeks.com](http://www.skeeks.com)
