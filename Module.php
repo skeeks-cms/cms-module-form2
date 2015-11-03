@@ -21,7 +21,6 @@ class Module extends \skeeks\cms\base\Module
     {
         return array_merge(parent::descriptorConfig(), [
             "name"          => "Конструктор форм",
-            "description"   => "Модуль прорабатывает модель данных игрового портала. Поставляет модели Игра, Игровой жанр, Игровая платформа, Игровая компания (разработчик, издатель)",
         ]);
     }
 

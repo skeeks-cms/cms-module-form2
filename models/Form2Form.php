@@ -12,6 +12,7 @@ use skeeks\cms\models\Core;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use Yii;
+use yii\validators\EmailValidator;
 
 /**
  * This is the model class for table "{{%form2_form}}".
@@ -27,6 +28,8 @@ use Yii;
  * @property string $emails
  * @property string $phones
  * @property string $user_ids
+ *
+ * @property array $emailsAsArray
  *
  * @property Form2FormSend[] $form2FormSends
  * @property Form2FormProperty[] $form2FormProperties
@@ -45,30 +48,34 @@ class Form2Form extends Core
     /**
      * @inheritdoc
      */
-    public function behaviors()
-    {
-        return ArrayHelper::merge(parent::behaviors(), [
-            Implode::className() =>
-            [
-                'class' => Implode::className(),
-                'fields' => ['emails', 'phones', 'user_ids']
-            ],
-        ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
             [['name'], 'required'],
             [['description'], 'string'],
-            [['emails', 'phones', 'user_ids'], 'safe'],
+            [['emails', 'phones', 'user_ids'], 'string'],
             [['name'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 32],
-            [['code'], 'unique']
+            [['code'], 'unique'],
+
+            [['emails'], function($attribute)
+            {
+                if ($this->emailsAsArray)
+                {
+                    foreach ($this->emailsAsArray as $email)
+                    {
+                        $validator = new EmailValidator();
+
+                        if (!$validator->validate($email, $error))
+                        {
+                            $this->addError($attribute, $email . ' — некорректный email адрес');
+                            return false;
+                        }
+                    }
+                }
+
+            }],
         ]);
     }
 
@@ -108,6 +115,25 @@ class Form2Form extends Core
         return $this->hasMany(Form2FormProperty::className(), ['form_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
 
+
+    /**
+     * @return array
+     */
+    public function getEmailsAsArray()
+    {
+        $emailsAll = [];
+        if ($this->emails)
+        {
+            $emails = explode(",", $this->emails);
+
+            foreach ($emails as $email)
+            {
+                $emailsAll[] = trim($email);
+            }
+        }
+
+        return $emailsAll;
+    }
 
     /**
      * @return Form2FormSend

@@ -99,13 +99,6 @@ class Form2FormSend extends RelatedElementModel
                 'class' => Serialize::className(),
                 'fields' => ['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request']
             ],
-
-            Implode::className() =>
-            [
-                'class' => Implode::className(),
-                'fields' => ['emails', 'phones', 'user_ids']
-            ],
-
         ]);
     }
 
@@ -117,7 +110,8 @@ class Form2FormSend extends RelatedElementModel
         return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'processed_by', 'processed_at', 'status', 'form_id'], 'integer'],
             [['email_message', 'phone_message', 'site_code'], 'string'],
-            [['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request', 'emails', 'phones', 'user_ids'], 'safe'],
+            [['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request'], 'safe'],
+            [['emails', 'phones', 'user_ids'], 'string'],
             [['ip'], 'string', 'max' => 32],
             [['page_url'], 'string', 'max' => 500],
             [['comment'], 'string'],
@@ -223,6 +217,24 @@ class Form2FormSend extends RelatedElementModel
     }
 
 
+    /**
+     * @return array
+     */
+    public function getEmailsAsArray()
+    {
+        $emailsAll = [];
+        if ($this->emails)
+        {
+            $emails = explode(",", $this->emails);
+
+            foreach ($emails as $email)
+            {
+                $emailsAll[] = trim($email);
+            }
+        }
+
+        return $emailsAll;
+    }
 
     /**
      * Уведомить всех кого надо и как надо
@@ -231,9 +243,9 @@ class Form2FormSend extends RelatedElementModel
     {
         if ($this->form)
         {
-            if ($this->form->emails)
+            if ($this->form->emailsAsArray)
             {
-                foreach ($this->form->emails as $email)
+                foreach ($this->form->emailsAsArray as $email)
                 {
                     \Yii::$app->mailer->compose('@skeeks/modules/cms/form2/mail/send-message', [
                         'form'              => $this->form,
@@ -243,7 +255,6 @@ class Form2FormSend extends RelatedElementModel
                     ->setTo($email)
                     ->setSubject("Отправка формы «{$this->form->name}» #" . $this->id)
                     ->send();
-
                 }
             }
         }

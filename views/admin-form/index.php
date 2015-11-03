@@ -25,7 +25,7 @@
             'format' => 'raw',
             'value' => function(\skeeks\modules\cms\form2\models\Form2Form $model)
             {
-                return implode(", ", $model->emails);
+                return $model->emails;
             }
         ],
 
@@ -35,7 +35,7 @@
             'format' => 'raw',
             'value' => function(\skeeks\modules\cms\form2\models\Form2Form $model)
             {
-                return implode(", ", $model->phones);
+                return $model->phones;
             }
         ],
 

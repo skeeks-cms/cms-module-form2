@@ -80,37 +80,21 @@ use common\models\User;
 
     <?= $form->fieldSet('Email уведомления')?>
 
-        <?= $form->field($model, 'emails')->widget(
-            \skeeks\cms\widgets\formInputs\EditedSelect::className(),
-            [
-                'controllerRoute' => 'cms/admin-user-email',
-                'items' => \yii\helpers\ArrayHelper::map(
-                    \skeeks\cms\models\CmsUserEmail::find()->all(),
-                    'value',
-                    'value'
-                ),
-                'multiple' => true
-            ]
-        )
-        ->hint('Вы можете указать несколько Email адресов, на которые будут приходить уведомления и заполнении этой формы.')?>
+        <?= $form->field($model, 'emails')->textarea()
+        ->hint('Вы можете указать несколько Email адресов (через запятую), на которые будут приходить уведомления и заполнении этой формы.')?>
 
     <?= $form->fieldSetEnd(); ?>
 
     <?= $form->fieldSet('Sms уведомления')?>
 
-    <?= $form->field($model, 'phones')->widget(
-            \skeeks\cms\widgets\formInputs\EditedSelect::className(),
-            [
-                'controllerRoute' => 'cms/admin-user-phone',
-                'items' => \yii\helpers\ArrayHelper::map(
-                    \skeeks\cms\models\CmsUserPhone::find()->all(),
-                    'value',
-                    'value'
-                ),
-                'multiple' => true
-            ]
-        )
-        ->hint('Вы можете указать несколько телефонных номеров, на которые будут приходить sms уведомления и заполнении этой формы.')?>
+    <?= \yii\bootstrap\Alert::widget([
+        'options' => [
+          'class' => 'alert-info',
+        ],
+        'body' => 'Работает если подключен центр sms уведомлений',
+    ]); ?>
+    <?= $form->field($model, 'phones')->textarea()
+        ->hint('Вы можете указать несколько телефонных номеров (через запятую), на которые будут приходить sms уведомления и заполнении этой формы.')?>
 
     <?= $form->fieldSetEnd(); ?>
 

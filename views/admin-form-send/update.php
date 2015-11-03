@@ -57,21 +57,21 @@ if ($attrs = $model->relatedPropertiesModel->attributeLabels())
                 'attribute' => 'emails',
                 'format' => 'raw',
                 'label' => 'Email уведомления',
-                'value' => implode(", ", $model->emails)
+                'value' => $model->emails
             ],
 
             [
                 'attribute' => 'phones',
                 'format' => 'raw',
                 'label' => 'Sms уведомления',
-                'value' => implode(", ", $model->phones)
+                'value' => $model->phones
             ],
 
             [
                 'attribute' => 'user_ids',
                 'format' => 'raw',
                 'label' => 'Уведомления пользователей',
-                'value' => implode(", ", $model->user_ids)
+                'value' => $model->user_ids
             ],
         ]
     ]); ?>
