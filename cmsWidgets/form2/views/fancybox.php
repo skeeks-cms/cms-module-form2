@@ -13,6 +13,7 @@ $modelHasRelatedProperties = $widget->modelForm->createModelFormSend();
 
 ?>
     <?php $form = ActiveForm::begin([
+        'id'                                        => $widget->id . "-active-form",
         'modelForm'                                 => $widget->modelForm,
         'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
             function(jForm, ajax)
@@ -51,7 +52,6 @@ JS
 ),
     ]);
 ?>
-
 <?= \yii\bootstrap\Alert::widget([
     'options' => [
         'class' => 'alert-success sx-success-message',
