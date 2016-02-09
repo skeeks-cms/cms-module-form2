@@ -9,9 +9,9 @@ use common\models\User;
 /* @var $console \skeeks\cms\controllers\AdminUserController */
 /* @var $action \skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction */
 ?>
-
 <?=
     \skeeks\modules\cms\form2\cmsWidgets\form2\FormWidget::widget([
-        'form_id' => $action->controller->model->id
+        'namespace' => "FormWidget-admin-" . $action->controller->model->id,
+        'form_id'   => $action->controller->model->id
     ]);
 ?>
