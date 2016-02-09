@@ -12,6 +12,7 @@ use skeeks\cms\base\Widget;
 use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\modules\cms\form2\models\Form2Form;
+use yii\base\ErrorException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -64,19 +65,36 @@ class FormWidget extends WidgetRenderable
 
     protected function _run()
     {
-        if (!$this->form_id)
+        try
         {
-            if ($this->form_code)
+            if (!$this->form_id)
             {
-                $this->modelForm = Form2Form::find()->where(['code' => $this->form_code])->one();
-                if ($form)
+                if ($this->form_code)
                 {
-                    $this->form_id = $form->id;
+                    $this->modelForm = Form2Form::find()->where(['code' => $this->form_code])->one();
+                    if ($form)
+                    {
+                        $this->form_id = $form->id;
+                    }
+                }
+
+                if (!$this->modelForm)
+                {
+                    throw new ErrorException("Форма не найдена: code=" . $this->form_code) ;
+                }
+            } else
+            {
+
+                $this->modelForm = Form2Form::find()->where(['id' => $this->form_id])->one();
+
+                if (!$this->modelForm)
+                {
+                    throw new ErrorException("Форма не найдена: id=" . $this->form_id);
                 }
             }
-        } else
+        } catch (\Exception $e)
         {
-            $this->modelForm = Form2Form::find()->where(['id' => $this->form_id])->one();
+            \Yii::error($e->getCode());
         }
 
         if (!$this->modelForm)
