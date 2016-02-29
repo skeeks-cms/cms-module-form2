@@ -213,7 +213,9 @@ class Form2FormSend extends RelatedElementModel
      */
     public function getRelatedProperties()
     {
-        return $this->form->form2FormProperties;
+        //return $this->form->form2FormProperties;
+        return $this->hasMany(Form2FormProperty::className(), ['form_id' => 'id'])
+                    ->via('form')->orderBy(['priority' => SORT_ASC]);
     }
 
 

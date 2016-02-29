@@ -73,7 +73,7 @@ class BackendController extends Controller
 
                 $validateModel = $modelFormSend->relatedPropertiesModel;
 
-                $modelFormSend->data_values     = $validateModel->attributeValues();
+                $modelFormSend->data_values     = $validateModel->toArray($validateModel->attributes());
                 $modelFormSend->data_labels     = $validateModel->attributeLabels();
                 $modelFormSend->emails          = $modelForm->emails;
                 $modelFormSend->phones          = $modelForm->phones;
