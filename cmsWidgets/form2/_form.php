@@ -6,32 +6,28 @@
  * @date 27.05.2015
  */
 /* @var $this yii\web\View */
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
-<?php $form = ActiveForm::begin(); ?>
-    <?= $form->fieldSet('Настройки'); ?>
+<?= $form->fieldSet('Настройки'); ?>
 
-        <?/*= $form->fieldSelect($model, 'form_id', \yii\helpers\ArrayHelper::map(
+    <?/*= $form->fieldSelect($model, 'form_id', \yii\helpers\ArrayHelper::map(
+        \skeeks\modules\cms\form2\models\Form2Form::find()->all(),
+        'id',
+        'name'
+    )); */?>
+
+    <?= $form->field($model, 'form_id')->widget(
+        \skeeks\cms\widgets\formInputs\EditedSelect::className(),
+        [
+            'controllerRoute' => '/form2/admin-form',
+            'items' => \yii\helpers\ArrayHelper::map(
             \skeeks\modules\cms\form2\models\Form2Form::find()->all(),
-            'id',
-            'name'
-        )); */?>
+                'id',
+                'name'
+            ),
+        ]
+    ); ?>
 
-        <?= $form->field($model, 'form_id')->widget(
-            \skeeks\cms\widgets\formInputs\EditedSelect::className(),
-            [
-                'controllerRoute' => '/form2/admin-form',
-                'items' => \yii\helpers\ArrayHelper::map(
-                \skeeks\modules\cms\form2\models\Form2Form::find()->all(),
-                    'id',
-                    'name'
-                ),
-            ]
-        ); ?>
+    <?= $form->field($model, 'btnSubmit')->textInput(); ?>
+    <?= $form->field($model, 'btnSubmitClass')->textInput(); ?>
 
-        <?= $form->field($model, 'btnSubmit')->textInput(); ?>
-        <?= $form->field($model, 'btnSubmitClass')->textInput(); ?>
-
-    <?= $form->fieldSetEnd(); ?>
-<?= $form->buttonsStandart($model) ?>
-<?php ActiveForm::end(); ?>
+<?= $form->fieldSetEnd(); ?>

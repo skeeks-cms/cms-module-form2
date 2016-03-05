@@ -16,6 +16,7 @@ use yii\base\ErrorException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\widgets\ActiveForm;
 
 /**
  * Class FormWidget
@@ -56,6 +57,14 @@ class FormWidget extends WidgetRenderable
             ['btnSubmit', 'string'],
             ['btnSubmitClass', 'string'],
         ]);
+    }
+
+    public function renderConfigForm(ActiveForm $form)
+    {
+        echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
+            'form'  => $form,
+            'model' => $this
+        ], $this);
     }
 
     /**
