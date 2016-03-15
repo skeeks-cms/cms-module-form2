@@ -1,6 +1,11 @@
 Процесс разработки модуля.
 ==============
 
+2.2.1
+-----------------
+  * Fixed bug https://github.com/skeeks-cms/cms/issues/18
+  * Renamed template whith-messages
+
 2.2.0
 -----------------
   * Адаптация под SkeekS CMS 2.5
