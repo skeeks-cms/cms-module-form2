@@ -21,7 +21,7 @@ class AdminFormController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                     = "Управление формами";
+        $this->name                     = \Yii::t('skeeks/form2/app', 'Forms management');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = Form2Form::className();
 
@@ -38,7 +38,7 @@ class AdminFormController extends AdminModelEditorController
                 'view' =>
                 [
                     'class' => AdminOneModelEditAction::className(),
-                    'name' => 'Результат',
+                    'name' => \Yii::t('skeeks/form2/app', 'Result'),
                     "icon" => "glyphicon glyphicon-eye-open",
                     "priority" => 0,
                 ],

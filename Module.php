@@ -13,15 +13,4 @@ namespace skeeks\modules\cms\form2;
 class Module extends \skeeks\cms\base\Module
 {
     public $controllerNamespace = 'skeeks\modules\cms\form2\controllers';
-
-    /**
-     * @return array
-     */
-    static public function descriptorConfig()
-    {
-        return array_merge(parent::descriptorConfig(), [
-            "name"          => "Конструктор форм",
-        ]);
-    }
-
 }

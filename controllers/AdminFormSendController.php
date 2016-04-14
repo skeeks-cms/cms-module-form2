@@ -21,7 +21,7 @@ class AdminFormSendController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                     = "Сообщения с форм";
+        $this->name                     = \Yii::t('skeeks/form2/app', 'Messages');
         $this->modelShowAttribute       = "id";
         $this->modelClassName           = Form2FormSend::className();
 
@@ -37,7 +37,7 @@ class AdminFormSendController extends AdminModelEditorController
         [
             'update' =>
             [
-                'name' => 'Смотреть',
+                'name' => \Yii::t('skeeks/form2/app', 'View'),
                 "icon" => "glyphicon glyphicon-eye-open",
                 "priority" => 0,
             ],

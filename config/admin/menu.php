@@ -12,19 +12,19 @@ return [
         'items' =>
         [
             [
-                "label"     => "Конструктор форм",
+                "label"     => \Yii::t('skeeks/form2/app', 'Form designer'),
                 "img"       => ['\skeeks\modules\cms\form2\assets\FormAsset', 'icons/forms.png'],
 
                 'items' =>
                 [
                     [
-                        "label" => "Формы",
+                        "label" => \Yii::t('skeeks/form2/app', 'Forms'),
                         "url"   => ["form2/admin-form"],
                         "img"       => ['\skeeks\modules\cms\form2\assets\FormAsset', 'icons/forms.png'],
                     ],
 
                     [
-                        "label" => "Сообщения с форм",
+                        "label" => \Yii::t('skeeks/form2/app', 'Messages'),
                         "url"   => ["form2/admin-form-send"],
                         "img"       => ['\skeeks\modules\cms\form2\assets\FormAsset', 'icons/form-submits.png'],
                     ],

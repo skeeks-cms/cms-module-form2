@@ -1,6 +1,10 @@
 Процесс разработки модуля.
 ==============
 
+2.2.2
+-----------------
+  * Getting the translation into other languages
+
 2.2.1
 -----------------
   * Fixed bug https://github.com/skeeks-cms/cms/issues/18
