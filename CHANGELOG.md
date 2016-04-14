@@ -1,6 +1,10 @@
 Процесс разработки модуля.
 ==============
 
+2.2.3
+-----------------
+  * Fix bugs
+
 2.2.2
 -----------------
   * Getting the translation into other languages
