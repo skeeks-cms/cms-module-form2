@@ -7,7 +7,6 @@
  */
 namespace skeeks\modules\cms\form2\controllers;
 
-use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\Request;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\forms\PasswordChangeForm;
@@ -19,6 +18,7 @@ use skeeks\modules\cms\form2\models\Form2FormSend;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
+use yii\web\Controller;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 
