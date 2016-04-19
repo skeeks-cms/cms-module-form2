@@ -10,7 +10,7 @@ namespace skeeks\modules\cms\form2;
  * Class Module
  * @package skeeks\modules\cms\form2
  */
-class Module extends \skeeks\cms\base\Module
+class Module extends \yii\web\Module
 {
     public $controllerNamespace = 'skeeks\modules\cms\form2\controllers';
 }

@@ -3,6 +3,7 @@
 
 2.2.4.pre
 -----------------
+  * Removed skeeks/cms/base/Module
   * Cancel use cms base controller
 
 2.2.3
