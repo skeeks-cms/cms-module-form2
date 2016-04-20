@@ -140,7 +140,7 @@ class Form2FormSend extends RelatedElementModel
 
             ['ip', 'default', 'value' => function(self $model, $attribute)
             {
-                return Request::getRealUserIp();
+                return \Yii::$app->request->userIP;
             }],
         ]);
     }
@@ -255,7 +255,7 @@ class Form2FormSend extends RelatedElementModel
                     ])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
                     ->setTo($email)
-                    ->setSubject("Отправка формы «{$this->form->name}» #" . $this->id)
+                    ->setSubject(\Yii::t('skeeks/form2/app', 'Submitting form') . ": «{$this->form->name}» #" . $this->id)
                     ->send();
                 }
             }

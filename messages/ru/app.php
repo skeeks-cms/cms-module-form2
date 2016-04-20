@@ -6,4 +6,5 @@ return
     'Form designer'                                             => 'Конструктор форм',
     'Forms'                                                     => 'Формы',
     'Messages'                                                  => 'Сообщения',
+    'Submitting form'                                           => 'Отправка формы',
 ];
