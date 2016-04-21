@@ -25,29 +25,27 @@ Configuration app
 
 ```php
 
-return [
-    'components' =>
-    [
-        'i18n' => [
-            'translations' =>
-            [
-                'skeeks/form2/app' => [
-                    'class'             => 'yii\i18n\PhpMessageSource',
-                    'basePath'          => '@skeeks/modules/cms/form2/messages',
-                    'fileMap' => [
-                        'skeeks/form2/app' => 'app.php',
-                    ],
-                ]
+'components' =>
+[
+    'i18n' => [
+        'translations' =>
+        [
+            'skeeks/form2/app' => [
+                'class'             => 'yii\i18n\PhpMessageSource',
+                'basePath'          => '@skeeks/modules/cms/form2/messages',
+                'fileMap' => [
+                    'skeeks/form2/app' => 'app.php',
+                ],
             ]
-        ],
-    ],
-    'modules' =>
-    [
-        'form2' => [
-            'class'         => '\skeeks\modules\cms\form2\Module',
         ]
+    ],
+],
+'modules' =>
+[
+    'form2' => [
+        'class'         => '\skeeks\modules\cms\form2\Module',
     ]
-];
+]
 
 ```
 
