@@ -1,14 +1,14 @@
 {
     "name": "skeeks/cms-module-form2",
-    "description": "Конструктор форм SkeekS cms",
-    "keywords": ["module", "cms", "skeeks", "sx", "app", "yii2"],
+    "description": "Form designer for SkeekS CMS",
+    "keywords": ["module", "cms", "skeeks", "sx", "yii2", "Form designer"],
     "homepage": "http://www.skeeks.com/",
     "type": "yii2-extension",
-    "license": "GPL-2.0+",
+    "license": "GPL-3.0+",
     "support": {
         "issues": "http://cms.skeeks.com",
-        "wiki": "http://git.skeeks.com/skeeks/cms/wikis/home",
-        "source": "http://git.skeeks.com/skeeks/cms"
+        "wiki": "http://en.cms.skeeks.com/docs",
+        "source": "https://github.com/skeeks-cms/cms-module-form2"
     },
     "authors": [
         {
