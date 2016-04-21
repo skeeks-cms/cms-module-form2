@@ -1,7 +1,7 @@
-Процесс разработки модуля.
+CHANGELOG
 ==============
 
-2.2.4.pre
+2.2.4
 -----------------
   * Removed skeeks/cms/base/Module
   * Cancel use cms base controller
