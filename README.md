@@ -25,31 +25,29 @@ Configuration app
 
 ```php
 
-'components' =>
-[
-    'cmsMarketplace' =>
+return [
+    'components' =>
     [
-        'class' => '\skeeks\cms\marketplace\CmsMarketplaceComponent',
-    ],
-    'i18n' => [
-        'translations' =>
-        [
-            'skeeks/marketplace' => [
-                'class'             => 'yii\i18n\PhpMessageSource',
-                'basePath'          => '@skeeks/cms/marketplace/messages',
-                'fileMap' => [
-                    'skeeks/marketplace' => 'main.php',
-                ],
+        'i18n' => [
+            'translations' =>
+            [
+                'skeeks/form2/app' => [
+                    'class'             => 'yii\i18n\PhpMessageSource',
+                    'basePath'          => '@skeeks/modules/cms/form2/messages',
+                    'fileMap' => [
+                        'skeeks/form2/app' => 'app.php',
+                    ],
+                ]
             ]
-        ]
+        ],
     ],
-],
-'modules' =>
-[
-    'cmsMarketplace' => [
-        'class'         => 'skeeks\cms\marketplace\CmsMarketplaceModule',
+    'modules' =>
+    [
+        'form2' => [
+            'class'         => '\skeeks\modules\cms\form2\Module',
+        ]
     ]
-]
+];
 
 ```
 
