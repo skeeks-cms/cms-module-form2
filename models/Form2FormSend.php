@@ -62,12 +62,15 @@ class Form2FormSend extends RelatedElementModel
     const STATUS_PROCESSED  = 5;
     const STATUS_EXECUTED   = 10;
 
-    static public $statuses =
-    [
-        self::STATUS_NEW          => "Новое сообщение",
-        self::STATUS_PROCESSED    => "В обработке",
-        self::STATUS_EXECUTED     => "Завершено",
-    ];
+    static public function getStatuses()
+    {
+        return [
+            self::STATUS_NEW          => Yii::t('skeeks/form2/app', 'New message'),
+            self::STATUS_PROCESSED    => Yii::t('skeeks/form2/app', 'In progress'),
+            self::STATUS_EXECUTED     => Yii::t('skeeks/form2/app', 'Completed'),
+        ];
+    }
+
 
     use HasRelatedPropertiesTrait;
 
@@ -115,7 +118,7 @@ class Form2FormSend extends RelatedElementModel
             [['ip'], 'string', 'max' => 32],
             [['page_url'], 'string', 'max' => 500],
             [['comment'], 'string'],
-            [['status'], 'in', 'range' => array_keys(self::$statuses)],
+            [['status'], 'in', 'range' => array_keys(self::getStatuses())],
 
             ['data_request', 'default', 'value' => function(self $model, $attribute)
             {
@@ -151,31 +154,31 @@ class Form2FormSend extends RelatedElementModel
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'processed_by' => Yii::t('app', 'Кто обработал'),
-            'data_values' => Yii::t('app', 'Data Values'),
-            'data_labels' => Yii::t('app', 'Data Labels'),
-            'emails' => Yii::t('app', 'Emails'),
-            'phones' => Yii::t('app', 'Phones'),
-            'user_ids' => Yii::t('app', 'User Ids'),
-            'email_message' => Yii::t('app', 'Email Message'),
-            'phone_message' => Yii::t('app', 'Phone Message'),
-            'status' => Yii::t('app', 'Статус'),
-            'form_id' => Yii::t('app', 'Форма'),
-            'ip' => Yii::t('app', 'Ip'),
-            'page_url' => Yii::t('app', 'Page Url'),
-            'data_server' => Yii::t('app', 'Data Server'),
-            'data_session' => Yii::t('app', 'Data Session'),
-            'data_cookie' => Yii::t('app', 'Data Cookie'),
-            'data_request' => Yii::t('app', 'Data Request'),
-            'additional_data' => Yii::t('app', 'Additional Data'),
-            'site_code' => Yii::t('app', 'Site'),
-            'processed_at' => Yii::t('app', 'Когда обратали'),
-            'comment' => Yii::t('app', 'Комментарий'),
+            'id' => Yii::t('skeeks/form2/app', 'ID'),
+            'created_by' => Yii::t('skeeks/form2/app', 'Created By'),
+            'updated_by' => Yii::t('skeeks/form2/app', 'Updated By'),
+            'created_at' => Yii::t('skeeks/form2/app', 'Created At'),
+            'updated_at' => Yii::t('skeeks/form2/app', 'Updated At'),
+            'processed_by' => Yii::t('skeeks/form2/app', 'Who handled'),
+            'data_values' => Yii::t('skeeks/form2/app', 'Data Values'),
+            'data_labels' => Yii::t('skeeks/form2/app', 'Data Labels'),
+            'emails' => Yii::t('skeeks/form2/app', 'Emails'),
+            'phones' => Yii::t('skeeks/form2/app', 'Phones'),
+            'user_ids' => Yii::t('skeeks/form2/app', 'User Ids'),
+            'email_message' => Yii::t('skeeks/form2/app', 'Email Message'),
+            'phone_message' => Yii::t('skeeks/form2/app', 'Phone Message'),
+            'status' => Yii::t('skeeks/form2/app', 'Status'),
+            'form_id' => Yii::t('skeeks/form2/app', 'Form'),
+            'ip' => Yii::t('skeeks/form2/app', 'Ip'),
+            'page_url' => Yii::t('skeeks/form2/app', 'Page Url'),
+            'data_server' => Yii::t('skeeks/form2/app', 'Data Server'),
+            'data_session' => Yii::t('skeeks/form2/app', 'Data Session'),
+            'data_cookie' => Yii::t('skeeks/form2/app', 'Data Cookie'),
+            'data_request' => Yii::t('skeeks/form2/app', 'Data Request'),
+            'additional_data' => Yii::t('skeeks/form2/app', 'Additional Data'),
+            'site_code' => Yii::t('skeeks/form2/app', 'Site'),
+            'processed_at' => Yii::t('skeeks/form2/app', 'When handled'),
+            'comment' => Yii::t('skeeks/form2/app', 'Comment'),
         ]);
     }
 

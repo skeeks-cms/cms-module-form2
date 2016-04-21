@@ -34,7 +34,7 @@ class FormWidget extends WidgetRenderable
     public $form_id;
     public $form_code;
 
-    public $btnSubmit = "Отправить";
+    public $btnSubmit = "Submit";
     public $btnSubmitClass = 'btn btn-primary';
 
     public function attributeLabels()

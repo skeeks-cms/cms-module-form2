@@ -21,7 +21,7 @@ class AdminFormPropertyController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                   = "Управление свойствами";
+        $this->name                   = Yii::t('skeeks/form2/app', 'Control of property values');
         $this->modelShowAttribute      = "name";
         $this->modelClassName          = Form2FormProperty::className();
 

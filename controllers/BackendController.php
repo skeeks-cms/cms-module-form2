@@ -84,7 +84,7 @@ class BackendController extends Controller
                     if (!$modelFormSend->save())
                     {
                         $rr->success = false;
-                        $rr->message = 'Не удалось отправить форму';
+                        $rr->message = \Yii::t('skeeks/form2/app', 'Failed to send the form');
                         return (array) $rr;
                     }
 
@@ -93,12 +93,12 @@ class BackendController extends Controller
                     $modelFormSend->notify();
 
                     $rr->success = true;
-                    $rr->message = 'Успешно отправлена';
+                    $rr->message = \Yii::t('skeeks/form2/app', 'Successfully sent');
 
                 } else
                 {
                     $rr->success = false;
-                    $rr->message = 'Проверьте правильность заполнения полей формы';
+                    $rr->message = \Yii::t('skeeks/form2/app', 'Check the correctness of filling the form fields');
                 }
 
                 return (array) $rr;
