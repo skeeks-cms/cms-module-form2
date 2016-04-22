@@ -27,24 +27,34 @@ class FormWidget extends WidgetRenderable
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => 'Конструктор форм'
+            'name' => \Yii::t('skeeks/form2/app', 'Form designer')
         ]);
     }
 
     public $form_id;
     public $form_code;
 
-    public $btnSubmit = "Submit";
+    public $btnSubmit = null;
     public $btnSubmitClass = 'btn btn-primary';
+
+    public function init()
+    {
+        if (!$this->btnSubmit)
+        {
+            $this->btnSubmit = \Yii::t('skeeks/form2/app', 'Submit');
+        }
+
+        parent::init();
+    }
 
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
         [
-            'form_id'   => 'Форма',
-            'form_code' => 'Код формы',
-            'btnSubmit' => 'Надпись на кнопке отправить',
-            'btnSubmitClass' => 'CSS Класс кнопки отправить'
+            'form_id'        => \Yii::t('skeeks/form2/app', 'Form'),
+            'form_code'      => \Yii::t('skeeks/form2/app', 'Form code'),
+            'btnSubmit'      => \Yii::t('skeeks/form2/app', 'The inscription on the button send'),
+            'btnSubmitClass' => \Yii::t('skeeks/form2/app', 'CSS Class send button')
         ]);
     }
 
