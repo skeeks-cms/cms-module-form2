@@ -69,7 +69,7 @@ class Form2Form extends Core
 
                         if (!$validator->validate($email, $error))
                         {
-                            $this->addError($attribute, $email . ' — некорректный email адрес');
+                            $this->addError($attribute, $email . ' — ' . \Yii::t('skeeks/form2/app', 'Incorrect email address'));
                             return false;
                         }
                     }
@@ -85,17 +85,17 @@ class Form2Form extends Core
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
-            'code' => Yii::t('app', 'Code'),
-            'emails' => Yii::t('app', 'Email адреса'),
-            'phones' => Yii::t('app', 'Телефоны'),
-            'user_ids' => Yii::t('app', 'User Ids'),
+            'id' => \Yii::t('skeeks/form2/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/form2/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/form2/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/form2/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/form2/app', 'Updated At'),
+            'name' => \Yii::t('skeeks/form2/app', 'Name'),
+            'description' => \Yii::t('skeeks/form2/app', 'Description'),
+            'code' => \Yii::t('skeeks/form2/app', 'Code'),
+            'emails' => \Yii::t('skeeks/form2/app', 'Email addresses'),
+            'phones' => \Yii::t('skeeks/form2/app', 'Telephones'),
+            'user_ids' => \Yii::t('skeeks/form2/app', 'User Ids'),
         ]);
     }
 

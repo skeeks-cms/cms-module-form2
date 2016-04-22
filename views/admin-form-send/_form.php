@@ -13,20 +13,20 @@ use common\models\User;
 <?php $form = ActiveForm::begin(); ?>
 <?php  ?>
 
-<?= $form->fieldSet('Общая информация')?>
+<?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'General information'))?>
     <?= $form->field($model, 'name')->textInput(); ?>
     <?= $form->field($model, 'code')->textInput(); ?>
     <?= $form->field($model, 'description')->textarea(); ?>
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet('Настройки уведомлений')?>
+<?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Notification settings'))?>
 
 
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet('Элементы формы')?>
+<?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Form elements'))?>
     <?/*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
         'label'             => "Элементы формы",
         'hint'              => "",

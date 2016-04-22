@@ -40,7 +40,7 @@
         ],
 
         [
-            'label' => "Количество полей в форме",
+            'label' => \Yii::t('skeeks/form2/app', 'Number of fields in the form'),
             'class' => \yii\grid\DataColumn::className(),
             'format' => 'raw',
             'value' => function(\skeeks\modules\cms\form2\models\Form2Form $model)
@@ -50,7 +50,7 @@
         ],
 
         [
-            'label' => "Количество сообщений",
+            'label' => \Yii::t('skeeks/form2/app', 'Number of posts'),
             'class' => \yii\grid\DataColumn::className(),
             'format' => 'raw',
             'value' => function(\skeeks\modules\cms\form2\models\Form2Form $model)

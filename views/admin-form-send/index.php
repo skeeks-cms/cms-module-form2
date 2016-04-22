@@ -18,7 +18,7 @@
         [
             'attribute' => 'status',
             'class' => \yii\grid\DataColumn::className(),
-            'filter' => \skeeks\modules\cms\form2\models\Form2FormSend::$statuses,
+            'filter' => \skeeks\modules\cms\form2\models\Form2FormSend::getStatuses(),
             'format' => 'raw',
             'value' => function(\skeeks\modules\cms\form2\models\Form2FormSend $model)
             {
@@ -33,7 +33,7 @@
                     $class = "success";
                 }
 
-                return '<span class="label label-' . $class . '">' . \yii\helpers\ArrayHelper::getValue(\skeeks\modules\cms\form2\models\Form2FormSend::$statuses, $model->status) . '</span>';
+                return '<span class="label label-' . $class . '">' . \yii\helpers\ArrayHelper::getValue(\skeeks\modules\cms\form2\models\Form2FormSend::getStatuses(), $model->status) . '</span>';
             }
         ],
 

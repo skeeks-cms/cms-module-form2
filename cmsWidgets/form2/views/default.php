@@ -46,7 +46,7 @@ JS
     <? endforeach; ?>
 <? endif; ?>
 
-<?= \yii\helpers\Html::submitButton("" . \Yii::t('app', $widget->btnSubmit), [
+<?= \yii\helpers\Html::submitButton("" . \Yii::t('skeeks/form2/app', $widget->btnSubmit), [
     'class' => $widget->btnSubmitClass,
 ]); ?>
 

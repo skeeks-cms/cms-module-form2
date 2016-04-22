@@ -13,17 +13,17 @@ use common\models\User;
 <?php $form = ActiveForm::begin(); ?>
 <?php  ?>
 
-<?= $form->fieldSet('Общая информация')?>
+<?= $form->fieldSet( \Yii::t('skeeks/form2/app', 'General information'))?>
     <?= $form->field($model, 'name')->textInput(); ?>
     <?= $form->field($model, 'code')->textInput(); ?>
     <?= $form->field($model, 'description')->textarea(); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet('Элементы формы')?>
+    <?= $form->fieldSet( \Yii::t('skeeks/form2/app', 'form elements'))?>
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                'label'             => "Свойства элементов",
-                'hint'              => "У каждого контента на сайте есть свой набор свойств, тут они и задаются",
+                'label'             => \Yii::t('skeeks/form2/app', 'Element properties'),
+                'hint'              => \Yii::t('skeeks/form2/app', 'Each content on the site has its own set of properties, and then they are set'),
                 'parentModel'       => $model,
                 'relation'          => [
                     'form_id' => 'id'
@@ -78,23 +78,23 @@ use common\models\User;
     <?= $form->fieldSetEnd(); ?>
 
 
-    <?= $form->fieldSet('Email уведомления')?>
+    <?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Email Message'))?>
 
         <?= $form->field($model, 'emails')->textarea()
-        ->hint('Вы можете указать несколько Email адресов (через запятую), на которые будут приходить уведомления и заполнении этой формы.')?>
+        ->hint(\Yii::t('skeeks/form2/app', 'You can specify multiple Email addresses (separated by commas), which will receive the notification and filling out this form.'))?>
 
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet('Sms уведомления')?>
+    <?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Phone Message'))?>
 
     <?= \yii\bootstrap\Alert::widget([
         'options' => [
           'class' => 'alert-info',
         ],
-        'body' => 'Работает если подключен центр sms уведомлений',
+        'body' => \Yii::t('skeeks/form2/app', 'It works when connected to the center of sms notifications'),
     ]); ?>
     <?= $form->field($model, 'phones')->textarea()
-        ->hint('Вы можете указать несколько телефонных номеров (через запятую), на которые будут приходить sms уведомления и заполнении этой формы.')?>
+        ->hint(\Yii::t('skeeks/form2/app', 'Phone Message'))?>
 
     <?= $form->fieldSetEnd(); ?>
 

@@ -40,14 +40,14 @@ if ($attrs = $model->relatedPropertiesModel->attributeLabels())
     }
 };
 ?>
-<?= $form->fieldSet('Данные с формы'); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Data from form')); ?>
     <?= \yii\widgets\DetailView::widget([
         'model'         => $model->relatedPropertiesModel,
         'attributes'    => $attribures
     ])?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Кто был уведомлен'); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Who has been notified')); ?>
 
     <?= \yii\widgets\DetailView::widget([
         'model'         => $model,
@@ -55,64 +55,64 @@ if ($attrs = $model->relatedPropertiesModel->attributeLabels())
         [
             [
                 'attribute' => 'emails',
-                'format' => 'raw',
-                'label' => 'Email уведомления',
-                'value' => $model->emails
+                'format'    => 'raw',
+                'label'     => \Yii::t('skeeks/form2/app', 'Email Message'),
+                'value'     => $model->emails
             ],
 
             [
                 'attribute' => 'phones',
-                'format' => 'raw',
-                'label' => 'Sms уведомления',
-                'value' => $model->phones
+                'format'    => 'raw',
+                'label'     => \Yii::t('skeeks/form2/app', 'Phone Message'),
+                'value'     => $model->phones
             ],
 
             [
                 'attribute' => 'user_ids',
-                'format' => 'raw',
-                'label' => 'Уведомления пользователей',
-                'value' => $model->user_ids
+                'format'    => 'raw',
+                'label'     => \Yii::t('skeeks/form2/app', 'Users messages'),
+                'value'     => $model->user_ids
             ],
         ]
     ]); ?>
 
 <?= $form->fieldSetEnd(); ?>
-<?= $form->fieldSet('Дополнительная информация'); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Additional Data')); ?>
     <?= \yii\widgets\DetailView::widget([
         'model'         => $model,
         'attributes'    =>
         [
             [
                 'attribute'     => 'id',
-                'label'         => 'Номер сообщения',
+                'label'         => \Yii::t('skeeks/form2/app', 'Post Number'),
             ],
 
             [
                 'attribute' => 'created_at',
-                'value' => \Yii::$app->formatter->asDatetime($model->created_at, 'medium') . "(" . \Yii::$app->formatter->asRelativeTime($model->created_at) . ")",
+                'value'     => \Yii::$app->formatter->asDatetime($model->created_at, 'medium') . "(" . \Yii::$app->formatter->asRelativeTime($model->created_at) . ")",
             ],
 
             [
                 'format' => 'raw',
-                'label' => 'Отправлено с сайта',
-                'value' => "<a href=\"{$model->site->url}\" target=\"_blank\" data-pjax=\"0\">{$model->site->name}</a>",
+                'label'  => \Yii::t('skeeks/form2/app', 'Post Number'),
+                'value'  => "<a href=\"{$model->site->url}\" target=\"_blank\" data-pjax=\"0\">{$model->site->name}</a>",
             ],
 
             [
                 'format' => 'raw',
-                'label' => 'Отправил пользователь',
-                'value' => "{$model->createdBy->displayName}",
+                'label'  => \Yii::t('skeeks/form2/app', 'Submitted by'),
+                'value'  => "{$model->createdBy->displayName}",
             ],
 
             [
                 'attribute' => 'ip',
-                'label' => 'Ip адрес отправителя',
+                'label' => \Yii::t('skeeks/form2/app', 'Ip address of the sender'),
             ],
 
             [
                 'attribute' => 'page_url',
                 'format' => 'raw',
-                'label' => 'Отправлена со страницы',
+                'label' => \Yii::t('skeeks/form2/app', 'Ip address of the sender'),
                 'value' => Html::a($model->page_url, $model->page_url, [
                     'target' => '_blank',
                     'data-pjax' => 0
@@ -123,26 +123,26 @@ if ($attrs = $model->relatedPropertiesModel->attributeLabels())
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Управление'); ?>
-    <?= $form->fieldSelect($model, 'status', \skeeks\modules\cms\form2\models\Form2FormSend::$statuses)
-        ->hint('Если вы обработали это сообщение, измените его статус для удобства'); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Control')); ?>
+    <?= $form->fieldSelect($model, 'status', \skeeks\modules\cms\form2\models\Form2FormSend::getStatuses())
+        ->hint(\Yii::t('skeeks/form2/app', 'If you are treated with this message, change the status for convenience')); ?>
 
     <?= $form->fieldSelect($model, 'processed_by', \yii\helpers\ArrayHelper::map(
             \skeeks\cms\models\User::find()->active()->all(),
             'id',
             'displayName'
         ))
-        ->hint('Если вы обработали это сообщение, измените его статус для удобства'); ?>
+        ->hint(\Yii::t('skeeks/form2/app', 'If you are treated with this message, change the status for convenience')); ?>
 
-    <?= $form->field($model, 'comment')->textarea(['rows' => 5])->hint('Короткое примечание, личные пометки по этой отправке. Необязательно.'); ?>
+    <?= $form->field($model, 'comment')->textarea(['rows' => 5])->hint(\Yii::t('skeeks/form2/app', 'Short note, personal notes on this ship. Not necessary.')); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Для разработчиков'); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'For developers')); ?>
 
 <div class="sx-block">
-  <h3>Дополнительные данные, которые могут пригодиться в некоторых случаях, разработчикам.</h3>
-  <small>Для удобства просмотра данных, можно воспользоваться сервисом: <a href="http://jsonformatter.curiousconcept.com/#" target="_blank">http://jsonformatter.curiousconcept.com/#</a></small>
+  <h3><?=\Yii::t('skeeks/form2/app', 'Additional information that may be useful in some cases, the developers.');?></h3>
+  <small><?=\Yii::t('skeeks/form2/app', 'For the convenience of viewing the data, you can use the service:');?> <a href="http://jsonformatter.curiousconcept.com/#" target="_blank">http://jsonformatter.curiousconcept.com/#</a></small>
 </div>
 <hr />
 

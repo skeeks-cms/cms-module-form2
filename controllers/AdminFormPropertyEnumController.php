@@ -22,7 +22,7 @@ class AdminFormPropertyEnumController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                   = "Управление значениями свойств";
+        $this->name                   = \Yii::t('skeeks/form2/app', 'Control of properties');
         $this->modelShowAttribute     = "value";
         $this->modelClassName         = Form2FormPropertyEnum::className();
 
