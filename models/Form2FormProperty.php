@@ -59,7 +59,7 @@ class Form2FormProperty extends RelatedPropertyModel
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'form_id' => Yii::t('skeeks/form2/app', 'Contact form'),
+            'form_id' => \Yii::t('skeeks/form2/app', 'Contact form'),
         ]);
     }
 
@@ -70,7 +70,7 @@ class Form2FormProperty extends RelatedPropertyModel
     {
         return ArrayHelper::merge(parent::rules(), [
             [['form_id'], 'integer'],
-            [['code', 'form_id'], 'unique', 'targetAttribute' => ['code', 'form_id'], 'message' => Yii::t('skeeks/form2/app', 'User Ids')]
+            [['code', 'form_id'], 'unique', 'targetAttribute' => ['code', 'form_id'], 'message' => \Yii::t('skeeks/form2/app', 'User Ids')]
         ]);
     }
 

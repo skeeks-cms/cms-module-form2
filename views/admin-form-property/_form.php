@@ -11,7 +11,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Основные настройки') ?>
+<?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Basic settings')) ?>
 
     <?= $form->fieldRadioListBoolean($model, 'active') ?>
     <?= $form->fieldRadioListBoolean($model, 'is_required') ?>
@@ -23,7 +23,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <? else: ?>
 
-    <?= $form->field($model, 'form_id')->label('Контент')->widget(
+    <?= $form->field($model, 'form_id')->label(\Yii::t('skeeks/form2/app', 'Contents'))->widget(
         \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\modules\cms\form2\models\Form2Form::find()->all(),
@@ -37,10 +37,10 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <? endif; ?>
 
     <?= $form->fieldSelect($model, 'component', [
-        'Базовые типы'          => \Yii::$app->cms->basePropertyTypes(),
-        'Пользовательские типы' => \Yii::$app->cms->userPropertyTypes(),
+        \Yii::t('skeeks/form2/app', 'Base types')          => \Yii::$app->cms->basePropertyTypes(),
+        \Yii::t('skeeks/form2/app', 'Custom types') => \Yii::$app->cms->userPropertyTypes(),
     ])
-        ->label("Тип свойства")
+        ->label(\Yii::t('skeeks/form2/app', 'Property type'))
         ;
     ?>
     <?= $form->field($model, 'component_settings')->label(false)->widget(
@@ -55,7 +55,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Дополнительно') ?>
+<?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Additionally')) ?>
     <?= $form->field($model, 'hint')->textInput() ?>
     <?= $form->fieldInputInt($model, 'priority') ?>
 
@@ -67,11 +67,11 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 <? if (!$model->isNewRecord) : ?>
-<?= $form->fieldSet('Значения для списка') ?>
+<?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Values for the list')) ?>
 
     <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label'             => "Значения для списка",
-        'hint'              => "Вы можете привязать к элементу несколько свойст, и задать им значение",
+        'label'             => \Yii::t('skeeks/form2/app', 'Values for the list'),
+        'hint'              => \Yii::t('skeeks/form2/app', 'You can link to the item number of properties, and set them to the value'),
         'parentModel'       => $model,
         'relation'          => [
             'property_id' => 'id'

@@ -12,17 +12,17 @@ use skeeks\cms\mail\helpers\Html;
  */
 ?>
 <?= Html::beginTag('h1'); ?>
-    Отправка формы  «<?= \yii\helpers\Html::encode($form->name)?>» #<?= $formSend->id; ?>
+    <?= \Yii::t('skeeks/form2/app', 'Submitting forms');?>  «<?= \yii\helpers\Html::encode($form->name)?>» #<?= $formSend->id; ?>
 <?= Html::endTag('h1'); ?>
 
 <?= Html::beginTag('p'); ?>
-    Форма была заполнена и успешно отправлена со страницы: <?= Html::a($formSend->page_url, $formSend->page_url); ?><br />
-    Дата и время отправки: <?= \Yii::$app->formatter->asDatetime($formSend->created_at) ?><br />
-    Уникальный номер сообщения: <?= $formSend->id; ?>
+    <?= \Yii::t('skeeks/form2/app', 'The form has been completed and successfully sent from the page');?>: <?= Html::a($formSend->page_url, $formSend->page_url); ?><br />
+    <?= \Yii::t('skeeks/form2/app', 'Date and time of sending');?>: <?= \Yii::$app->formatter->asDatetime($formSend->created_at) ?><br />
+    <?= \Yii::t('skeeks/form2/app', 'Unique message number');?>: <?= $formSend->id; ?>
 <?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('h3'); ?>
-    Данные формы:
+    <?= \Yii::t('skeeks/form2/app', 'Data from form');?>:
 <?= Html::endTag('h3'); ?>
 
 <?= Html::beginTag('p'); ?>
@@ -60,9 +60,9 @@ if ($attrs = $formSend->relatedPropertiesModel->attributeLabels())
 
 
 <?= Html::beginTag('h5'); ?>
-    Дополнительная информация:
+    <?= \Yii::t('skeeks/form2/app', 'Additional Data');?>:
 <?= Html::endTag('h5'); ?>
 
 <?= Html::beginTag('p'); ?>
-    Дополнительные данные по данному сообщению можно посмотреть <?= Html::a('тут', \skeeks\cms\helpers\UrlHelper::construct('form2/admin-form-send/update', ['pk' => $formSend->id])->enableAdmin()->enableAbsolute()->toString()); ?>.
+    <?= \Yii::t('skeeks/form2/app', 'Additional information on the report can be viewed');?> <?= Html::a(\Yii::t('skeeks/form2/app', 'here'), \skeeks\cms\helpers\UrlHelper::construct('form2/admin-form-send/update', ['pk' => $formSend->id])->enableAdmin()->enableAbsolute()->toString()); ?>.
 <?= Html::endTag('p'); ?>
