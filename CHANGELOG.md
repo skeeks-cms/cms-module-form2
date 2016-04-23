@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.2.5
+-----------------
+  * Updated translation database
+
 2.2.4
 -----------------
   * Removed skeeks/cms/base/Module
