@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.2.5.1
+-----------------
+  * Translation phrase
+
 2.2.5
 -----------------
   * Updated translation database

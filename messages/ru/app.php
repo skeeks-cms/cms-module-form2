@@ -91,4 +91,5 @@ return
     'When handled'                                              => 'Когда обработали',
     'Who handled'                                               => 'Кто обработал',
     'Who has been notified'                                     => 'Кто был уведомлен',
+    'Submitting forms'                                          => 'Отправка формы',
 ];
