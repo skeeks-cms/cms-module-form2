@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-2.2.5.4.pre
+2.2.5.4
 -----------------
   * Fixed sort grid
   * Admin changes
