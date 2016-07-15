@@ -29,20 +29,8 @@ use common\models\User;
                     'form_id' => 'id'
                 ],
 
-                'dataProviderCallback' => function($dataProvider)
-                {
-                    /**
-                     * @var \yii\data\BaseDataProvider $dataProvider
-                     */
-                    $dataProvider->getPagination()->defaultPageSize   = 5000;
-                },
-
                 'controllerRoute'   => 'form2/admin-form-property',
                 'gridViewOptions'   => [
-                    'settingsData'              => [
-                        'orderBy' => 'priority',
-                        'order' => SORT_ASC,
-                    ],
                     'sortable' => true,
                     'columns' => [
                         [

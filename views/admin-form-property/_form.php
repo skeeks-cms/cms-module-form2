@@ -76,14 +76,6 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         'relation'          => [
             'property_id' => 'id'
         ],
-
-        'sort'              => [
-            'defaultOrder' =>
-            [
-                'priority' => SORT_ASC
-            ]
-        ],
-
         'controllerRoute'   => 'form2/admin-form-property-enum',
         'gridViewOptions'   => [
             'sortable' => true,
