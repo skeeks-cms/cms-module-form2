@@ -20,7 +20,7 @@ use common\models\User;
 <?= $form->fieldSetEnd(); ?>
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet( \Yii::t('skeeks/form2/app', 'form elements'))?>
+    <?= $form->fieldSet( \Yii::t('skeeks/form2/app', 'Form elements'))?>
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                 'label'             => \Yii::t('skeeks/form2/app', 'Element properties'),
                 'hint'              => \Yii::t('skeeks/form2/app', 'Each content on the site has its own set of properties, and then they are set'),

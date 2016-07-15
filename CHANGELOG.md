@@ -1,6 +1,14 @@
 CHANGELOG
 ==============
 
+2.2.5.4.pre
+-----------------
+  * Translation phrase
+
+2.2.5.3
+-----------------
+  * Translation phrase
+
 2.2.5.1
 -----------------
   * Translation phrase
