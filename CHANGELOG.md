@@ -3,6 +3,7 @@ CHANGELOG
 
 2.2.5.4.pre
 -----------------
+  * Admin changes
   * Translation phrase
 
 2.2.5.3

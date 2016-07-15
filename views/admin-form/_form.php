@@ -29,13 +29,6 @@ use common\models\User;
                     'form_id' => 'id'
                 ],
 
-                'sort'              => [
-                    'defaultOrder' =>
-                    [
-                        'priority' => SORT_ASC
-                    ]
-                ],
-
                 'dataProviderCallback' => function($dataProvider)
                 {
                     /**
@@ -46,6 +39,10 @@ use common\models\User;
 
                 'controllerRoute'   => 'form2/admin-form-property',
                 'gridViewOptions'   => [
+                    'settingsData'              => [
+                        'orderBy' => 'priority',
+                        'order' => SORT_ASC,
+                    ],
                     'sortable' => true,
                     'columns' => [
                         [
