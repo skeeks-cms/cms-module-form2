@@ -3,6 +3,7 @@ CHANGELOG
 
 2.2.5.4.pre
 -----------------
+  * Fixed sort grid
   * Admin changes
   * Translation phrase
 
