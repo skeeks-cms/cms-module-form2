@@ -37,6 +37,8 @@ class FormWidget extends WidgetRenderable
     public $btnSubmit = null;
     public $btnSubmitClass = 'btn btn-primary';
 
+    public $afterValidateJs = '';
+
     public function init()
     {
         if (!$this->btnSubmit)

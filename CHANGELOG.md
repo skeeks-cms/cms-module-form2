@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.2.6
+-----------------
+  * Added new settings in the widget
+
 2.2.5.4
 -----------------
   * Fixed sort grid

@@ -13,12 +13,14 @@ $modelHasRelatedProperties = $widget->modelForm->createModelFormSend();
     <?php $form = \skeeks\modules\cms\form2\widgets\ActiveFormConstructForm::begin([
         'id'                                        => $widget->id . "-active-form",
         'modelForm'                                 => $widget->modelForm,
-        'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
+        'afterValidateCallback'                     => $widget->afterValidateJs ? $widget->afterValidateJs : new \yii\web\JsExpression(<<<JS
             function(jForm, ajax)
             {
                 var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
                     'blockerSelector' : '#' + jForm.attr('id'),
                     'enableBlocker' : true,
+                    'allowResponseSuccessMessage' : false,
+                    'allowResponseErrorMessage' : false,
                 });
 
                 handler.bind('error', function(e, data)
