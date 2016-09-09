@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.3.0.pre
+-----------------
+  * Adapting to new additional properties
+
 2.2.6
 -----------------
   * Added new settings in the widget
