@@ -69,7 +69,10 @@ JS
 
     <? if ($handler) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]); ?>
-            <?= $handler->renderConfigForm($form); ?>
+        <? if($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) : ?>
+            <? $handler->enumRoute = 'form2/admin-form-property-enum'; ?>
+        <? endif; ?>
+        <?= $handler->renderConfigForm($form); ?>
     <? endif; ?>
 
 
@@ -107,32 +110,6 @@ JS
 
 <?= $form->fieldSetEnd(); ?>
 
-
-<? if (!$model->isNewRecord) : ?>
-<?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Values for the list')) ?>
-
-    <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label'             => \Yii::t('skeeks/form2/app', 'Values for the list'),
-        'hint'              => \Yii::t('skeeks/form2/app', 'You can link to the item number of properties, and set them to the value'),
-        'parentModel'       => $model,
-        'relation'          => [
-            'property_id' => 'id'
-        ],
-        'controllerRoute'   => 'form2/admin-form-property-enum',
-        'gridViewOptions'   => [
-            'sortable' => true,
-            'columns' => [
-                'id',
-                'code',
-                'value',
-                'priority',
-                'def',
-            ],
-        ],
-    ]); ?>
-
-<?= $form->fieldSetEnd(); ?>
-<? endif; ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 

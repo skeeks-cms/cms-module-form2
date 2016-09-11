@@ -145,9 +145,14 @@ class Form2Form extends Core
             throw new InvalidParamException;
         }
 
-        return new \skeeks\modules\cms\form2\models\Form2FormSend([
+        $form2Send = new \skeeks\modules\cms\form2\models\Form2FormSend([
             'form_id' => (int) $this->id
         ]);
+
+        $rpm = $form2Send->relatedPropertiesModel;
+        $rpm->loadDefaultValues();
+
+        return $form2Send;
     }
 
 }
