@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-2.3.0.pre
+2.3.0
 -----------------
   * Adapting to new additional properties
 
