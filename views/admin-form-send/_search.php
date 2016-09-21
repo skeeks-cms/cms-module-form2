@@ -26,8 +26,17 @@ if ($filter->id)
         'action' => '/' . \Yii::$app->request->pathInfo,
     ]); ?>
 
-    <?= $form->field($searchModel, 'status')->listBox(\yii\helpers\ArrayHelper::merge(['' => null],
-    \skeeks\modules\cms\form2\models\Form2FormSend::getStatuses()
+
+    <?= $form->field($searchModel, 'form_id')->listBox(\yii\helpers\ArrayHelper::merge(['' => null],
+        \yii\helpers\ArrayHelper::map(
+            \skeeks\modules\cms\form2\models\Form2Form::find()->all(),
+            'id',
+            'name'
+        )
     ), ['size' => 1])->setVisible(); ?>
+
+    <?= $form->field($searchModel, 'status')->listBox(\yii\helpers\ArrayHelper::merge(['' => null],
+        \skeeks\modules\cms\form2\models\Form2FormSend::getStatuses()
+    ), ['size' => 1]); ?>
 
 <? $form::end(); ?>
