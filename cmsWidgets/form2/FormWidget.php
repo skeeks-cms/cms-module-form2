@@ -88,7 +88,18 @@ class FormWidget extends WidgetRenderable
     {
         try
         {
-            if (!$this->form_id)
+            $form = null;
+
+            if ($this->form_id)
+            {
+                $this->modelForm = Form2Form::find()->where(['id' => $this->form_id])->one();
+
+                if (!$this->modelForm)
+                {
+                    throw new ErrorException("Форма не найдена: id=" . $this->form_id);
+                }
+
+            } else
             {
                 if ($this->form_code)
                 {
@@ -103,19 +114,10 @@ class FormWidget extends WidgetRenderable
                 {
                     throw new ErrorException("Форма не найдена: code=" . $this->form_code) ;
                 }
-            } else
-            {
-
-                $this->modelForm = Form2Form::find()->where(['id' => $this->form_id])->one();
-
-                if (!$this->modelForm)
-                {
-                    throw new ErrorException("Форма не найдена: id=" . $this->form_id);
-                }
             }
         } catch (\Exception $e)
         {
-            \Yii::error($e->getCode());
+            \Yii::warning($e->getMessage(), static::className());
         }
 
         if (!$this->modelForm)

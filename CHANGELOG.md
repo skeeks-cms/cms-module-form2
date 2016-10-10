@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.3.2
+-----------------
+  * Fixed errors
+
 2.3.1
 -----------------
   * Added filter form
