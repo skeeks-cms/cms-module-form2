@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.3.3
+-----------------
+  * Widget successJs errorJS options
+
 2.3.2
 -----------------
   * Fixed errors

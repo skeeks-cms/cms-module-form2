@@ -10,7 +10,32 @@
 $modelHasRelatedProperties = $widget->modelForm->createModelFormSend();
 
 ?>
-    <?php $form = \skeeks\modules\cms\form2\widgets\ActiveFormConstructForm::begin([
+    <?php
+    $successJs = '';
+    $errorJs = '';
+    if ($widget->successJs)
+    {
+        $successJs = <<<JS
+        var successJs = {$widget->successJs};
+        if (successJs)
+        {
+            successJs(jForm, data);
+        }
+JS;
+;;
+    }
+    if ($widget->errorJs)
+    {
+        $errorJs = <<<JS
+        var errorJs = {$widget->errorJs};
+        if (errorJs)
+        {
+            errorJs(jForm, data);
+        }
+JS;
+;
+    }
+    $form = \skeeks\modules\cms\form2\widgets\ActiveFormConstructForm::begin([
         'id'                                        => $widget->id . "-active-form",
         'modelForm'                                 => $widget->modelForm,
         'afterValidateCallback'                     => $widget->afterValidateJs ? $widget->afterValidateJs : new \yii\web\JsExpression(<<<JS
@@ -28,6 +53,8 @@ $modelHasRelatedProperties = $widget->modelForm->createModelFormSend();
                     $('.sx-success-message', jForm).hide();
                     $('.sx-error-message', jForm).show();
                     $('.sx-error-message .sx-body', jForm).empty().append(data.message);
+
+                    {$errorJs}
                 });
 
                 handler.bind('success', function(e, data)
@@ -44,6 +71,9 @@ $modelHasRelatedProperties = $widget->modelForm->createModelFormSend();
                             $(this).val('');
                         }
                     });
+
+                    {$successJs}
+
                 });
             }
 JS
@@ -75,8 +105,6 @@ JS
     <? endforeach; ?>
 <? endif; ?>
 
-<?= \yii\helpers\Html::submitButton("" . \Yii::t('skeeks/form2/app', $widget->btnSubmit), [
-    'class' => $widget->btnSubmitClass,
-]); ?>
+<?= \yii\helpers\Html::tag($widget->btn_tag, \Yii::t('skeeks/form2/app', $widget->btnSubmit), $widget->btn_options); ?>
 
 <?php \skeeks\modules\cms\form2\widgets\ActiveFormConstructForm::end(); ?>

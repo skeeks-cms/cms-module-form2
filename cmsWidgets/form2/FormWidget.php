@@ -34,10 +34,15 @@ class FormWidget extends WidgetRenderable
     public $form_id;
     public $form_code;
 
+    public $btn_tag     = 'button';
+    public $btn_options = [];
+
     public $btnSubmit = null;
     public $btnSubmitClass = 'btn btn-primary';
 
     public $afterValidateJs = '';
+    public $successJs = '';
+    public $errorJs = '';
 
     public function init()
     {
@@ -45,6 +50,11 @@ class FormWidget extends WidgetRenderable
         {
             $this->btnSubmit = \Yii::t('skeeks/form2/app', 'Submit');
         }
+
+        $this->btn_options = ArrayHelper::merge([
+            'type'  => 'submit',
+            'class' => $this->btnSubmitClass,
+        ], $this->btn_options);
 
         parent::init();
     }
