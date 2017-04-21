@@ -101,7 +101,7 @@ if ($attrs = $model->relatedPropertiesModel->attributeLabels())
             [
                 'format' => 'raw',
                 'label'  => \Yii::t('skeeks/form2/app', 'Submitted by'),
-                'value'  => "{$model->createdBy->displayName}",
+                'value'  => $model->createdBy ? $model->createdBy->displayName : '-',
             ],
 
             [
