@@ -5,6 +5,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 /* @var $this yii\web\View */
 /* @var $action \skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction */
 /* @var $model \skeeks\modules\cms\form2\models\Form2FormSend */
+$controller = $this->context;
+$action = $controller->action;
 $model = $action->controller->model;
 
 if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_NEW && !$model->processed_by)

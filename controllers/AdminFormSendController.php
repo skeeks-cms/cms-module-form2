@@ -7,6 +7,7 @@
  */
 namespace skeeks\modules\cms\form2\controllers;
 
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\modules\cms\form2\models\Form2Form;
@@ -35,14 +36,16 @@ class AdminFormSendController extends AdminModelEditorController
     {
         $actions = ArrayHelper::merge(parent::actions(),
         [
-            'update' =>
+            'view' =>
             [
+                'class' => BackendModelAction::class,
                 'name' => \Yii::t('skeeks/form2/app', 'View'),
                 "icon" => "glyphicon glyphicon-eye-open",
                 "priority" => 0,
             ],
         ]);
 
+        ArrayHelper::remove($actions, 'update');
         ArrayHelper::remove($actions, 'create');
         ArrayHelper::remove($actions, 'system');
         ArrayHelper::remove($actions, 'related-properties');
