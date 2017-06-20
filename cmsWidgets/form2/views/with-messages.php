@@ -81,6 +81,9 @@ JS
     ]);
 ?>
 
+
+    <?= $form->errorSummary($modelHasRelatedProperties); ?>
+
 <?= \yii\bootstrap\Alert::widget([
     'options' => [
         'class' => 'alert-success sx-success-message',

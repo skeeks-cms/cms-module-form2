@@ -81,19 +81,25 @@ class BackendController extends Controller
 
                 if ($validateModel->load(\Yii::$app->request->post()) && $validateModel->validate())
                 {
-                    if (!$modelFormSend->save())
+                    if ($this->_beforeSave($modelForm, $validateModel, $modelFormSend))
+                    {
+                        if (!$modelFormSend->save())
+                        {
+                            $rr->success = false;
+                            $rr->message = \Yii::t('skeeks/form2/app', 'Failed to send the form');
+                            return (array) $rr;
+                        }
+
+                        $validateModel->save();
+                        $modelFormSend->notify();
+
+                        $rr->success = true;
+                        $rr->message = \Yii::t('skeeks/form2/app', 'Successfully sent');
+                    } else
                     {
                         $rr->success = false;
-                        $rr->message = \Yii::t('skeeks/form2/app', 'Failed to send the form');
-                        return (array) $rr;
+                        $rr->message = \Yii::t('skeeks/form2/app', 'Check the correctness of filling the form fields');
                     }
-
-                    $validateModel->save();
-
-                    $modelFormSend->notify();
-
-                    $rr->success = true;
-                    $rr->message = \Yii::t('skeeks/form2/app', 'Successfully sent');
 
                 } else
                 {
@@ -104,6 +110,16 @@ class BackendController extends Controller
                 return (array) $rr;
             }
         }
+    }
+
+    /**
+     * @param RelatedPropertiesModel $validateModel
+     * @param Form2FormSend $modelFormSend
+     * @return bool
+     */
+    protected function _beforeSave(Form2Form $modelForm, RelatedPropertiesModel $validateModel, Form2FormSend $modelFormSend)
+    {
+        return true;
     }
 
     /**
