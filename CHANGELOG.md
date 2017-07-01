@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.4.0.pre
+-----------------
+  * New rp boolean value
+  
 2.3.6
 -----------------
   * Updated
