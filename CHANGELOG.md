@@ -1,7 +1,7 @@
 CHANGELOG
 ==============
 
-2.4.0.pre
+2.4.0
 -----------------
   * New related value types
   * New rp boolean value
