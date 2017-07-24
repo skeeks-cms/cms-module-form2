@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.4.0.1
+-----------------
+  * Change messages
+  
 2.4.0
 -----------------
   * New related value types

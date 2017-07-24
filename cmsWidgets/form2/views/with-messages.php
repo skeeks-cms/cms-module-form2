@@ -82,7 +82,7 @@ JS
 ?>
 
 
-    <?= $form->errorSummary($modelHasRelatedProperties); ?>
+    <?/*= $form->errorSummary($modelHasRelatedProperties); */?>
 
 <?= \yii\bootstrap\Alert::widget([
     'options' => [
