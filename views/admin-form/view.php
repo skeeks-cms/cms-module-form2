@@ -8,10 +8,11 @@ use common\models\User;
 /* @var $model \skeeks\modules\cms\form2\models\Form2Form */
 /* @var $console \skeeks\cms\controllers\AdminUserController */
 /* @var $action \skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction */
+$controller = $this->context;
 ?>
 <?=
     \skeeks\modules\cms\form2\cmsWidgets\form2\FormWidget::widget([
-        'namespace' => "FormWidget-admin-" . $action->controller->model->id,
-        'form_id'   => $action->controller->model->id
+        'namespace' => "FormWidget-admin-" . $controller->model->id,
+        'form_id'   => $controller->model->id
     ]);
 ?>
