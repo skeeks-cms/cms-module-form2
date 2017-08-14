@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.4.0.3.pre
+-----------------
+  * mysq 5.7 migrate update
+  
 2.4.0.2
 -----------------
   * Fixed errors
