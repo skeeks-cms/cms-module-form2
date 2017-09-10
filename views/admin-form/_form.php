@@ -29,7 +29,7 @@ use common\models\User;
                     'form_id' => 'id'
                 ],
 
-                'controllerRoute'   => 'form2/admin-form-property',
+                'controllerRoute'   => '/form2/admin-form-property',
                 'gridViewOptions'   => [
                     'sortable' => true,
                     'columns' => [
