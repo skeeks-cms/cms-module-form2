@@ -252,7 +252,9 @@ class Form2FormSend extends RelatedElementModel
             {
                 foreach ($this->form->emailsAsArray as $email)
                 {
-                    \Yii::$app->mailer->compose('@skeeks/modules/cms/form2/mail/send-message', [
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/modules/cms/form2/mail';
+
+                    \Yii::$app->mailer->compose('send-message', [
                         'form'              => $this->form,
                         'formSend'          => $this
                     ])

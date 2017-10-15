@@ -93,6 +93,8 @@ class BackendController extends Controller
                         $validateModel->save();
                         $modelFormSend->notify();
 
+                        $this->_afterSave($modelForm, $validateModel, $modelFormSend);
+
                         $rr->success = true;
                         $rr->message = \Yii::t('skeeks/form2/app', 'Successfully sent');
                     } else
@@ -120,6 +122,15 @@ class BackendController extends Controller
     protected function _beforeSave(Form2Form $modelForm, RelatedPropertiesModel $validateModel, Form2FormSend $modelFormSend)
     {
         return true;
+    }
+
+    /**
+     * @param RelatedPropertiesModel $validateModel
+     * @param Form2FormSend $modelFormSend
+     */
+    protected function _afterSave(Form2Form $modelForm, RelatedPropertiesModel $validateModel, Form2FormSend $modelFormSend)
+    {
+        return;
     }
 
     /**
