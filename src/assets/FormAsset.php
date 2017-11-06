@@ -15,7 +15,7 @@ use yii\web\AssetBundle;
  */
 class FormAsset extends AssetBundle
 {
-    public $sourcePath = '@vendor/skeeks/cms-module-form2/assets';
+    public $sourcePath = '@skeeks/modules/cms/form2/assets';
 
     public $css = [];
     public $js = [];
