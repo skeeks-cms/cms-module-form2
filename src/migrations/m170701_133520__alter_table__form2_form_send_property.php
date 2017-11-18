@@ -17,13 +17,20 @@ class m170701_133520__alter_table__form2_form_send_property extends Migration
             ['element_id' => null],
             ['property_id' => null],
         ]);
-        
+
         $this->dropForeignKey('form2_form_send_property_element_id', '{{%form2_form_send_property}}');
         $this->dropForeignKey('form2_form_send_property_property_id', '{{%form2_form_send_property}}');
 
-        $this->alterColumn("{{%form2_form_send_property}}", 'element_id', $this->integer()->notNull());
-        $this->alterColumn("{{%form2_form_send_property}}", 'property_id', $this->integer()->notNull());
-        
+        if ($this->db->driverName == 'mysql') {
+            $this->alterColumn("{{%form2_form_send_property}}", 'element_id', $this->integer()->notNull());
+            $this->alterColumn("{{%form2_form_send_property}}", 'property_id', $this->integer()->notNull());
+        } else {
+            $this->alterColumn("{{%form2_form_send_property}}", 'element_id', $this->integer());
+            $this->alterColumn("{{%form2_form_send_property}}", 'element_id', "SET NOT NULL");
+            $this->alterColumn("{{%form2_form_send_property}}", 'property_id', $this->integer());
+            $this->alterColumn("{{%form2_form_send_property}}", 'property_id', "SET NOT NULL");
+        }
+
         $this->addForeignKey(
             'form2_form_send_property_element_id', "{{%form2_form_send_property}}",
             'element_id', '{{%form2_form_send}}', 'id', 'CASCADE', 'CASCADE'
