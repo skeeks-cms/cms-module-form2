@@ -10,7 +10,7 @@ use yii\db\Migration;
 
 class m150615_192740_create_table__form2_form_send_property extends Migration
 {
-    public function up()
+    public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%form2_form_send_property}}", true);
         if ($tableExist)
@@ -43,17 +43,17 @@ class m150615_192740_create_table__form2_form_send_property extends Migration
 
         ], $tableOptions);
 
-        $this->createIndex('updated_by', '{{%form2_form_send_property}}', 'updated_by');
-        $this->createIndex('created_by', '{{%form2_form_send_property}}', 'created_by');
-        $this->createIndex('created_at', '{{%form2_form_send_property}}', 'created_at');
-        $this->createIndex('updated_at', '{{%form2_form_send_property}}', 'updated_at');
+        $this->createIndex('form2_form_send_property__updated_by', '{{%form2_form_send_property}}', 'updated_by');
+        $this->createIndex('form2_form_send_property__created_by', '{{%form2_form_send_property}}', 'created_by');
+        $this->createIndex('form2_form_send_property__created_at', '{{%form2_form_send_property}}', 'created_at');
+        $this->createIndex('form2_form_send_property__updated_at', '{{%form2_form_send_property}}', 'updated_at');
 
-        $this->createIndex('property_id', '{{%form2_form_send_property}}', 'property_id');
-        $this->createIndex('element_id', '{{%form2_form_send_property}}', 'element_id');
-        $this->createIndex('value', '{{%form2_form_send_property}}', 'value');
-        $this->createIndex('value_enum', '{{%form2_form_send_property}}', 'value_enum');
-        $this->createIndex('value_num', '{{%form2_form_send_property}}', 'value_num');
-        $this->createIndex('description', '{{%form2_form_send_property}}', 'description');
+        $this->createIndex('form2_form_send_property__property_id', '{{%form2_form_send_property}}', 'property_id');
+        $this->createIndex('form2_form_send_property__element_id', '{{%form2_form_send_property}}', 'element_id');
+        $this->createIndex('form2_form_send_property__value', '{{%form2_form_send_property}}', 'value');
+        $this->createIndex('form2_form_send_property__value_enum', '{{%form2_form_send_property}}', 'value_enum');
+        $this->createIndex('form2_form_send_property__value_num', '{{%form2_form_send_property}}', 'value_num');
+        $this->createIndex('form2_form_send_property__description', '{{%form2_form_send_property}}', 'description');
 
         $this->addForeignKey(
             'form2_form_send_property_created_by', "{{%form2_form_send_property}}",

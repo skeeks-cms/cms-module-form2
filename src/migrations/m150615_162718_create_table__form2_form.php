@@ -10,7 +10,7 @@ use yii\db\Migration;
 
 class m150615_162718_create_table__form2_form extends Migration
 {
-    public function up()
+    public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%form2_form}}", true);
         if ($tableExist)
@@ -43,23 +43,23 @@ class m150615_162718_create_table__form2_form extends Migration
 
         ], $tableOptions);
 
-        $this->createIndex('updated_by', '{{%form2_form}}', 'updated_by');
-        $this->createIndex('created_by', '{{%form2_form}}', 'created_by');
-        $this->createIndex('created_at', '{{%form2_form}}', 'created_at');
-        $this->createIndex('updated_at', '{{%form2_form}}', 'updated_at');
-        $this->createIndex('name', '{{%form2_form}}', 'name');
-        $this->createIndex('code', '{{%form2_form}}', 'code', true);
+        $this->createIndex('form2_form__updated_by', '{{%form2_form}}', 'updated_by');
+        $this->createIndex('form2_form__created_by', '{{%form2_form}}', 'created_by');
+        $this->createIndex('form2_form__created_at', '{{%form2_form}}', 'created_at');
+        $this->createIndex('form2_form__updated_at', '{{%form2_form}}', 'updated_at');
+        $this->createIndex('form2_form__name', '{{%form2_form}}', 'name');
+        $this->createIndex('form2_form__code', '{{%form2_form}}', 'code', true);
 
         $this->addCommentOnTable('{{%form2_form}}', 'Forms');
 
 
         $this->addForeignKey(
-            'form2_form_created_by', "{{%form2_form}}",
+            'form2_form__created_by', "{{%form2_form}}",
             'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'
         );
 
         $this->addForeignKey(
-            'form2_form_updated_by', "{{%form2_form}}",
+            'form2_form__updated_by', "{{%form2_form}}",
             'updated_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'
         );
     }

@@ -10,7 +10,7 @@ use yii\db\Migration;
 
 class m150615_162740_create_table__form2_form_send extends Migration
 {
-    public function up()
+    public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%form2_form_send}}", true);
         if ($tableExist)
@@ -64,18 +64,18 @@ class m150615_162740_create_table__form2_form_send extends Migration
 
         ], $tableOptions);
 
-        $this->createIndex('updated_by', '{{%form2_form_send}}', 'updated_by');
-        $this->createIndex('created_by', '{{%form2_form_send}}', 'created_by');
-        $this->createIndex('created_at', '{{%form2_form_send}}', 'created_at');
-        $this->createIndex('updated_at', '{{%form2_form_send}}', 'updated_at');
+        $this->createIndex('form2_form_send__updated_by', '{{%form2_form_send}}', 'updated_by');
+        $this->createIndex('form2_form_send__created_by', '{{%form2_form_send}}', 'created_by');
+        $this->createIndex('form2_form_send__created_at', '{{%form2_form_send}}', 'created_at');
+        $this->createIndex('form2_form_send__updated_at', '{{%form2_form_send}}', 'updated_at');
 
-        $this->createIndex('form_id', '{{%form2_form_send}}', 'form_id');
-        $this->createIndex('processed_by', '{{%form2_form_send}}', 'processed_by');
-        $this->createIndex('processed_at', '{{%form2_form_send}}', 'processed_at');
-        $this->createIndex('status', '{{%form2_form_send}}', 'status');
-        $this->createIndex('ip', '{{%form2_form_send}}', 'ip');
-        $this->createIndex('page_url', '{{%form2_form_send}}', 'page_url');
-        $this->createIndex('site_code', '{{%form2_form_send}}', 'site_code');
+        $this->createIndex('form2_form_send__form_id', '{{%form2_form_send}}', 'form_id');
+        $this->createIndex('form2_form_send__processed_by', '{{%form2_form_send}}', 'processed_by');
+        $this->createIndex('form2_form_send__processed_at', '{{%form2_form_send}}', 'processed_at');
+        $this->createIndex('form2_form_send__status', '{{%form2_form_send}}', 'status');
+        $this->createIndex('form2_form_send__ip', '{{%form2_form_send}}', 'ip');
+        $this->createIndex('form2_form_send__page_url', '{{%form2_form_send}}', 'page_url');
+        $this->createIndex('form2_form_send__site_code', '{{%form2_form_send}}', 'site_code');
 
         $this->addCommentOnTable('{{%form2_form_send}}', 'Form messages');
 

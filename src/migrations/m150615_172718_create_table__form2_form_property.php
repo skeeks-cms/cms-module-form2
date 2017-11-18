@@ -10,7 +10,7 @@ use yii\db\Migration;
 
 class m150615_172718_create_table__form2_form_property extends Migration
 {
-    public function up()
+    public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%form2_form_property}}", true);
         if ($tableExist)
@@ -55,30 +55,29 @@ class m150615_172718_create_table__form2_form_property extends Migration
 
         ], $tableOptions);
 
-        $this->createIndex('updated_by', '{{%form2_form_property}}', 'updated_by');
-        $this->createIndex('created_by', '{{%form2_form_property}}', 'created_by');
-        $this->createIndex('created_at', '{{%form2_form_property}}', 'created_at');
-        $this->createIndex('updated_at', '{{%form2_form_property}}', 'updated_at');
+        $this->createIndex('form2_form_property__updated_by', '{{%form2_form_property}}', 'updated_by');
+        $this->createIndex('form2_form_property__created_by', '{{%form2_form_property}}', 'created_by');
+        $this->createIndex('form2_form_property__created_at', '{{%form2_form_property}}', 'created_at');
+        $this->createIndex('form2_form_property__updated_at', '{{%form2_form_property}}', 'updated_at');
 
-        $this->createIndex('name', '{{%form2_form_property}}', 'name');
-        $this->createIndex('code', '{{%form2_form_property}}', ['code', 'form_id'], true);
+        $this->createIndex('form2_form_property__name', '{{%form2_form_property}}', 'name');
+        $this->createIndex('form2_form_property__code', '{{%form2_form_property}}', ['code', 'form_id'], true);
 
-        $this->createIndex('active', '{{%form2_form_property}}', 'active');
-        $this->createIndex('priority', '{{%form2_form_property}}', 'priority');
-        $this->createIndex('property_type', '{{%form2_form_property}}', 'property_type');
-        $this->createIndex('list_type', '{{%form2_form_property}}', 'list_type');
-        $this->createIndex('multiple', '{{%form2_form_property}}', 'multiple');
-        $this->createIndex('multiple_cnt', '{{%form2_form_property}}', 'multiple_cnt');
-        $this->createIndex('with_description', '{{%form2_form_property}}', 'with_description');
-        $this->createIndex('searchable', '{{%form2_form_property}}', 'searchable');
-        $this->createIndex('filtrable', '{{%form2_form_property}}', 'filtrable');
-        $this->createIndex('is_required', '{{%form2_form_property}}', 'is_required');
-        $this->createIndex('version', '{{%form2_form_property}}', 'version');
-        $this->createIndex('component', '{{%form2_form_property}}', 'component');
-        $this->createIndex('hint', '{{%form2_form_property}}', 'hint');
-        $this->createIndex('smart_filtrable', '{{%form2_form_property}}', 'smart_filtrable');
-        $this->createIndex('form_id', '{{%form2_form_property}}', 'form_id');
-
+        $this->createIndex('form2_form_property__active', '{{%form2_form_property}}', 'active');
+        $this->createIndex('form2_form_property__priority', '{{%form2_form_property}}', 'priority');
+        $this->createIndex('form2_form_property__property_type', '{{%form2_form_property}}', 'property_type');
+        $this->createIndex('form2_form_property__list_type', '{{%form2_form_property}}', 'list_type');
+        $this->createIndex('form2_form_property__multiple', '{{%form2_form_property}}', 'multiple');
+        $this->createIndex('form2_form_property__multiple_cnt', '{{%form2_form_property}}', 'multiple_cnt');
+        $this->createIndex('form2_form_property__with_description', '{{%form2_form_property}}', 'with_description');
+        $this->createIndex('form2_form_property__searchable', '{{%form2_form_property}}', 'searchable');
+        $this->createIndex('form2_form_property__filtrable', '{{%form2_form_property}}', 'filtrable');
+        $this->createIndex('form2_form_property__is_required', '{{%form2_form_property}}', 'is_required');
+        $this->createIndex('form2_form_property__version', '{{%form2_form_property}}', 'version');
+        $this->createIndex('form2_form_property__component', '{{%form2_form_property}}', 'component');
+        $this->createIndex('form2_form_property__hint', '{{%form2_form_property}}', 'hint');
+        $this->createIndex('form2_form_property__smart_filtrable', '{{%form2_form_property}}', 'smart_filtrable');
+        $this->createIndex('form2_form_property__form_id', '{{%form2_form_property}}', 'form_id');
 
         $this->addForeignKey(
             'form2_form_property_created_by', "{{%form2_form_property}}",

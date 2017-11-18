@@ -10,7 +10,7 @@ use yii\db\Migration;
 
 class m160701_192740_alter_table__form2_form_send_property extends Migration
 {
-  public function up()
+  public function safeUp()
   {
       $this->dropIndex('value', '{{%form2_form_send_property}}');
       $this->alterColumn('{{%form2_form_send_property}}', "value", "longtext NOT NULL");

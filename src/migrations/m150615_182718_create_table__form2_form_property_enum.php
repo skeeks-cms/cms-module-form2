@@ -10,7 +10,7 @@ use yii\db\Migration;
 
 class m150615_182718_create_table__form2_form_property_enum extends Migration
 {
-    public function up()
+    public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%form2_form_property_enum}}", true);
         if ($tableExist)
@@ -41,16 +41,16 @@ class m150615_182718_create_table__form2_form_property_enum extends Migration
 
         ], $tableOptions);
 
-        $this->createIndex('updated_by', '{{%form2_form_property_enum}}', 'updated_by');
-        $this->createIndex('created_by', '{{%form2_form_property_enum}}', 'created_by');
-        $this->createIndex('created_at', '{{%form2_form_property_enum}}', 'created_at');
-        $this->createIndex('updated_at', '{{%form2_form_property_enum}}', 'updated_at');
+        $this->createIndex('form2_form_property_enum__updated_by', '{{%form2_form_property_enum}}', 'updated_by');
+        $this->createIndex('form2_form_property_enum__created_by', '{{%form2_form_property_enum}}', 'created_by');
+        $this->createIndex('form2_form_property_enum__created_at', '{{%form2_form_property_enum}}', 'created_at');
+        $this->createIndex('form2_form_property_enum__updated_at', '{{%form2_form_property_enum}}', 'updated_at');
 
-        $this->createIndex('property_id', '{{%form2_form_property_enum}}', 'property_id');
-        $this->createIndex('def', '{{%form2_form_property_enum}}', 'def');
-        $this->createIndex('code', '{{%form2_form_property_enum}}', 'code');
-        $this->createIndex('priority', '{{%form2_form_property_enum}}', 'priority');
-        $this->createIndex('value', '{{%form2_form_property_enum}}', 'value');
+        $this->createIndex('form2_form_property_enum__property_id', '{{%form2_form_property_enum}}', 'property_id');
+        $this->createIndex('form2_form_property_enum__def', '{{%form2_form_property_enum}}', 'def');
+        $this->createIndex('form2_form_property_enum__code', '{{%form2_form_property_enum}}', 'code');
+        $this->createIndex('form2_form_property_enum__priority', '{{%form2_form_property_enum}}', 'priority');
+        $this->createIndex('form2_form_property_enum__value', '{{%form2_form_property_enum}}', 'value');
 
         $this->addForeignKey(
             'form2_form_property_enum_created_by', "{{%form2_form_property_enum}}",
