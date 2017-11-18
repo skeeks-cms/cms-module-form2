@@ -64,21 +64,20 @@ class m150615_162740_create_table__form2_form_send extends Migration
 
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(updated_by);");
-        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(created_by);");
+        $this->createIndex('updated_by', '{{%form2_form_send}}', 'updated_by');
+        $this->createIndex('created_by', '{{%form2_form_send}}', 'created_by');
+        $this->createIndex('created_at', '{{%form2_form_send}}', 'created_at');
+        $this->createIndex('updated_at', '{{%form2_form_send}}', 'updated_at');
 
-        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(updated_at);");
+        $this->createIndex('form_id', '{{%form2_form_send}}', 'form_id');
+        $this->createIndex('processed_by', '{{%form2_form_send}}', 'processed_by');
+        $this->createIndex('processed_at', '{{%form2_form_send}}', 'processed_at');
+        $this->createIndex('status', '{{%form2_form_send}}', 'status');
+        $this->createIndex('ip', '{{%form2_form_send}}', 'ip');
+        $this->createIndex('page_url', '{{%form2_form_send}}', 'page_url');
+        $this->createIndex('site_code', '{{%form2_form_send}}', 'site_code');
 
-        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(form_id);");
-        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(processed_by);");
-        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(processed_at);");
-        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(status);");
-        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(ip);");
-        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(page_url);");
-        $this->execute("ALTER TABLE {{%form2_form_send}} ADD INDEX(site_code);");
-
-        $this->execute("ALTER TABLE {{%form2_form_send}} COMMENT = 'Сообщения с форм';");
+        $this->addCommentOnTable('{{%form2_form_send}}', 'Form messages');
 
         $this->addForeignKey(
             'form2_form_send_site_code_fk', "{{%form2_form_send}}",

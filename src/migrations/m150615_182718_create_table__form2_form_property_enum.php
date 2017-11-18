@@ -41,20 +41,16 @@ class m150615_182718_create_table__form2_form_property_enum extends Migration
 
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%form2_form_property_enum}} ADD INDEX(updated_by);");
-        $this->execute("ALTER TABLE {{%form2_form_property_enum}} ADD INDEX(created_by);");
+        $this->createIndex('updated_by', '{{%form2_form_property_enum}}', 'updated_by');
+        $this->createIndex('created_by', '{{%form2_form_property_enum}}', 'created_by');
+        $this->createIndex('created_at', '{{%form2_form_property_enum}}', 'created_at');
+        $this->createIndex('updated_at', '{{%form2_form_property_enum}}', 'updated_at');
 
-        $this->execute("ALTER TABLE {{%form2_form_property_enum}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%form2_form_property_enum}} ADD INDEX(updated_at);");
-
-        $this->execute("ALTER TABLE {{%form2_form_property_enum}} ADD INDEX(property_id);");
-        $this->execute("ALTER TABLE {{%form2_form_property_enum}} ADD INDEX(def);");
-        $this->execute("ALTER TABLE {{%form2_form_property_enum}} ADD INDEX(code);");
-        $this->execute("ALTER TABLE {{%form2_form_property_enum}} ADD INDEX(priority);");
-
-        $this->execute("ALTER TABLE {{%form2_form_property_enum}} ADD INDEX(value);");
-
-        $this->execute("ALTER TABLE {{%form2_form_property_enum}} COMMENT = 'Справочник значений свойств';");
+        $this->createIndex('property_id', '{{%form2_form_property_enum}}', 'property_id');
+        $this->createIndex('def', '{{%form2_form_property_enum}}', 'def');
+        $this->createIndex('code', '{{%form2_form_property_enum}}', 'code');
+        $this->createIndex('priority', '{{%form2_form_property_enum}}', 'priority');
+        $this->createIndex('value', '{{%form2_form_property_enum}}', 'value');
 
         $this->addForeignKey(
             'form2_form_property_enum_created_by', "{{%form2_form_property_enum}}",

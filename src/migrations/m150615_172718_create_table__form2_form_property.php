@@ -55,33 +55,30 @@ class m150615_172718_create_table__form2_form_property extends Migration
 
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(updated_by);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(created_by);");
+        $this->createIndex('updated_by', '{{%form2_form_property}}', 'updated_by');
+        $this->createIndex('created_by', '{{%form2_form_property}}', 'created_by');
+        $this->createIndex('created_at', '{{%form2_form_property}}', 'created_at');
+        $this->createIndex('updated_at', '{{%form2_form_property}}', 'updated_at');
 
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(updated_at);");
+        $this->createIndex('name', '{{%form2_form_property}}', 'name');
+        $this->createIndex('code', '{{%form2_form_property}}', ['code', 'form_id'], true);
 
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(name);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD UNIQUE(code,form_id);");
+        $this->createIndex('active', '{{%form2_form_property}}', 'active');
+        $this->createIndex('priority', '{{%form2_form_property}}', 'priority');
+        $this->createIndex('property_type', '{{%form2_form_property}}', 'property_type');
+        $this->createIndex('list_type', '{{%form2_form_property}}', 'list_type');
+        $this->createIndex('multiple', '{{%form2_form_property}}', 'multiple');
+        $this->createIndex('multiple_cnt', '{{%form2_form_property}}', 'multiple_cnt');
+        $this->createIndex('with_description', '{{%form2_form_property}}', 'with_description');
+        $this->createIndex('searchable', '{{%form2_form_property}}', 'searchable');
+        $this->createIndex('filtrable', '{{%form2_form_property}}', 'filtrable');
+        $this->createIndex('is_required', '{{%form2_form_property}}', 'is_required');
+        $this->createIndex('version', '{{%form2_form_property}}', 'version');
+        $this->createIndex('component', '{{%form2_form_property}}', 'component');
+        $this->createIndex('hint', '{{%form2_form_property}}', 'hint');
+        $this->createIndex('smart_filtrable', '{{%form2_form_property}}', 'smart_filtrable');
+        $this->createIndex('form_id', '{{%form2_form_property}}', 'form_id');
 
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(active);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(priority);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(property_type);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(list_type);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(multiple);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(multiple_cnt);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(with_description);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(searchable);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(filtrable);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(is_required);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(version);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(component);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(hint);");
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(smart_filtrable);");
-
-        $this->execute("ALTER TABLE {{%form2_form_property}} ADD INDEX(form_id);");
-
-        $this->execute("ALTER TABLE {{%form2_form_property}} COMMENT = 'Свойство раздела';");
 
         $this->addForeignKey(
             'form2_form_property_created_by', "{{%form2_form_property}}",

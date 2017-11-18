@@ -43,16 +43,15 @@ class m150615_162718_create_table__form2_form extends Migration
 
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%form2_form}} ADD INDEX(updated_by);");
-        $this->execute("ALTER TABLE {{%form2_form}} ADD INDEX(created_by);");
+        $this->createIndex('updated_by', '{{%form2_form}}', 'updated_by');
+        $this->createIndex('created_by', '{{%form2_form}}', 'created_by');
+        $this->createIndex('created_at', '{{%form2_form}}', 'created_at');
+        $this->createIndex('updated_at', '{{%form2_form}}', 'updated_at');
+        $this->createIndex('name', '{{%form2_form}}', 'name');
+        $this->createIndex('code', '{{%form2_form}}', 'code', true);
 
-        $this->execute("ALTER TABLE {{%form2_form}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%form2_form}} ADD INDEX(updated_at);");
+        $this->addCommentOnTable('{{%form2_form}}', 'Forms');
 
-        $this->execute("ALTER TABLE {{%form2_form}} ADD INDEX(name);");
-        $this->execute("ALTER TABLE {{%form2_form}} ADD UNIQUE(code);");
-
-        $this->execute("ALTER TABLE {{%form2_form}} COMMENT = 'Формы';");
 
         $this->addForeignKey(
             'form2_form_created_by', "{{%form2_form}}",

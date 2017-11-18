@@ -43,21 +43,17 @@ class m150615_192740_create_table__form2_form_send_property extends Migration
 
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%form2_form_send_property}} ADD INDEX(updated_by);");
-        $this->execute("ALTER TABLE {{%form2_form_send_property}} ADD INDEX(created_by);");
+        $this->createIndex('updated_by', '{{%form2_form_send_property}}', 'updated_by');
+        $this->createIndex('created_by', '{{%form2_form_send_property}}', 'created_by');
+        $this->createIndex('created_at', '{{%form2_form_send_property}}', 'created_at');
+        $this->createIndex('updated_at', '{{%form2_form_send_property}}', 'updated_at');
 
-        $this->execute("ALTER TABLE {{%form2_form_send_property}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%form2_form_send_property}} ADD INDEX(updated_at);");
-
-        $this->execute("ALTER TABLE {{%form2_form_send_property}} ADD INDEX(property_id);");
-        $this->execute("ALTER TABLE {{%form2_form_send_property}} ADD INDEX(element_id);");
-
-        $this->execute("ALTER TABLE {{%form2_form_send_property}} ADD INDEX(value);");
-        $this->execute("ALTER TABLE {{%form2_form_send_property}} ADD INDEX(value_enum);");
-        $this->execute("ALTER TABLE {{%form2_form_send_property}} ADD INDEX(value_num);");
-        $this->execute("ALTER TABLE {{%form2_form_send_property}} ADD INDEX(description);");
-
-        $this->execute("ALTER TABLE {{%form2_form_send_property}} COMMENT = 'Связь свойства и значения';");
+        $this->createIndex('property_id', '{{%form2_form_send_property}}', 'property_id');
+        $this->createIndex('element_id', '{{%form2_form_send_property}}', 'element_id');
+        $this->createIndex('value', '{{%form2_form_send_property}}', 'value');
+        $this->createIndex('value_enum', '{{%form2_form_send_property}}', 'value_enum');
+        $this->createIndex('value_num', '{{%form2_form_send_property}}', 'value_num');
+        $this->createIndex('description', '{{%form2_form_send_property}}', 'description');
 
         $this->addForeignKey(
             'form2_form_send_property_created_by', "{{%form2_form_send_property}}",
