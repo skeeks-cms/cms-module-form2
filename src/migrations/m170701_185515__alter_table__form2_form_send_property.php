@@ -14,13 +14,13 @@ class m170701_185515__alter_table__form2_form_send_property extends Migration
     public function safeUp()
     {
         $this->addColumn("{{%form2_form_send_property}}", "value_num2", $this->decimal(18, 4));
-        $this->createIndex("value_num2", "{{%form2_form_send_property}}", "value_num2");
+        $this->createIndex("form2_form_send_property__value_num2", "{{%form2_form_send_property}}", "value_num2");
 
         $this->addColumn("{{%form2_form_send_property}}", "value_int2", $this->integer());
-        $this->createIndex("value_int2", "{{%form2_form_send_property}}", "value_int2");
+        $this->createIndex("form2_form_send_property__value_int2", "{{%form2_form_send_property}}", "value_int2");
 
         $this->addColumn("{{%form2_form_send_property}}", "value_string", $this->string(255));
-        $this->createIndex("value_string", "{{%form2_form_send_property}}", "value_string");
+        $this->createIndex("form2_form_send_property__value_string", "{{%form2_form_send_property}}", "value_string");
 
     }
 
