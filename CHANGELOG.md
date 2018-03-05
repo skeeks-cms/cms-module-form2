@@ -1,6 +1,106 @@
 CHANGELOG
 ==============
 
+2.5.3
+-----------------
+  * Pgsql support
+  
+2.5.2
+-----------------
+  * Pgsql support
+  
+2.5.1
+-----------------
+  * Fixed
+  
+2.5.0.1
+-----------------
+  * Fixed
+  
+2.5.0
+-----------------
+  * Using composer-config-plugin
+  
+2.4.0.6
+-----------------
+  * Fixed
+  
+2.4.0.5
+-----------------
+  * Fixed email url
+  
+2.4.0.4
+-----------------
+  * Fixed
+  
+2.4.0.3
+-----------------
+  * mysq 5.7 migrate update
+  
+2.4.0.2
+-----------------
+  * Fixed errors
+  
+2.4.0.1
+-----------------
+  * Change messages
+  
+2.4.0
+-----------------
+  * New related value types
+  * New rp boolean value
+  
+2.3.6
+-----------------
+  * Updated
+  
+2.3.5
+-----------------
+  * Fixed notice
+  
+2.3.3.1
+-----------------
+  * Fixed notice
+  
+2.3.3
+-----------------
+  * Widget successJs errorJS options
+
+2.3.2
+-----------------
+  * Fixed errors
+
+2.3.1
+-----------------
+  * Added filter form
+  * Fixed #35 [https://github.com/skeeks-cms/cms/issues/35] (Errors in JavaScript code in the behavior of the widget in the admin table)
+
+2.3.0
+-----------------
+  * Adapting to new additional properties
+
+2.2.6
+-----------------
+  * Added new settings in the widget
+
+2.2.5.4
+-----------------
+  * Fixed sort grid
+  * Admin changes
+  * Translation phrase
+
+2.2.5.3
+-----------------
+  * Translation phrase
+
+2.2.5.1
+-----------------
+  * Translation phrase
+
+2.2.5
+-----------------
+  * Updated translation database
+
 2.2.4
 -----------------
   * Removed skeeks/cms/base/Module

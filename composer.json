@@ -2,12 +2,12 @@
     "name": "skeeks/cms-module-form2",
     "description": "Form designer for SkeekS CMS",
     "keywords": ["module", "cms", "skeeks", "sx", "yii2", "Form designer"],
-    "homepage": "http://www.skeeks.com/",
+    "homepage": "https://skeeks.com/",
     "type": "yii2-extension",
     "license": "GPL-3.0+",
     "support": {
-        "issues": "http://cms.skeeks.com",
-        "wiki": "http://en.cms.skeeks.com/docs",
+        "issues": "https://cms.skeeks.com",
+        "wiki": "https://cms.skeeks.com/docs",
         "source": "https://github.com/skeeks-cms/cms-module-form2"
     },
     "authors": [
@@ -16,13 +16,17 @@
             "email": "semenov@skeeks.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
-        "skeeks/cms": "*"
+        "skeeks/cms": "~5.0 || dev-master"
     },
     "autoload": {
         "psr-4": {
-            "skeeks\\modules\\cms\\form2\\": ""
+            "skeeks\\modules\\cms\\form2\\": "src/"
+        }
+    },
+    "extra": {
+        "config-plugin": {
+            "web": "src/config/main.php"
         }
     }
 }
