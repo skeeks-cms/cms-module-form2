@@ -24,14 +24,14 @@ if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_NEW
 
 <?
 $attribures = [];
-if ($attrs = $model->relatedPropertiesModel->attributeLabels())
+if ($attrs = $model->relatedProperties)
 {
     foreach ($attrs as $code => $value)
     {
-        $data['attribute']  = $code;
+        $data['attribute']  = $value->name;
         $data['format']     = 'raw';
 
-        $value              = $model->relatedPropertiesModel->getSmartAttribute($code);
+        $value              = $model->relatedPropertiesModel->getSmartAttribute($value->code);
         $data['value']      = $value;
         if (is_array($value))
         {
@@ -40,20 +40,20 @@ if ($attrs = $model->relatedPropertiesModel->attributeLabels())
 
         $attribures[]       = $data;
     }
-};
+}
 ?>
 <?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Data from form')); ?>
-    <?= \yii\widgets\DetailView::widget([
-        'model'         => $model->relatedPropertiesModel,
-        'attributes'    => $attribures
-    ])?>
+<?= \yii\widgets\DetailView::widget([
+    'model'         => $model->relatedPropertiesModel,
+    'attributes'    => $attribures
+])?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Who has been notified')); ?>
 
-    <?= \yii\widgets\DetailView::widget([
-        'model'         => $model,
-        'attributes'    =>
+<?= \yii\widgets\DetailView::widget([
+    'model'         => $model,
+    'attributes'    =>
         [
             [
                 'attribute' => 'emails',
@@ -76,13 +76,13 @@ if ($attrs = $model->relatedPropertiesModel->attributeLabels())
                 'value'     => $model->user_ids
             ],
         ]
-    ]); ?>
+]); ?>
 
 <?= $form->fieldSetEnd(); ?>
 <?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Additional Data')); ?>
-    <?= \yii\widgets\DetailView::widget([
-        'model'         => $model,
-        'attributes'    =>
+<?= \yii\widgets\DetailView::widget([
+    'model'         => $model,
+    'attributes'    =>
         [
             [
                 'attribute'     => 'id',
@@ -121,37 +121,37 @@ if ($attrs = $model->relatedPropertiesModel->attributeLabels())
                 ])
             ],
         ]
-    ]); ?>
+]); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Control')); ?>
-    <?= $form->fieldSelect($model, 'status', \skeeks\modules\cms\form2\models\Form2FormSend::getStatuses())
-        ->hint(\Yii::t('skeeks/form2/app', 'If you are treated with this message, change the status for convenience')); ?>
+<?= $form->fieldSelect($model, 'status', \skeeks\modules\cms\form2\models\Form2FormSend::getStatuses())
+    ->hint(\Yii::t('skeeks/form2/app', 'If you are treated with this message, change the status for convenience')); ?>
 
-    <?= $form->fieldSelect($model, 'processed_by', \yii\helpers\ArrayHelper::map(
-            \skeeks\cms\models\User::find()->active()->all(),
-            'id',
-            'displayName'
-        ))
-        ->hint(\Yii::t('skeeks/form2/app', 'If you are treated with this message, change the status for convenience')); ?>
+<?= $form->fieldSelect($model, 'processed_by', \yii\helpers\ArrayHelper::map(
+    \skeeks\cms\models\User::find()->active()->all(),
+    'id',
+    'displayName'
+))
+    ->hint(\Yii::t('skeeks/form2/app', 'If you are treated with this message, change the status for convenience')); ?>
 
-    <?= $form->field($model, 'comment')->textarea(['rows' => 5])->hint(\Yii::t('skeeks/form2/app', 'Short note, personal notes on this ship. Not necessary.')); ?>
+<?= $form->field($model, 'comment')->textarea(['rows' => 5])->hint(\Yii::t('skeeks/form2/app', 'Short note, personal notes on this ship. Not necessary.')); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'For developers')); ?>
 
-<div class="sx-block">
-  <h3><?=\Yii::t('skeeks/form2/app', 'Additional information that may be useful in some cases, the developers.');?></h3>
-  <small><?=\Yii::t('skeeks/form2/app', 'For the convenience of viewing the data, you can use the service:');?> <a href="http://jsonformatter.curiousconcept.com/#" target="_blank">http://jsonformatter.curiousconcept.com/#</a></small>
-</div>
-<hr />
+    <div class="sx-block">
+        <h3><?=\Yii::t('skeeks/form2/app', 'Additional information that may be useful in some cases, the developers.');?></h3>
+        <small><?=\Yii::t('skeeks/form2/app', 'For the convenience of viewing the data, you can use the service:');?> <a href="http://jsonformatter.curiousconcept.com/#" target="_blank">http://jsonformatter.curiousconcept.com/#</a></small>
+    </div>
+    <hr />
 
 
-    <?= \yii\widgets\DetailView::widget([
-        'model'         => $model,
-        'attributes'    =>
+<?= \yii\widgets\DetailView::widget([
+    'model'         => $model,
+    'attributes'    =>
         [
             [
                 'attribute' => 'data_server',
@@ -192,7 +192,7 @@ if ($attrs = $model->relatedPropertiesModel->attributeLabels())
                 'value' => "<textarea class='form-control' rows=\"10\">" . \yii\helpers\Json::encode($model->data_values) . "</textarea>"
             ],
         ]
-    ]); ?>
+]); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
