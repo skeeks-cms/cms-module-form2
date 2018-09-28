@@ -1,6 +1,11 @@
 CHANGELOG
 ==============
 
+2.5.4
+-----------------
+  * License update
+  * Fixed admin view
+  
 2.5.3
 -----------------
   * Pgsql support
