@@ -39,7 +39,7 @@ class AdminFormController extends AdminModelEditorController
                 [
                     'class' => AdminOneModelEditAction::className(),
                     'name' => \Yii::t('skeeks/form2/app', 'Result'),
-                    "icon" => "glyphicon glyphicon-eye-open",
+                    "icon" => "fa fa-eye",
                     "priority" => 0,
                 ],
             ]

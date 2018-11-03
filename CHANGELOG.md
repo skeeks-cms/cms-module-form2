@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.5.5
+-----------------
+ * Update icons to fontawesome for bootstrap4
+ 
 2.5.4
 -----------------
   * License update

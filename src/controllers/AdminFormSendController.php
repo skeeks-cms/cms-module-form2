@@ -40,7 +40,7 @@ class AdminFormSendController extends AdminModelEditorController
             [
                 'class' => BackendModelAction::class,
                 'name' => \Yii::t('skeeks/form2/app', 'View'),
-                "icon" => "glyphicon glyphicon-eye-open",
+                "icon" => "fa fa-eye",
                 "priority" => 0,
             ],
         ]);
