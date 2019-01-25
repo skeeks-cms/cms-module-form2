@@ -26,7 +26,13 @@
     },
     "extra": {
         "config-plugin": {
-            "web": "src/config/main.php"
+            "web": [
+                "src/config/common.php",
+                "src/config/web.php"
+            ],
+            "console": [
+                "src/config/common.php"
+            ]
         }
     }
 }
