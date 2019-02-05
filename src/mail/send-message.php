@@ -64,5 +64,5 @@ if ($attrs = $formSend->relatedPropertiesModel->attributeLabels())
 <?= Html::endTag('h5'); ?>
 
 <?= Html::beginTag('p'); ?>
-    <?= \Yii::t('skeeks/form2/app', 'Additional information on the report can be viewed');?> <?= Html::a(\Yii::t('skeeks/form2/app', 'here'), \yii\helpers\Url::to(['/form2/admin-form-send/update', 'pk' => $formSend->id], true) ); ?>.
+    <?= \Yii::t('skeeks/form2/app', 'Additional information on the report can be viewed');?> <?= Html::a(\Yii::t('skeeks/form2/app', 'here'), \yii\helpers\Url::to(['/form2/admin-form-send/view', 'pk' => $formSend->id], true) ); ?>.
 <?= Html::endTag('p'); ?>
