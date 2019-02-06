@@ -4,7 +4,7 @@
     "keywords": ["module", "cms", "skeeks", "sx", "yii2", "Form designer"],
     "homepage": "https://skeeks.com/",
     "type": "yii2-extension",
-    "license": "BSD 3-Clause",
+    "license": "BSD-3-Clause",
     "support": {
         "issues": "https://cms.skeeks.com",
         "wiki": "https://cms.skeeks.com/docs",
