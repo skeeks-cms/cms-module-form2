@@ -9,13 +9,16 @@ namespace skeeks\modules\cms\form2\models;
 
 use skeeks\cms\helpers\Request;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
+use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Core;
+use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\User;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeStorageFile;
 use yii\helpers\ArrayHelper;
 
 use Yii;
@@ -254,14 +257,46 @@ class Form2FormSend extends RelatedElementModel
                 {
                     \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/modules/cms/form2/mail';
 
-                    \Yii::$app->mailer->compose('send-message', [
+                    $message = \Yii::$app->mailer->compose('send-message', [
                         'form'              => $this->form,
                         'formSend'          => $this
                     ])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
                     ->setTo($email)
                     ->setSubject(\Yii::t('skeeks/form2/app', 'Submitting form') . ": «{$this->form->name}» #" . $this->id)
-                    ->send();
+                    ;
+
+                    $rp = $this->relatedPropertiesModel;
+                    $rp->initAllProperties();
+
+                    foreach ($rp->toArray() as $code => $value)
+                    {
+                        $property = $rp->getRelatedProperty($code);
+
+                        if ($property && $property->handler instanceof PropertyTypeStorageFile) {
+                            if ($property->handler->isMultiple) {
+                                if ($files = StorageFile::find()->where(['id' => $value])->all()) {
+                                    /**
+                                     * @var StorageFile $file
+                                     */
+                                    foreach ($files as $file)
+                                    {
+                                        $message->attach($file->getRootSrc());
+                                    }
+                                }
+                            } else {
+                                if ($file = StorageFile::find()->where(['id' => $value])->one()) {
+                                    /**
+                                     * @var StorageFile $file
+                                     */
+                                    $message->attach($file->getRootSrc());
+                                }
+                            }
+                        }
+                    }
+
+
+                    $message->send();
                 }
             }
         }

@@ -31,14 +31,16 @@ use skeeks\cms\mail\helpers\Html;
 
 <?
 $attribures = [];
-if ($attrs = $formSend->relatedPropertiesModel->attributeLabels())
+$rp = $formSend->relatedPropertiesModel;
+$rp->initAllProperties();
+if ($attrs = $rp->attributeLabels())
 {
     foreach ($attrs as $code => $value)
     {
         $data['attribute']  = $code;
         $data['format']     = 'raw';
 
-        $value              = $formSend->relatedPropertiesModel->getSmartAttribute($code);
+        $value              = $rp->getAttributeAsHtml($code);
         $data['value']      = $value;
         if (is_array($value))
         {
@@ -52,7 +54,7 @@ if ($attrs = $formSend->relatedPropertiesModel->attributeLabels())
 
 
     <?= \yii\widgets\DetailView::widget([
-        'model'         => $formSend->relatedPropertiesModel,
+        'model'         => $rp,
         'attributes'    => $attribures
     ])?>
 

@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.5.6
+-----------------
+ * Files attachment
+ 
 2.5.5
 -----------------
  * Update icons to fontawesome for bootstrap4

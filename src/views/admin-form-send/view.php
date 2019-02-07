@@ -31,12 +31,7 @@ if ($attrs = $model->relatedProperties)
         $data['attribute']  = $value->name;
         $data['format']     = 'raw';
 
-        $value              = $model->relatedPropertiesModel->getSmartAttribute($value->code);
-        $data['value']      = $value;
-        if (is_array($value))
-        {
-            $data['value']      = implode(', ', $value);
-        }
+        $data['value']      = $model->relatedPropertiesModel->getAttributeAsHtml($value->code);
 
         $attribures[]       = $data;
     }
