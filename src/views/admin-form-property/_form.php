@@ -71,6 +71,7 @@ JS
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]); ?>
         <? if($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) : ?>
             <? $handler->enumRoute = 'form2/admin-form-property-enum'; ?>
+            <? $handler->enumClass = \skeeks\modules\cms\form2\models\Form2FormPropertyEnum::class; ?>
         <? endif; ?>
         <?= $handler->renderConfigForm($form); ?>
     <? endif; ?>
