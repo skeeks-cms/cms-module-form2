@@ -94,7 +94,7 @@ class FormWidget extends WidgetRenderable
      */
     public $modelForm;
 
-    protected function _run()
+    public function run()
     {
         try
         {
@@ -135,7 +135,7 @@ class FormWidget extends WidgetRenderable
             return "";
         }
 
-        return parent::_run();
+        return parent::run();
     }
 
 }
