@@ -85,12 +85,7 @@ class Form2Form extends Core
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'id' => \Yii::t('skeeks/form2/app', 'ID'),
-            'created_by' => \Yii::t('skeeks/form2/app', 'Created By'),
-            'updated_by' => \Yii::t('skeeks/form2/app', 'Updated By'),
-            'created_at' => \Yii::t('skeeks/form2/app', 'Created At'),
-            'updated_at' => \Yii::t('skeeks/form2/app', 'Updated At'),
-            'name' => \Yii::t('skeeks/form2/app', 'Name'),
+            'name' => \Yii::t('skeeks/form2/app', 'Название'),
             'description' => \Yii::t('skeeks/form2/app', 'Description'),
             'code' => \Yii::t('skeeks/form2/app', 'Code'),
             'emails' => \Yii::t('skeeks/form2/app', 'Email addresses'),

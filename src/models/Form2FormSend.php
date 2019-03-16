@@ -14,6 +14,7 @@ use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\Core;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\User;
@@ -31,7 +32,7 @@ use Yii;
  * @property integer $updated_by
  * @property integer $created_at
  * @property integer $updated_at
- * @property integer processed_at
+ * @property integer $processed_at
  * @property integer $processed_by
  * @property string $data_values
  * @property string $data_labels
@@ -158,10 +159,6 @@ class Form2FormSend extends RelatedElementModel
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'id' => \Yii::t('skeeks/form2/app', 'ID'),
-            'created_by' => \Yii::t('skeeks/form2/app', 'Created By'),
-            'updated_by' => \Yii::t('skeeks/form2/app', 'Updated By'),
-            'created_at' => \Yii::t('skeeks/form2/app', 'Created At'),
-            'updated_at' => \Yii::t('skeeks/form2/app', 'Updated At'),
             'processed_by' => \Yii::t('skeeks/form2/app', 'Who handled'),
             'data_values' => \Yii::t('skeeks/form2/app', 'Data Values'),
             'data_labels' => \Yii::t('skeeks/form2/app', 'Data Labels'),
@@ -181,7 +178,7 @@ class Form2FormSend extends RelatedElementModel
             'additional_data' => \Yii::t('skeeks/form2/app', 'Additional Data'),
             'site_code' => \Yii::t('skeeks/form2/app', 'Site'),
             'processed_at' => \Yii::t('skeeks/form2/app', 'When handled'),
-            'comment' => \Yii::t('skeeks/form2/app', 'Comment'),
+            'comment' => \Yii::t('skeeks/form2/app', 'Комментарий менеджера'),
         ]);
     }
 

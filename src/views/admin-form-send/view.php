@@ -109,7 +109,7 @@ if ($attrs = $model->relatedProperties)
             [
                 'attribute' => 'page_url',
                 'format' => 'raw',
-                'label' => \Yii::t('skeeks/form2/app', 'Ip address of the sender'),
+                'label' => \Yii::t('skeeks/form2/app', 'Page Url'),
                 'value' => Html::a($model->page_url, $model->page_url, [
                     'target' => '_blank',
                     'data-pjax' => 0
@@ -124,11 +124,9 @@ if ($attrs = $model->relatedProperties)
 <?= $form->fieldSelect($model, 'status', \skeeks\modules\cms\form2\models\Form2FormSend::getStatuses())
     ->hint(\Yii::t('skeeks/form2/app', 'If you are treated with this message, change the status for convenience')); ?>
 
-<?= $form->fieldSelect($model, 'processed_by', \yii\helpers\ArrayHelper::map(
-    \skeeks\cms\models\User::find()->active()->all(),
-    'id',
-    'displayName'
-))
+<?= $form->field($model, 'processed_by')->widget(
+        \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::class
+)
     ->hint(\Yii::t('skeeks/form2/app', 'If you are treated with this message, change the status for convenience')); ?>
 
 <?= $form->field($model, 'comment')->textarea(['rows' => 5])->hint(\Yii::t('skeeks/form2/app', 'Short note, personal notes on this ship. Not necessary.')); ?>

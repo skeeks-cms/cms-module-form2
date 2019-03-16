@@ -1,6 +1,10 @@
 CHANGELOG
 ==============
 
+2.5.7
+-----------------
+ * Fixed admin
+ 
 2.5.6
 -----------------
  * Files attachment
