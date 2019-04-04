@@ -31,6 +31,11 @@ class FormWidget extends WidgetRenderable
         ]);
     }
 
+    /**
+     * @var array
+     */
+    public $activeFormConfig = [];
+
     public $form_id;
     public $form_code;
 
