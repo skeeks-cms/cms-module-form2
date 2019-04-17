@@ -37,7 +37,7 @@ use Yii;
  * @property string $data_values
  * @property string $data_labels
  * @property string $emails
- * @property string $site_code
+ * @property int $cms_site_id
  * @property string $comment
  * @property string $phones
  * @property string $user_ids
@@ -58,7 +58,7 @@ use Yii;
  *
  * @property Form2FormSendProperty[]    relatedElementProperties
  * @property Form2FormProperty[]        relatedProperties
- * @property CmsSite                    $site
+ * @property CmsSite                    $cmsSite
  */
 class Form2FormSend extends RelatedElementModel
 {
@@ -115,8 +115,8 @@ class Form2FormSend extends RelatedElementModel
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'processed_by', 'processed_at', 'status', 'form_id'], 'integer'],
-            [['email_message', 'phone_message', 'site_code'], 'string'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'processed_by', 'processed_at', 'status', 'form_id', 'cms_site_id'], 'integer'],
+            [['email_message', 'phone_message'], 'string'],
             [['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request'], 'safe'],
             [['emails', 'phones', 'user_ids'], 'string'],
             [['ip'], 'string', 'max' => 32],
@@ -176,7 +176,7 @@ class Form2FormSend extends RelatedElementModel
             'data_cookie' => \Yii::t('skeeks/form2/app', 'Data Cookie'),
             'data_request' => \Yii::t('skeeks/form2/app', 'Data Request'),
             'additional_data' => \Yii::t('skeeks/form2/app', 'Additional Data'),
-            'site_code' => \Yii::t('skeeks/form2/app', 'Site'),
+            'cms_site_id' => \Yii::t('skeeks/form2/app', 'Site'),
             'processed_at' => \Yii::t('skeeks/form2/app', 'When handled'),
             'comment' => \Yii::t('skeeks/form2/app', 'Комментарий менеджера'),
         ]);
@@ -200,12 +200,21 @@ class Form2FormSend extends RelatedElementModel
     }
 
     /**
+     * @deprecated
      * @return CmsSite
      */
     public function getSite()
     {
         //return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
-        return CmsSite::getByCode($this->site_code);
+        return CmsSite::getById($this->cms_site_id);
+    }
+
+    /**
+     * @return CmsSite
+     */
+    public function getCmsSite()
+    {
+        return $this->hasOne(CmsSite::className(), ['id' => 'cms_site_id']);
     }
 
     /**

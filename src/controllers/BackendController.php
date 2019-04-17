@@ -68,7 +68,7 @@ class BackendController extends Controller
                  */
                 $modelForm                  = $modelClass::find()->where(['id' => $modelValue])->one();
                 $modelFormSend              = $modelForm->createModelFormSend();
-                $modelFormSend->site_code   = \Yii::$app->cms->site->code;
+                $modelFormSend->cms_site_id   = \Yii::$app->cms->site->id;
                 $modelFormSend->page_url    = \Yii::$app->request->referrer;
 
                 $validateModel = $modelFormSend->relatedPropertiesModel;

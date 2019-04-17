@@ -1,6 +1,11 @@
 CHANGELOG
 ==============
 
+2.5.9.pre
+-----------------
+ * Add cms_site_id
+ * Removed site_code
+ 
 2.5.8
 -----------------
  * Fixed admin
