@@ -115,6 +115,13 @@ if ($attrs = $model->relatedProperties)
                     'data-pjax' => 0
                 ])
             ],
+
+            [
+                'attribute' => 'utms',
+                'format' => 'raw',
+                'label' => \Yii::t('skeeks/form2/app', 'Utm метки'),
+                'value' => $model->utms ? \yii\helpers\Json::encode($model->utms) : ""
+            ],
         ]
 ]); ?>
 

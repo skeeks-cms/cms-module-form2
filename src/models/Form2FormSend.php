@@ -8,6 +8,7 @@
 namespace skeeks\modules\cms\form2\models;
 
 use skeeks\cms\helpers\Request;
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\Implode;
@@ -52,6 +53,7 @@ use Yii;
  * @property string $data_cookie
  * @property string $data_request
  * @property string $additional_data
+ * @property array $utms
  *
  * @property User $processedBy
  * @property Form2Form $form
@@ -106,6 +108,12 @@ class Form2FormSend extends RelatedElementModel
                 'class' => Serialize::className(),
                 'fields' => ['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request']
             ],
+
+            HasJsonFieldsBehavior::className() =>
+            [
+                'class' => HasJsonFieldsBehavior::className(),
+                'fields' => ['utms']
+            ],
         ]);
     }
 
@@ -122,6 +130,7 @@ class Form2FormSend extends RelatedElementModel
             [['ip'], 'string', 'max' => 32],
             [['page_url'], 'string', 'max' => 500],
             [['comment'], 'string'],
+            [['utms'], 'safe'],
             [['status'], 'in', 'range' => array_keys(self::getStatuses())],
 
             ['data_request', 'default', 'value' => function(self $model, $attribute)
@@ -179,6 +188,7 @@ class Form2FormSend extends RelatedElementModel
             'cms_site_id' => \Yii::t('skeeks/form2/app', 'Site'),
             'processed_at' => \Yii::t('skeeks/form2/app', 'When handled'),
             'comment' => \Yii::t('skeeks/form2/app', 'Комментарий менеджера'),
+            'utms' => \Yii::t('skeeks/form2/app', 'Utm метки'),
         ]);
     }
 

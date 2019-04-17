@@ -1,8 +1,9 @@
 CHANGELOG
 ==============
 
-2.5.9.pre
+2.5.9
 -----------------
+ * Add utms
  * Add cms_site_id
  * Removed site_code
  

@@ -12,59 +12,64 @@ use skeeks\cms\mail\helpers\Html;
  */
 ?>
 <?= Html::beginTag('h1'); ?>
-    <?= \Yii::t('skeeks/form2/app', 'Submitting forms');?>  «<?= \yii\helpers\Html::encode($form->name)?>» #<?= $formSend->id; ?>
+<?= \Yii::t('skeeks/form2/app', 'Submitting forms'); ?>  «<?= \yii\helpers\Html::encode($form->name) ?>» #<?= $formSend->id; ?>
 <?= Html::endTag('h1'); ?>
 
-<?= Html::beginTag('p'); ?>
-    <?= \Yii::t('skeeks/form2/app', 'The form has been completed and successfully sent from the page');?>: <?= Html::a($formSend->page_url, $formSend->page_url); ?><br />
-    <?= \Yii::t('skeeks/form2/app', 'Date and time of sending');?>: <?= \Yii::$app->formatter->asDatetime($formSend->created_at) ?><br />
-    <?= \Yii::t('skeeks/form2/app', 'Unique message number');?>: <?= $formSend->id; ?>
-<?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('h3'); ?>
-    <?= \Yii::t('skeeks/form2/app', 'Data from form');?>:
+<?= \Yii::t('skeeks/form2/app', 'Data from form'); ?>:
 <?= Html::endTag('h3'); ?>
 
 <?= Html::beginTag('p'); ?>
-
 
 
 <?
 $attribures = [];
 $rp = $formSend->relatedPropertiesModel;
 $rp->initAllProperties();
-if ($attrs = $rp->attributeLabels())
-{
-    foreach ($attrs as $code => $value)
-    {
-        $data['attribute']  = $code;
-        $data['format']     = 'raw';
+if ($attrs = $rp->attributeLabels()) {
+    foreach ($attrs as $code => $value) {
+        $data['attribute'] = $code;
+        $data['format'] = 'raw';
 
-        $value              = $rp->getAttributeAsHtml($code);
-        $data['value']      = $value;
-        if (is_array($value))
-        {
-            $data['value']      = implode(', ', $value);
+        $value = $rp->getAttributeAsHtml($code);
+        $data['value'] = $value;
+        if (is_array($value)) {
+            $data['value'] = implode(', ', $value);
         }
 
-        $attribures[]       = $data;
+        $attribures[] = $data;
     }
 };
 ?>
 
 
-    <?= \yii\widgets\DetailView::widget([
-        'model'         => $rp,
-        'attributes'    => $attribures
-    ])?>
+<?= \yii\widgets\DetailView::widget([
+    'model'      => $rp,
+    'attributes' => $attribures,
+]) ?>
 
 <?= Html::endTag('p'); ?>
 
 
 <?= Html::beginTag('h5'); ?>
-    <?= \Yii::t('skeeks/form2/app', 'Additional Data');?>:
+<?= \Yii::t('skeeks/form2/app', 'Additional Data'); ?>:
 <?= Html::endTag('h5'); ?>
 
 <?= Html::beginTag('p'); ?>
-    <?= \Yii::t('skeeks/form2/app', 'Additional information on the report can be viewed');?> <?= Html::a(\Yii::t('skeeks/form2/app', 'here'), \yii\helpers\Url::to(['/form2/admin-form-send/view', 'pk' => $formSend->id], true) ); ?>.
+<?= \Yii::t('skeeks/form2/app', 'The form has been completed and successfully sent from the page'); ?>: <?= Html::a($formSend->page_url, $formSend->page_url); ?><br/>
+<?= \Yii::t('skeeks/form2/app', 'Date and time of sending'); ?>: <?= \Yii::$app->formatter->asDatetime($formSend->created_at) ?><br/>
+<?= \Yii::t('skeeks/form2/app', 'Unique message number'); ?>: <?= $formSend->id; ?><br/>
+<? if ($formSend->utms) : ?>
+    <?= \Yii::t('skeeks/form2/app', 'Utm метки'); ?>:<br />
+    <? foreach ($formSend->utms as $name => $value) : ?>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small><?= $name; ?>: <?= $value; ?></small><br />
+    <? endforeach; ?>
+<? endif; ?>
+<?= Html::endTag('p'); ?>
+
+
+<?= Html::beginTag('p'); ?>
+<?= \Yii::t('skeeks/form2/app', 'Additional information on the report can be viewed'); ?> <?= Html::a(\Yii::t('skeeks/form2/app', 'here'),
+    \yii\helpers\Url::to(['/form2/admin-form-send/view', 'pk' => $formSend->id], true)); ?>.
 <?= Html::endTag('p'); ?>
