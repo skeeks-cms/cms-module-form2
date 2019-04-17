@@ -15,17 +15,12 @@ $modelHasRelatedProperties = $widget->modelForm->createModelFormSend();
     <?php $form = ActiveForm::begin([
         'id'                                        => $widget->id . "-active-form",
         'modelForm'                                 => $widget->modelForm,
-        'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
-            function(jForm, ajax)
+        'clientCallback'                     => new \yii\web\JsExpression(<<<JS
+            function(ActiveFormAjaxSubmit)
             {
-                var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
-                    'blockerSelector' : '#' + jForm.attr('id'),
-                    'enableBlocker' : true,
-                });
-
-                handler.bind('success', function(response)
+                ActiveFormAjaxSubmit.on('success', function(e, response)
                 {
-                    $('input, textarea', jForm).each(function(value, key)
+                    $('input, textarea', ActiveFormAjaxSubmit.jForm).each(function(value, key)
                     {
                         var name = $(this).attr('name');
                         if (name != '_csrf' && name != 'sx-model-value' && name != 'sx-model')
