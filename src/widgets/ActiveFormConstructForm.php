@@ -2,7 +2,7 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (ÑêèêÑ)
+ * @copyright 2010 SkeekS (ï¿½ï¿½ï¿½ï¿½ï¿½)
  * @date 18.03.2015
  */
 namespace skeeks\modules\cms\form2\widgets;
@@ -39,6 +39,8 @@ class ActiveFormConstructForm extends \skeeks\cms\base\widgets\ActiveForm
         $this->action                       = \skeeks\cms\helpers\UrlHelper::construct('form2/backend/submit')->toString();
 
         $this->enableAjaxValidation         = true;
+        $this->validateOnChange         = false;
+        $this->validateOnBlur         = false;
 
         parent::__construct($config);
     }
