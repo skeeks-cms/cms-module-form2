@@ -18,5 +18,22 @@ return [
                 ],
             ],
         ],
+
+        'authManager' => [
+            'config' => [
+                'roles' => [
+                    [
+                        'name'  => \skeeks\cms\rbac\CmsManager::ROLE_ADMIN,
+                        'child' => [
+                            //Есть доступ к системе администрирования
+                            'permissions' => [
+                                "form2/admin-form",
+                                "form2/admin-form-send",
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
     ],
 ];
