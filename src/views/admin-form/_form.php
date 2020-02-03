@@ -87,6 +87,6 @@ use common\models\User;
 
 <? endif; ?>
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<?= $form->buttonsStandart($model); ?>
 <?php ActiveForm::end(); ?>
 

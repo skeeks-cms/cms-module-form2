@@ -63,7 +63,7 @@ use common\models\User;
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<?= $form->buttonsStandart($model); ?>
 <?php ActiveForm::end(); ?>
 
 <!--<div class="row">

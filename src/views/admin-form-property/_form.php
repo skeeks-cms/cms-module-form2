@@ -112,7 +112,7 @@ JS
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<?= $form->buttonsStandart($model); ?>
 
 <?php ActiveForm::end(); ?>
 
