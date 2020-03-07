@@ -40,9 +40,7 @@ use common\models\User;
 
                         [
                             'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                            'attribute'     => 'active',
-                            'falseValue'    => \skeeks\cms\components\Cms::BOOL_N,
-                            'trueValue'     => \skeeks\cms\components\Cms::BOOL_Y,
+                            'attribute'     => 'is_active',
                             'enableSorting' => false
                         ],
 

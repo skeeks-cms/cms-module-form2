@@ -49,13 +49,9 @@ JS
 
 <?= $form->fieldSet(\Yii::t('skeeks/form2/app', 'Basic settings')) ?>
 
-<?= $form->field($model, 'active')->checkbox([
-    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
-    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+<?= $form->field($model, 'is_active')->checkbox([
 ]) ?>
 <?= $form->field($model, 'is_required')->checkbox([
-    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
-    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
 ]); ?>
 
 
