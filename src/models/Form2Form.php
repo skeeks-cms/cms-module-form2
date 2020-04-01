@@ -95,6 +95,16 @@ class Form2Form extends Core
     }
 
     /**
+     * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'emails' => \Yii::t('skeeks/form2/app', 'You can specify multiple Email addresses (separated by commas), which will receive the notification and filling out this form.'),
+        ]);
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getForm2FormSends()

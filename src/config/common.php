@@ -29,6 +29,8 @@ return [
                             'permissions' => [
                                 "form2/admin-form",
                                 "form2/admin-form-send",
+                                "form2/admin-form-property",
+                                "form2/admin-form-property-enum",
                             ],
                         ],
                     ],

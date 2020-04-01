@@ -77,7 +77,6 @@ class AdminFormSendController extends BackendModelStandartController
                         ],
 
                         'status' => [
-                            'label' => \Yii::t('skeeks/form2/app', 'Number of fields in the form'),
                             'value' => function (Form2FormSend $model) {
 
                                 if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_NEW) {

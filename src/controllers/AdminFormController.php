@@ -8,14 +8,17 @@
 
 namespace skeeks\modules\cms\form2\controllers;
 
+use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\modules\cms\form2\models\Form2Form;
 use skeeks\modules\cms\form2\models\Form2FormSend;
+use skeeks\yii2\form\fields\TextareaField;
 use yii\base\Event;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * Class AdminFormController
@@ -38,6 +41,13 @@ class AdminFormController extends BackendModelStandartController
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
+
+            "create" => [
+                'fields' => [$this, 'updateFields'],
+            ],
+            "update" => [
+                'fields' => [$this, 'updateFields'],
+            ],
 
             'index' => [
 
@@ -82,19 +92,35 @@ class AdminFormController extends BackendModelStandartController
                         'checkbox',
                         'actions',
 
-                        'id',
+                        //'id',
                         //'created_at',
 
-                        'name',
-                        'code',
+                        'customName',
+                        /*'name',
+                        'code',*/
 
                         'emails',
                         //'phones',
-                        'countFields',
+                        //'countFields',
                         'count_sends',
 
                     ],
                     'columns'        => [
+                        'customName' => [
+                            'label' => "Форма",
+                            'format' => "raw",
+                            'value' => function(Form2Form $form) {
+                                $result = [];
+                                $result[] = Html::a($form->asText, "#", [
+                                    'class' => "sx-trigger-action",
+                                ]);
+
+                                $result[] = $form->code;
+
+                                return implode('<br />', $result);
+                            }
+                        ],
+
                         'created_at' => [
                             'class' => DateTimeColumnData::class,
                         ],
@@ -122,7 +148,66 @@ class AdminFormController extends BackendModelStandartController
                 "icon"     => "fa fa-eye",
                 "priority" => 0,
             ],
+
+
+            "properties" => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
+                'name'            => "Элементы формы",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/form2/admin-form-property",
+                'relation'        => ['form_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+                    ArrayHelper::removeValue($visibleColumns, 'form_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
+            "send" => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
+                'name'            => "Сообщения",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/form2/admin-form-send",
+                'relation'        => ['form_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+                    ArrayHelper::removeValue($visibleColumns, 'form_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
         ]);
+    }
+
+    public function updateFields()
+    {
+        return [
+            'name',
+            'code',
+            'description' => [
+                'class' => TextareaField::class
+            ],
+            'emails' => [
+                'class' => TextareaField::class
+            ]
+        ];
     }
 
 }
