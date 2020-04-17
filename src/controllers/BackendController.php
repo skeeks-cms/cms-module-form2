@@ -62,7 +62,7 @@ class BackendController extends Controller
                  */
                 $modelForm = $modelClass::find()->where(['id' => $modelValue])->one();
                 $modelFormSend = $modelForm->createModelFormSend();
-                $modelFormSend->cms_site_id = \Yii::$app->cms->site->id;
+                $modelFormSend->cms_site_id = \Yii::$app->skeeks->site->id;
                 $modelFormSend->utms = (array)\Yii::$app->seo->utms;
                 $modelFormSend->page_url = \Yii::$app->request->referrer;
 
