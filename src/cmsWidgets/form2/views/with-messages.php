@@ -38,6 +38,12 @@ JS;
     $form = \skeeks\modules\cms\form2\widgets\ActiveFormConstructForm::begin([
         'id'                                        => $widget->id . "-active-form",
         'modelForm'                                 => $widget->modelForm,
+        'options'                                 => [
+            'data' => [
+                'form_code' => $widget->form_code,
+                'form_namespace' => $widget->namespace,
+            ]
+        ],
         'afterValidateCallback'                     => $widget->afterValidateJs ? $widget->afterValidateJs : new \yii\web\JsExpression(<<<JS
             function(jForm, ajax)
             {

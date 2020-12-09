@@ -15,6 +15,12 @@ $modelHasRelatedProperties = $widget->modelForm->createModelFormSend();
     <?php $form = ActiveForm::begin([
         'id'                                        => $widget->id . "-active-form",
         'modelForm'                                 => $widget->modelForm,
+        'options'                                 => [
+            'data' => [
+                'form_code' => $widget->form_code,
+                'form_namespace' => $widget->namespace,
+            ]
+        ],
         'clientCallback'                     => new \yii\web\JsExpression(<<<JS
             function(ActiveFormAjaxSubmit)
             {
@@ -30,6 +36,22 @@ $modelHasRelatedProperties = $widget->modelForm->createModelFormSend();
                     });
                 });
             }
+<script>     
+sx.EventManager.on("ajaxFormSuccessSubmited", function(e, data) {
+    //Успешно отправлена любая форма
+    //ym(67855000,'reachGoal','any-form');
+    
+    if (data.form.jForm.data('form_code') == 'register') {
+        //Отправлена конкретная форма (регистрация)
+        ym(67855000,'reachGoal','register');
+    }
+    
+    
+    if (data.form.jForm.data('form_code') == 'test') {
+        //Отправлена конкретная форма (с кодом test)
+    }
+});
+</script>
 JS
 ),
     ]);

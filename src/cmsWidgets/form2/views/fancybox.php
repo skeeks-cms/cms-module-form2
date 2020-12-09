@@ -15,6 +15,12 @@ $modelHasRelatedProperties = $widget->modelForm->createModelFormSend();
     <?php $form = ActiveForm::begin([
         'id'                                        => $widget->id . "-active-form",
         'modelForm'                                 => $widget->modelForm,
+        'options'                                 => [
+            'data' => [
+                'form_code' => $widget->form_code,
+                'form_namespace' => $widget->namespace,
+            ]
+        ],
         'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
             function(jForm, ajax)
             {
