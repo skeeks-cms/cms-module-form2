@@ -5,75 +5,71 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 15.06.2015
  */
+
 namespace skeeks\modules\cms\form2\models;
 
 use skeeks\cms\helpers\Request;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
-use skeeks\cms\models\behaviors\HasStorageFile;
-use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
-use skeeks\cms\models\Core;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\User;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeStorageFile;
 use yii\helpers\ArrayHelper;
 
-use Yii;
-
 /**
  * This is the model class for table "{{%form2_form_send}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $processed_at
- * @property integer $processed_by
- * @property string $data_values
- * @property string $data_labels
- * @property string $emails
- * @property int $cms_site_id
- * @property string $comment
- * @property string $phones
- * @property string $user_ids
- * @property string $email_message
- * @property string $phone_message
- * @property integer $status
- * @property integer $form_id
- * @property string $ip
- * @property string $page_url
- * @property string $data_server
- * @property string $data_session
- * @property string $data_cookie
- * @property string $data_request
- * @property string $additional_data
- * @property array $utms
+ * @property integer                 $id
+ * @property integer                 $created_by
+ * @property integer                 $updated_by
+ * @property integer                 $created_at
+ * @property integer                 $updated_at
+ * @property integer                 $processed_at
+ * @property integer                 $processed_by
+ * @property string                  $data_values
+ * @property string                  $data_labels
+ * @property string                  $emails
+ * @property int                     $cms_site_id
+ * @property string                  $comment
+ * @property string                  $phones
+ * @property string                  $user_ids
+ * @property string                  $email_message
+ * @property string                  $phone_message
+ * @property integer                 $status
+ * @property integer                 $form_id
+ * @property string                  $ip
+ * @property string                  $page_url
+ * @property string                  $data_server
+ * @property string                  $data_session
+ * @property string                  $data_cookie
+ * @property string                  $data_request
+ * @property string                  $additional_data
+ * @property array                   $utms
  *
- * @property User $processedBy
- * @property Form2Form $form
+ * @property User                    $processedBy
+ * @property Form2Form               $form
  *
- * @property Form2FormSendProperty[]    relatedElementProperties
- * @property Form2FormProperty[]        relatedProperties
- * @property CmsSite                    $cmsSite
+ * @property Form2FormSendProperty[] relatedElementProperties
+ * @property Form2FormProperty[]     relatedProperties
+ * @property CmsSite                 $cmsSite
  */
 class Form2FormSend extends RelatedElementModel
 {
-    const STATUS_NEW        = 0;
-    const STATUS_PROCESSED  = 5;
-    const STATUS_EXECUTED   = 10;
+    const STATUS_NEW = 0;
+    const STATUS_PROCESSED = 5;
+    const STATUS_EXECUTED = 10;
 
     static public function getStatuses()
     {
         return [
-            self::STATUS_NEW          => \Yii::t('skeeks/form2/app', 'New message'),
-            self::STATUS_PROCESSED    => \Yii::t('skeeks/form2/app', 'In progress'),
-            self::STATUS_EXECUTED     => \Yii::t('skeeks/form2/app', 'Completed'),
+            self::STATUS_NEW       => \Yii::t('skeeks/form2/app', 'New message'),
+            self::STATUS_PROCESSED => \Yii::t('skeeks/form2/app', 'In progress'),
+            self::STATUS_EXECUTED  => \Yii::t('skeeks/form2/app', 'Completed'),
         ];
     }
 
@@ -96,24 +92,24 @@ class Form2FormSend extends RelatedElementModel
     {
         return array_merge(parent::behaviors(), [
 
-            HasRelatedProperties::className() =>
-            [
-                'class'                             => HasRelatedProperties::className(),
-                'relatedElementPropertyClassName'   => Form2FormSendProperty::className(),
-                'relatedPropertyClassName'          => Form2FormProperty::className(),
+            HasRelatedProperties::className() => [
+                'class'                           => HasRelatedProperties::className(),
+                'relatedElementPropertyClassName' => Form2FormSendProperty::className(),
+                'relatedPropertyClassName'        => Form2FormProperty::className(),
+                //'relatedPropertyEnumClassName'    => Form2FormPropertyEnum::className(),
             ],
 
             Serialize::className() =>
-            [
-                'class' => Serialize::className(),
-                'fields' => ['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request']
-            ],
+                [
+                    'class'  => Serialize::className(),
+                    'fields' => ['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request'],
+                ],
 
             HasJsonFieldsBehavior::className() =>
-            [
-                'class' => HasJsonFieldsBehavior::className(),
-                'fields' => ['utms']
-            ],
+                [
+                    'class'  => HasJsonFieldsBehavior::className(),
+                    'fields' => ['utms'],
+                ],
         ]);
     }
 
@@ -133,31 +129,46 @@ class Form2FormSend extends RelatedElementModel
             [['utms'], 'safe'],
             [['status'], 'in', 'range' => array_keys(self::getStatuses())],
 
-            ['data_request', 'default', 'value' => function(self $model, $attribute)
-            {
-                return $_REQUEST;
-            }],
+            [
+                'data_request',
+                'default',
+                'value' => function (self $model, $attribute) {
+                    return $_REQUEST;
+                },
+            ],
 
-            ['data_server', 'default', 'value' => function(self $model, $attribute)
-            {
-                return $_SERVER;
-            }],
+            [
+                'data_server',
+                'default',
+                'value' => function (self $model, $attribute) {
+                    return $_SERVER;
+                },
+            ],
 
-            ['data_cookie', 'default', 'value' => function(self $model, $attribute)
-            {
-                return $_COOKIE;
-            }],
+            [
+                'data_cookie',
+                'default',
+                'value' => function (self $model, $attribute) {
+                    return $_COOKIE;
+                },
+            ],
 
-            ['data_session', 'default', 'value' => function(self $model, $attribute)
-            {
-                \Yii::$app->session->open();
-                return $_SESSION;
-            }],
+            [
+                'data_session',
+                'default',
+                'value' => function (self $model, $attribute) {
+                    \Yii::$app->session->open();
+                    return $_SESSION;
+                },
+            ],
 
-            ['ip', 'default', 'value' => function(self $model, $attribute)
-            {
-                return \Yii::$app->request->userIP;
-            }],
+            [
+                'ip',
+                'default',
+                'value' => function (self $model, $attribute) {
+                    return \Yii::$app->request->userIP;
+                },
+            ],
         ]);
     }
 
@@ -167,32 +178,32 @@ class Form2FormSend extends RelatedElementModel
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'id' => \Yii::t('skeeks/form2/app', 'ID'),
-            'processed_by' => \Yii::t('skeeks/form2/app', 'Who handled'),
-            'data_values' => \Yii::t('skeeks/form2/app', 'Data Values'),
-            'data_labels' => \Yii::t('skeeks/form2/app', 'Data Labels'),
-            'emails' => \Yii::t('skeeks/form2/app', 'Emails'),
-            'phones' => \Yii::t('skeeks/form2/app', 'Phones'),
-            'user_ids' => \Yii::t('skeeks/form2/app', 'User Ids'),
-            'email_message' => \Yii::t('skeeks/form2/app', 'Email Message'),
-            'phone_message' => \Yii::t('skeeks/form2/app', 'Phone Message'),
-            'status' => \Yii::t('skeeks/form2/app', 'Status'),
-            'form_id' => \Yii::t('skeeks/form2/app', 'Form'),
-            'ip' => \Yii::t('skeeks/form2/app', 'Ip'),
-            'page_url' => \Yii::t('skeeks/form2/app', 'Page Url'),
-            'data_server' => \Yii::t('skeeks/form2/app', 'Data Server'),
-            'data_session' => \Yii::t('skeeks/form2/app', 'Data Session'),
-            'data_cookie' => \Yii::t('skeeks/form2/app', 'Data Cookie'),
-            'data_request' => \Yii::t('skeeks/form2/app', 'Data Request'),
+            'id'              => \Yii::t('skeeks/form2/app', 'ID'),
+            'processed_by'    => \Yii::t('skeeks/form2/app', 'Who handled'),
+            'data_values'     => \Yii::t('skeeks/form2/app', 'Data Values'),
+            'data_labels'     => \Yii::t('skeeks/form2/app', 'Data Labels'),
+            'emails'          => \Yii::t('skeeks/form2/app', 'Emails'),
+            'phones'          => \Yii::t('skeeks/form2/app', 'Phones'),
+            'user_ids'        => \Yii::t('skeeks/form2/app', 'User Ids'),
+            'email_message'   => \Yii::t('skeeks/form2/app', 'Email Message'),
+            'phone_message'   => \Yii::t('skeeks/form2/app', 'Phone Message'),
+            'status'          => \Yii::t('skeeks/form2/app', 'Status'),
+            'form_id'         => \Yii::t('skeeks/form2/app', 'Form'),
+            'ip'              => \Yii::t('skeeks/form2/app', 'Ip'),
+            'page_url'        => \Yii::t('skeeks/form2/app', 'Page Url'),
+            'data_server'     => \Yii::t('skeeks/form2/app', 'Data Server'),
+            'data_session'    => \Yii::t('skeeks/form2/app', 'Data Session'),
+            'data_cookie'     => \Yii::t('skeeks/form2/app', 'Data Cookie'),
+            'data_request'    => \Yii::t('skeeks/form2/app', 'Data Request'),
             'additional_data' => \Yii::t('skeeks/form2/app', 'Additional Data'),
-            'cms_site_id' => \Yii::t('skeeks/form2/app', 'Site'),
-            'processed_at' => \Yii::t('skeeks/form2/app', 'When handled'),
-            'comment' => \Yii::t('skeeks/form2/app', 'Комментарий менеджера'),
-            'utms' => \Yii::t('skeeks/form2/app', 'Utm метки'),
+            'cms_site_id'     => \Yii::t('skeeks/form2/app', 'Site'),
+            'processed_at'    => \Yii::t('skeeks/form2/app', 'When handled'),
+            'comment'         => \Yii::t('skeeks/form2/app', 'Комментарий менеджера'),
+            'utms'            => \Yii::t('skeeks/form2/app', 'Utm метки'),
         ]);
     }
 
-     /**
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getProcessedBy()
@@ -210,8 +221,8 @@ class Form2FormSend extends RelatedElementModel
     }
 
     /**
-     * @deprecated
      * @return CmsSite
+     * @deprecated
      */
     public function getSite()
     {
@@ -237,7 +248,7 @@ class Form2FormSend extends RelatedElementModel
     {
         //return $this->form->form2FormProperties;
         return $this->hasMany(Form2FormProperty::className(), ['form_id' => 'id'])
-                    ->via('form')->orderBy(['priority' => SORT_ASC]);
+            ->via('form')->orderBy(['priority' => SORT_ASC]);
     }
 
 
@@ -247,12 +258,10 @@ class Form2FormSend extends RelatedElementModel
     public function getEmailsAsArray()
     {
         $emailsAll = [];
-        if ($this->emails)
-        {
+        if ($this->emails) {
             $emails = explode(",", $this->emails);
 
-            foreach ($emails as $email)
-            {
+            foreach ($emails as $email) {
                 $emailsAll[] = trim($email);
             }
         }
@@ -265,28 +274,23 @@ class Form2FormSend extends RelatedElementModel
      */
     public function notify()
     {
-        if ($this->form)
-        {
-            if ($this->form->emailsAsArray)
-            {
-                foreach ($this->form->emailsAsArray as $email)
-                {
+        if ($this->form) {
+            if ($this->form->emailsAsArray) {
+                foreach ($this->form->emailsAsArray as $email) {
                     \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/modules/cms/form2/mail';
 
                     $message = \Yii::$app->mailer->compose('send-message', [
-                        'form'              => $this->form,
-                        'formSend'          => $this
+                        'form'     => $this->form,
+                        'formSend' => $this,
                     ])
-                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
-                    ->setTo($email)
-                    ->setSubject(\Yii::t('skeeks/form2/app', 'Submitting form') . ": «{$this->form->name}» #" . $this->id)
-                    ;
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
+                        ->setTo($email)
+                        ->setSubject(\Yii::t('skeeks/form2/app', 'Submitting form').": «{$this->form->name}» #".$this->id);
 
                     $rp = $this->relatedPropertiesModel;
                     $rp->initAllProperties();
 
-                    foreach ($rp->toArray() as $code => $value)
-                    {
+                    foreach ($rp->toArray() as $code => $value) {
                         $property = $rp->getRelatedProperty($code);
 
                         if ($property && $property->handler instanceof PropertyTypeStorageFile) {
@@ -295,8 +299,7 @@ class Form2FormSend extends RelatedElementModel
                                     /**
                                      * @var StorageFile $file
                                      */
-                                    foreach ($files as $file)
-                                    {
+                                    foreach ($files as $file) {
                                         $message->attach($file->getRootSrc());
                                     }
                                 }

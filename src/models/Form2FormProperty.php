@@ -48,6 +48,8 @@ use Yii;
  */
 class Form2FormProperty extends RelatedPropertyModel
 {
+    public $relatedPropertyEnumClassName = Form2FormPropertyEnum::class;
+    
     /**
      * @inheritdoc
      */

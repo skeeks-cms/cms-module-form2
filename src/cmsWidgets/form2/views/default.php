@@ -36,22 +36,7 @@ $modelHasRelatedProperties = $widget->modelForm->createModelFormSend();
                     });
                 });
             }
-<script>     
-sx.EventManager.on("ajaxFormSuccessSubmited", function(e, data) {
-    //Успешно отправлена любая форма
-    //ym(67855000,'reachGoal','any-form');
-    
-    if (data.form.jForm.data('form_code') == 'register') {
-        //Отправлена конкретная форма (регистрация)
-        ym(67855000,'reachGoal','register');
-    }
-    
-    
-    if (data.form.jForm.data('form_code') == 'test') {
-        //Отправлена конкретная форма (с кодом test)
-    }
-});
-</script>
+
 JS
 ),
     ]);
