@@ -32,6 +32,14 @@ class AdminFormController extends BackendModelStandartController
         $this->modelShowAttribute = "name";
         $this->modelClassName = Form2Form::class;
 
+        $this->generateAccessActions = false;
+        $this->accessCallback = function () {
+            if (!\Yii::$app->skeeks->site->is_default) {
+                return false;
+            }
+            return \Yii::$app->user->can($this->uniqueId);
+        };
+
         parent::init();
     }
 
