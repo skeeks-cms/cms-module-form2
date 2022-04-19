@@ -5,33 +5,34 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 15.06.2015
  */
+
 namespace skeeks\modules\cms\form2\models;
 
-use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\Core;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
-use Yii;
 use yii\validators\EmailValidator;
 
 /**
  * This is the model class for table "{{%form2_form}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property string $name
- * @property string $description
- * @property string $code
- * @property string $emails
- * @property string $phones
- * @property string $user_ids
+ * @property integer             $id
+ * @property integer             $created_by
+ * @property integer             $updated_by
+ * @property integer             $created_at
+ * @property integer             $updated_at
+ * @property integer             $cms_site_id
+ * @property string              $name
+ * @property string              $description
+ * @property string              $code
+ * @property string              $emails
+ * @property string              $phones
+ * @property string              $user_ids
  *
- * @property array $emailsAsArray
+ * @property array               $emailsAsArray
  *
- * @property Form2FormSend[] $form2FormSends
+ * @property CmsSite             $cmsSite
+ * @property Form2FormSend[]     $form2FormSends
  * @property Form2FormProperty[] $form2FormProperties
  */
 class Form2Form extends Core
@@ -57,26 +58,38 @@ class Form2Form extends Core
             [['emails', 'phones', 'user_ids'], 'string'],
             [['name'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 32],
-            [['code'], 'unique'],
 
-            [['emails'], function($attribute)
-            {
-                if ($this->emailsAsArray)
-                {
-                    foreach ($this->emailsAsArray as $email)
-                    {
-                        $validator = new EmailValidator();
+            [['cms_site_id'], 'integer'],
+            [['cms_site_id'], 'default', 'value' => \Yii::$app->skeeks->site->id],
 
-                        if (!$validator->validate($email, $error))
-                        {
-                            $this->addError($attribute, $email . ' — ' . \Yii::t('skeeks/form2/app', 'Incorrect email address'));
-                            return false;
+            [['code'], 'unique', 'targetAttribute' => ['code', 'cms_site_id']],
+
+            [
+                ['emails'],
+                function ($attribute) {
+                    if ($this->emailsAsArray) {
+                        foreach ($this->emailsAsArray as $email) {
+                            $validator = new EmailValidator();
+
+                            if (!$validator->validate($email, $error)) {
+                                $this->addError($attribute, $email.' — '.\Yii::t('skeeks/form2/app', 'Incorrect email address'));
+                                return false;
+                            }
                         }
                     }
-                }
 
-            }],
+                },
+            ],
         ]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSite()
+    {
+        $class = \Yii::$app->skeeks->siteClass;
+        return $this->hasOne($class, ['id' => 'cms_site_id']);
     }
 
     /**
@@ -85,12 +98,12 @@ class Form2Form extends Core
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'name' => \Yii::t('skeeks/form2/app', 'Название'),
+            'name'        => \Yii::t('skeeks/form2/app', 'Название'),
             'description' => \Yii::t('skeeks/form2/app', 'Description'),
-            'code' => \Yii::t('skeeks/form2/app', 'Code'),
-            'emails' => \Yii::t('skeeks/form2/app', 'Email addresses'),
-            'phones' => \Yii::t('skeeks/form2/app', 'Telephones'),
-            'user_ids' => \Yii::t('skeeks/form2/app', 'User Ids'),
+            'code'        => \Yii::t('skeeks/form2/app', 'Code'),
+            'emails'      => \Yii::t('skeeks/form2/app', 'Email addresses'),
+            'phones'      => \Yii::t('skeeks/form2/app', 'Telephones'),
+            'user_ids'    => \Yii::t('skeeks/form2/app', 'User Ids'),
         ]);
     }
 
@@ -127,12 +140,10 @@ class Form2Form extends Core
     public function getEmailsAsArray()
     {
         $emailsAll = [];
-        if ($this->emails)
-        {
+        if ($this->emails) {
             $emails = explode(",", $this->emails);
 
-            foreach ($emails as $email)
-            {
+            foreach ($emails as $email) {
                 $emailsAll[] = trim($email);
             }
         }
@@ -145,13 +156,12 @@ class Form2Form extends Core
      */
     public function createModelFormSend()
     {
-        if ($this->isNewRecord)
-        {
+        if ($this->isNewRecord) {
             throw new InvalidParamException;
         }
 
         $form2Send = new \skeeks\modules\cms\form2\models\Form2FormSend([
-            'form_id' => (int) $this->id
+            'form_id' => (int)$this->id,
         ]);
 
         $rpm = $form2Send->relatedPropertiesModel;

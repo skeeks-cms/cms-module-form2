@@ -20,7 +20,7 @@
         [
             'controllerRoute' => '/form2/admin-form',
             'items' => \yii\helpers\ArrayHelper::map(
-            \skeeks\modules\cms\form2\models\Form2Form::find()->all(),
+            \skeeks\modules\cms\form2\models\Form2Form::find()->cmsSite()->all(),
                 'id',
                 'name'
             ),

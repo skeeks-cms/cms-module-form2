@@ -9,6 +9,7 @@
 namespace skeeks\modules\cms\form2\controllers;
 
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
@@ -33,12 +34,13 @@ class AdminFormController extends BackendModelStandartController
         $this->modelClassName = Form2Form::class;
 
         $this->generateAccessActions = false;
-        $this->accessCallback = function () {
+        
+        /*$this->accessCallback = function () {
             if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
             }
             return \Yii::$app->user->can($this->uniqueId);
-        };
+        };*/
 
         parent::init();
     }
@@ -52,6 +54,7 @@ class AdminFormController extends BackendModelStandartController
 
             "create" => [
                 'fields' => [$this, 'updateFields'],
+                'size'           => BackendAction::SIZE_SMALL,
             ],
             "update" => [
                 'fields' => [$this, 'updateFields'],
@@ -73,6 +76,7 @@ class AdminFormController extends BackendModelStandartController
                          * @var $query ActiveQuery
                          */
                         $query = $e->sender->dataProvider->query;
+                        $query->cmsSite();
 
                         $sendsQuery = Form2FormSend::find()->select(['count(*)'])->where(['form_id' => new Expression(Form2Form::tableName().".id")]);
 

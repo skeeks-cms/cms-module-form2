@@ -12,6 +12,9 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\modules\cms\form2\models\Form2FormSend;
+use yii\base\Event;
+use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -27,13 +30,7 @@ class AdminFormSendController extends BackendModelStandartController
         $this->modelClassName = Form2FormSend::className();
 
         $this->generateAccessActions = false;
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };
-
+       
         parent::init();
     }
 
@@ -53,6 +50,20 @@ class AdminFormSendController extends BackendModelStandartController
                 ],
 
                 "grid" => [
+
+                    'on init' => function (Event $e) {
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+                        $query->joinWith("form as form");
+                        $query->andWhere(['form.cms_site_id' => \Yii::$app->cms->cmsSite->id]);
+
+                        /*$query->select([
+                            Form2FormSend::tableName().'.*',
+                        ]);*/
+                    },
 
                     'defaultOrder' => [
                         'id' => SORT_DESC,

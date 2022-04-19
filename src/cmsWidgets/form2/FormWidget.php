@@ -107,7 +107,7 @@ class FormWidget extends WidgetRenderable
 
             if ($this->form_id)
             {
-                $this->modelForm = Form2Form::find()->where(['id' => $this->form_id])->one();
+                $this->modelForm = Form2Form::find()->cmsSite()->andWhere(['id' => $this->form_id])->one();
 
                 if (!$this->modelForm)
                 {
@@ -118,7 +118,7 @@ class FormWidget extends WidgetRenderable
             {
                 if ($this->form_code)
                 {
-                    $this->modelForm = Form2Form::find()->where(['code' => $this->form_code])->one();
+                    $this->modelForm = Form2Form::find()->cmsSite()->andWhere(['code' => $this->form_code])->one();
                     if ($form)
                     {
                         $this->form_id = $form->id;
