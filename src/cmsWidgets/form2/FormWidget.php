@@ -132,7 +132,7 @@ class FormWidget extends WidgetRenderable
             }
         } catch (\Exception $e)
         {
-            \Yii::warning($e->getMessage(), static::className());
+            \Yii::info($e->getMessage(), static::className());
         }
 
         if (!$this->modelForm)
