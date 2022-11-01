@@ -16,6 +16,7 @@ use Yii;
  * This is the model class for table "{{%form2_form_property}}".
  *
  * @property integer $id
+ * @property integer|null                 $cms_site_id
  * @property integer $created_by
  * @property integer $updated_by
  * @property integer $created_at
@@ -62,6 +63,7 @@ class Form2FormProperty extends RelatedPropertyModel
     {
         return array_merge(parent::attributeLabels(), [
             'form_id' => \Yii::t('skeeks/form2/app', 'Contact form'),
+            'cms_site_id' => Yii::t('skeeks/cms', 'Сайт'),
         ]);
     }
 
@@ -72,7 +74,20 @@ class Form2FormProperty extends RelatedPropertyModel
     {
         return ArrayHelper::merge(parent::rules(), [
             [['form_id'], 'integer'],
-            [['code', 'form_id'], 'unique', 'targetAttribute' => ['code', 'form_id'], 'message' => \Yii::t('skeeks/form2/app', 'User Ids')]
+            [['cms_site_id'], 'integer'],
+            [['code', 'form_id'], 'unique', 'targetAttribute' => ['code', 'form_id'], 'message' => \Yii::t('skeeks/form2/app', 'User Ids')],
+
+            [['cms_site_id'], 'integer'],
+            [
+                ['cms_site_id'],
+                'default',
+                'value' => function () {
+                    if (\Yii::$app->skeeks->site) {
+                        return \Yii::$app->skeeks->site->id;
+                    }
+                },
+            ],
+
         ]);
     }
 
