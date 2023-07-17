@@ -24,6 +24,9 @@ class ActiveFormConstructForm extends \skeeks\cms\base\widgets\ActiveForm
     use ActiveFormAjaxSubmitTrait;
 
     public $afterValidateCallback = "";
+    
+    public $validateOnChange = true;
+    public $validateOnBlur = true;
 
     /**
      * @var Form2Form
@@ -32,12 +35,12 @@ class ActiveFormConstructForm extends \skeeks\cms\base\widgets\ActiveForm
 
     public function __construct($config = [])
     {
-        $this->validationUrl = \skeeks\cms\helpers\UrlHelper::construct('form2/backend/validate')->toString();
+        //$this->validationUrl = \skeeks\cms\helpers\UrlHelper::construct('form2/backend/validate')->toString();
         $this->action = \skeeks\cms\helpers\UrlHelper::construct('form2/backend/submit')->toString();
 
-        $this->enableAjaxValidation = true;
+        /*$this->enableAjaxValidation = true;
         $this->validateOnChange = false;
-        $this->validateOnBlur = false;
+        $this->validateOnBlur = false;*/
 
         parent::__construct($config);
     }

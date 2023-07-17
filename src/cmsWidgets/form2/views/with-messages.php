@@ -44,46 +44,50 @@ JS;
                 'form_namespace' => $widget->namespace,
             ]
         ],
-        'afterValidateCallback'                     => $widget->afterValidateJs ? $widget->afterValidateJs : new \yii\web\JsExpression(<<<JS
-            function(jForm, ajax)
+        'clientCallback' => new \yii\web\JsExpression(<<<JS
+    function (ActiveFormAjaxSubmit) {
+    
+        ActiveFormAjaxSubmit.on('error', function(e, response) {
+            ActiveFormAjaxSubmit.AjaxQueryHandler.set("allowResponseSuccessMessage", false);
+            ActiveFormAjaxSubmit.AjaxQueryHandler.set("allowResponseErrorMessage", false);
+            
+            var jForm = ActiveFormAjaxSubmit.jForm;
+            var data = response.data;
+            $('.sx-success-message', jForm).hide();
+            $('.sx-error-message', jForm).show();
+            $('.sx-error-message .sx-body', jForm).empty().append(response.message);
+
+            {$errorJs}    
+        });
+        
+        ActiveFormAjaxSubmit.on('success', function(e, response) {
+            ActiveFormAjaxSubmit.AjaxQueryHandler.set("allowResponseSuccessMessage", false);
+            ActiveFormAjaxSubmit.AjaxQueryHandler.set("allowResponseErrorMessage", false);
+            
+            var jForm = ActiveFormAjaxSubmit.jForm;
+            var data = response.data;
+            $('.sx-error-message', jForm).hide();
+            $('.sx-success-message', jForm).show();
+            $('.sx-success-message .sx-body', jForm).empty().append(response.message);
+
+            $('input, textarea', jForm).each(function(value, key)
             {
-                var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
-                    'blockerSelector' : '#' + jForm.attr('id'),
-                    'enableBlocker' : true,
-                    'allowResponseSuccessMessage' : false,
-                    'allowResponseErrorMessage' : false,
-                });
-
-                handler.bind('error', function(e, data)
+                var name = $(this).attr('name');
+                if (name != '_csrf' && name != 'sx-model-value' && name != 'sx-model')
                 {
-                    $('.sx-success-message', jForm).hide();
-                    $('.sx-error-message', jForm).show();
-                    $('.sx-error-message .sx-body', jForm).empty().append(data.message);
+                    $(this).val('');
+                }
+            });
 
-                    {$errorJs}
-                });
-
-                handler.bind('success', function(e, data)
-                {
-                    $('.sx-error-message', jForm).hide();
-                    $('.sx-success-message', jForm).show();
-                    $('.sx-success-message .sx-body', jForm).empty().append(data.message);
-
-                    $('input, textarea', jForm).each(function(value, key)
-                    {
-                        var name = $(this).attr('name');
-                        if (name != '_csrf' && name != 'sx-model-value' && name != 'sx-model')
-                        {
-                            $(this).val('');
-                        }
-                    });
-
-                    {$successJs}
-
-                });
-            }
+            {$successJs}
+            
+        });
+        
+    }
 JS
 ),
+        
+        
     ]);
 ?>
 

@@ -17,6 +17,7 @@ use skeeks\modules\cms\form2\models\Form2FormSend;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
+use yii\widgets\ActiveForm;
 
 /**
  * Class BackendController
@@ -95,6 +96,14 @@ class BackendController extends Controller
                     }
 
                 } else {
+                    
+                    $rr->data = [
+                        'validation' => ArrayHelper::merge(
+                            ActiveForm::validate($validateModel),
+                            []
+                        )
+                    ];
+                    
                     $rr->success = false;
                     $rr->message = \Yii::t('skeeks/form2/app', 'Check the correctness of filling the form fields');
                 }
