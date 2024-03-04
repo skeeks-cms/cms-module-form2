@@ -11,6 +11,7 @@ namespace skeeks\modules\cms\form2\controllers;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\DateTimeColumnData;
+use skeeks\modules\cms\form2\models\Form2FormProperty;
 use skeeks\modules\cms\form2\models\Form2FormSend;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
@@ -63,6 +64,15 @@ class AdminFormSendController extends BackendModelStandartController
                         /*$query->select([
                             Form2FormSend::tableName().'.*',
                         ]);*/
+                    },
+                    
+                    'on beforeInit'        => function (Event $event) {
+                        /**
+                         * @var $query ActiveQuery
+                         * @var $grid GridView
+                         */
+                        $grid = $event->sender;
+                        $this->initGridColumns($grid);
                     },
 
                     'defaultOrder' => [
@@ -128,5 +138,51 @@ class AdminFormSendController extends BackendModelStandartController
         ArrayHelper::remove($actions, 'related-properties');
 
         return $actions;
+    }
+    
+    
+    
+    public function initGridColumns($grid)
+    {
+        $model = null;
+        $autoColumns = [];
+
+        $model = new Form2FormSend();
+
+        $relatedPropertiesModel = $model->relatedPropertiesModel;
+
+        $properties = Form2FormProperty::find()->all();
+
+        foreach ($properties as $property) {
+            $name = $property->code;
+            //$property = $relatedPropertiesModel->getRelatedProperty($name);
+            $filter = '';
+
+            $autoColumns["property{$property->id}"] = [
+                //'attribute' => $name,
+                'headerOptions' => [
+                    'style' => 'width: 150px;'
+                ],
+                'contentOptions' => [
+                    'style' => 'width: 150px;'
+                ],
+
+                'label'  => "" . $property->name . " [данные]",
+                'format' => 'raw',
+                'value'  => function ($model, $key, $index) use ($name, $relatedPropertiesModel) {
+                    /**
+                     * @var $model \skeeks\cms\models\CmsContentElement
+                     */
+                    return $model->relatedPropertiesModel->getAttributeAsHtml($name);
+                },
+            ];
+        }
+
+        if ($autoColumns) {
+            $grid->columns = ArrayHelper::merge($grid->columns, $autoColumns);
+        }
+
+
+        return $this;
     }
 }
