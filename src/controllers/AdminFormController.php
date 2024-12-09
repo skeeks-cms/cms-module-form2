@@ -34,7 +34,8 @@ class AdminFormController extends BackendModelStandartController
         $this->modelClassName = Form2Form::class;
 
         $this->generateAccessActions = false;
-        
+        $this->permissionName = "form2/admin-form";
+
         /*$this->accessCallback = function () {
             if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
@@ -54,7 +55,7 @@ class AdminFormController extends BackendModelStandartController
 
             "create" => [
                 'fields' => [$this, 'updateFields'],
-                'size'           => BackendAction::SIZE_SMALL,
+                'size'   => BackendAction::SIZE_SMALL,
             ],
             "update" => [
                 'fields' => [$this, 'updateFields'],
@@ -95,7 +96,7 @@ class AdminFormController extends BackendModelStandartController
                         ],
                     ],
 
-                    'defaultOrder'   => [
+                    'defaultOrder' => [
                         'count_sends' => SORT_DESC,
                         'id'          => SORT_DESC,
                     ],
@@ -119,9 +120,9 @@ class AdminFormController extends BackendModelStandartController
                     ],
                     'columns'        => [
                         'customName' => [
-                            'label' => "Форма",
+                            'label'  => "Форма",
                             'format' => "raw",
-                            'value' => function(Form2Form $form) {
+                            'value'  => function (Form2Form $form) {
                                 $result = [];
                                 $result[] = Html::a($form->asText, "#", [
                                     'class' => "sx-trigger-action",
@@ -130,7 +131,7 @@ class AdminFormController extends BackendModelStandartController
                                 $result[] = $form->code;
 
                                 return implode('<br />', $result);
-                            }
+                            },
                         ],
 
                         'created_at' => [
@@ -144,9 +145,9 @@ class AdminFormController extends BackendModelStandartController
                             },
                         ],
                         'count_sends' => [
-                            'label' => \Yii::t('skeeks/form2/app', 'Number of posts'),
+                            'label'     => \Yii::t('skeeks/form2/app', 'Number of posts'),
                             'attribute' => 'count_sends',
-                            'value' => function (Form2Form $model) {
+                            'value'     => function (Form2Form $model) {
                                 return $model->raw_row['count_sends'];
                             },
                         ],
@@ -214,11 +215,11 @@ class AdminFormController extends BackendModelStandartController
             'name',
             'code',
             'description' => [
-                'class' => TextareaField::class
+                'class' => TextareaField::class,
             ],
-            'emails' => [
-                'class' => TextareaField::class
-            ]
+            'emails'      => [
+                'class' => TextareaField::class,
+            ],
         ];
     }
 
