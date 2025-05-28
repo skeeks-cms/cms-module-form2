@@ -36,7 +36,7 @@ class ActiveFormConstructForm extends \skeeks\cms\base\widgets\ActiveForm
     public function __construct($config = [])
     {
         //$this->validationUrl = \skeeks\cms\helpers\UrlHelper::construct('form2/backend/validate')->toString();
-        $this->action = \skeeks\cms\helpers\UrlHelper::construct('form2/backend/submit')->toString();
+        $this->action = \skeeks\cms\helpers\UrlHelper::construct('/form2/backend/submit')->toString();
 
         /*$this->enableAjaxValidation = true;
         $this->validateOnChange = false;
