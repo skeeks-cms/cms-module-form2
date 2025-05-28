@@ -118,6 +118,13 @@ JS
     <? endforeach; ?>
 <? endif; ?>
 
+<?php if ($widget->modelForm->is_add_legal_checkbox) : ?>
+<div class="form-group field-relatedpropertiesmodel-phone required has-error">
+    <input type="checkbox" required id="sx-rules">
+    <label for="sx-rules"><?php echo $widget->modelForm->legalCheckboxText; ?></label>
+</div>
+<? endif; ?>
+
 <?= \yii\helpers\Html::tag($widget->btn_tag, \Yii::t('skeeks/form2/app', $widget->btnSubmit), $widget->btn_options); ?>
 
 <?php \skeeks\modules\cms\form2\widgets\ActiveFormConstructForm::end(); ?>

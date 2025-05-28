@@ -11,6 +11,7 @@ namespace skeeks\modules\cms\form2\models;
 use skeeks\cms\models\Core;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\validators\EmailValidator;
 
 /**
@@ -28,12 +29,15 @@ use yii\validators\EmailValidator;
  * @property string              $emails
  * @property string              $phones
  * @property string              $user_ids
+ * @property bool                $is_add_legal_checkbox
+ * @property string              $legal_checkbox_template
  *
  * @property array               $emailsAsArray
  *
  * @property CmsSite             $cmsSite
  * @property Form2FormSend[]     $form2FormSends
  * @property Form2FormProperty[] $form2FormProperties
+ * @property string $legalCheckboxText
  */
 class Form2Form extends Core
 {
@@ -54,7 +58,14 @@ class Form2Form extends Core
         return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
             [['name'], 'required'],
+
             [['description'], 'string'],
+
+            [['legal_checkbox_template'], 'string'],
+
+            [['is_add_legal_checkbox'], 'integer'],
+            [['is_add_legal_checkbox'], 'default', 'value' => 1],
+
             [['emails', 'phones', 'user_ids'], 'string'],
             [['name'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 32],
@@ -98,15 +109,24 @@ class Form2Form extends Core
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'name'        => \Yii::t('skeeks/form2/app', 'Название'),
-            'description' => \Yii::t('skeeks/form2/app', 'Description'),
-            'code'        => \Yii::t('skeeks/form2/app', 'Code'),
-            'emails'      => \Yii::t('skeeks/form2/app', 'Email addresses'),
-            'phones'      => \Yii::t('skeeks/form2/app', 'Telephones'),
-            'user_ids'    => \Yii::t('skeeks/form2/app', 'User Ids'),
+            'name'                    => \Yii::t('skeeks/form2/app', 'Название'),
+            'description'             => \Yii::t('skeeks/form2/app', 'Description'),
+            'code'                    => \Yii::t('skeeks/form2/app', 'Code'),
+            'emails'                  => \Yii::t('skeeks/form2/app', 'Email addresses'),
+            'phones'                  => \Yii::t('skeeks/form2/app', 'Telephones'),
+            'user_ids'                => \Yii::t('skeeks/form2/app', 'User Ids'),
+            'is_add_legal_checkbox'   => "Показывать checkbox о согласии с обработкой персональных данных",
+            'legal_checkbox_template' => "Сообщение возле галочки о персональных данных",
         ]);
     }
 
+    public function getLegalCheckboxText()
+    {
+        $template = $this->legal_checkbox_template ? $this->legal_checkbox_template : 'Я принимаю <a href="{url}" target="_blank" data-pjax="0">условия обработки персональных данных</a>';
+        $url = Url::to(['/cms/legal/personal-data']);
+        $template = str_replace("{url}", $url, $template);
+        return $template;
+    }
     /**
      * @inheritdoc
      */
@@ -114,6 +134,7 @@ class Form2Form extends Core
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'emails' => \Yii::t('skeeks/form2/app', 'You can specify multiple Email addresses (separated by commas), which will receive the notification and filling out this form.'),
+            'legal_checkbox_template' => "{url} - ссылка на условия обработки персональных данных. Если не заполнено поле, то будет показано автоматически.",
         ]);
     }
 

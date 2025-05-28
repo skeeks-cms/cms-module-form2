@@ -15,7 +15,9 @@ use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\modules\cms\form2\models\Form2Form;
 use skeeks\modules\cms\form2\models\Form2FormSend;
+use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\TextareaField;
+use skeeks\yii2\form\fields\TextField;
 use yii\base\Event;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
@@ -219,6 +221,16 @@ class AdminFormController extends BackendModelStandartController
             ],
             'emails'      => [
                 'class' => TextareaField::class,
+            ],
+            'is_add_legal_checkbox'      => [
+                'class' => BoolField::class,
+                'allowNull' => false,
+            ],
+            'legal_checkbox_template'      => [
+                'class' => TextField::class,
+                'elementOptions' => [
+                    'placeholder' => 'Я принимаю <a href="{url}" target="_blank" data-pjax="0">условия обработки персональных данных</a>'
+                ]
             ],
         ];
     }
