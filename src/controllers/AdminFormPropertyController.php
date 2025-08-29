@@ -337,7 +337,7 @@ class AdminFormPropertyController extends BackendModelStandartController
                                     $handler->load($post);
                                 }
                                 if ($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) {
-                                    $handler->enumRoute = 'cms/admin-form-property-enum';
+                                    $handler->enumRoute = 'form2/admin-form-property-enum';
                                 }
 
                                 $content = $handler->renderConfigFormFields($formElement->activeForm);
