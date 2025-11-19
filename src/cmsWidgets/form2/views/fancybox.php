@@ -83,7 +83,7 @@ JS
 <? endif; ?>
 
 <?php if ($widget->modelForm->is_add_legal_checkbox) : ?>
-<div class="form-group field-relatedpropertiesmodel-phone required has-error">
+<div class="form-group field-rules required has-error">
     <input type="checkbox" required id="sx-rules">
     <label for="sx-rules"><?php echo $widget->modelForm->legalCheckboxText; ?></label>
 </div>
