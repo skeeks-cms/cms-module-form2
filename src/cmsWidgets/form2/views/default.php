@@ -47,7 +47,8 @@ JS
         <?= $property->renderActiveForm($form, $modelHasRelatedProperties); ?>
     <? endforeach; ?>
 <? endif; ?>
-
+<input type="text" name="email_confirm" style="display:none">
+<input type="hidden" name="form_time" value="<?= time() ?>">
 <?php if ($widget->modelForm->is_add_legal_checkbox) : ?>
 <div class="form-group field-rules required has-error">
     <input type="checkbox" required id="sx-rules">

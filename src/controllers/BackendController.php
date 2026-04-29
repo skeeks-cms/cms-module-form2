@@ -74,6 +74,47 @@ class BackendController extends Controller
                 $modelFormSend->emails = $modelForm->emails;
                 $modelFormSend->phones = $modelForm->phones;
 
+                //Защита от ботов
+                if (!empty(\Yii::$app->request->post('email_confirm'))) {
+                    \Yii::error("Форма: Бот заполнил форму email_confirm", "form2");
+                    $rr->success = true;
+                    $rr->message = \Yii::t('skeeks/form2/app', 'Successfully sent');
+                    return (array)$rr;
+                }
+
+                $time = \Yii::$app->request->post('form_time');
+                if (time() - $time < 3) {
+                    // слишком быстро — бот
+                    \Yii::error("Форма: Бот заполнил форму слишком быстро", "form2");
+                    $rr->success = true;
+                    $rr->message = \Yii::t('skeeks/form2/app', 'Successfully sent');
+                    return (array)$rr;
+                }
+                
+                $ip = \Yii::$app->request->userIP;
+                
+                $count = Form2FormSend::find()
+                    ->where(['ip' => $ip])
+                    ->andWhere(['>', 'created_at', time() - 3600])
+                    ->count();
+                if ($count > 3) {
+                    \Yii::error("Форма: более 3-х запросов с одного ip в час", "form2");
+                    $rr->success = true;
+                    $rr->message = \Yii::t('skeeks/form2/app', 'Successfully sent');
+                    return (array)$rr;
+                }
+
+                $count = Form2FormSend::find()
+                    ->where(['ip' => $ip])
+                    ->andWhere(['>', 'created_at', time() - 3600*24])
+                    ->count();
+                
+                if ($count > 6) {
+                    \Yii::error("Форма: более 6 запросов с одного ip в сутки", "form2");
+                    $rr->success = true;
+                    $rr->message = \Yii::t('skeeks/form2/app', 'Successfully sent');
+                    return (array)$rr;
+                }
 
                 if ($validateModel->load(\Yii::$app->request->post()) && $validateModel->validate()) {
                     if ($this->_beforeSave($modelForm, $validateModel, $modelFormSend)) {
