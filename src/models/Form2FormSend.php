@@ -13,8 +13,10 @@ use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
+use skeeks\cms\models\CmsLead;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\services\CmsLeadService;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\User;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
@@ -236,6 +238,230 @@ class Form2FormSend extends RelatedElementModel
     public function getCmsSite()
     {
         return $this->hasOne(CmsSite::className(), ['id' => 'cms_site_id']);
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if (!$insert
+            || !class_exists(CmsLead::class)
+            || !class_exists(CmsLeadService::class)
+            || !CmsLead::getDb()->getTableSchema(CmsLead::tableName())
+        ) {
+            return;
+        }
+
+        $values = is_array($this->data_values) ? $this->data_values : [];
+        $labels = is_array($this->data_labels) ? $this->data_labels : [];
+        $description = ['ID отправки формы: '.$this->id];
+        $fields = [];
+        $name = null;
+        $phones = [];
+        $emails = [];
+
+        foreach ($values as $code => $value) {
+            $label = trim((string)($labels[$code] ?? $code));
+            $text = $this->leadValueAsText($value);
+            if ($text === '') {
+                continue;
+            }
+
+            $fields[] = [
+                'code' => (string)$code,
+                'label' => $label,
+                'value' => $value,
+                'as_text' => $text,
+            ];
+            $description[] = $label.': '.$text;
+            $haystack = mb_strtolower((string)$code.' '.$label);
+            if ($name === null && preg_match('/(^|\s)(имя|фио|название|name|title)(\s|$)|обраща|контактн(?:ое|ый)?\s+лиц/u', $haystack)) {
+                $name = $text;
+            }
+            if (preg_match('/телефон|phone|mobile/u', $haystack)) {
+                foreach ($this->leadScalarValues($value) as $candidate) {
+                    if ($this->isLeadPhone($candidate)) {
+                        $phones[$this->leadPhoneKey($candidate)] = ['value' => $candidate, 'name' => $label];
+                    }
+                }
+            }
+            if (preg_match('/e-?mail|почт/u', $haystack)) {
+                foreach ($this->leadScalarValues($value) as $candidate) {
+                    if (filter_var($candidate, FILTER_VALIDATE_EMAIL)) {
+                        $emails[mb_strtolower($candidate, 'UTF-8')] = ['value' => $candidate, 'name' => $label];
+                    }
+                }
+            }
+        }
+
+        if (!$emails) {
+            foreach ($fields as $field) {
+                foreach ($this->leadScalarValues($field['value']) as $candidate) {
+                    if (filter_var($candidate, FILTER_VALIDATE_EMAIL)) {
+                        $emails[mb_strtolower($candidate, 'UTF-8')] = ['value' => $candidate, 'name' => $field['label']];
+                    }
+                }
+            }
+        }
+        if (!$phones) {
+            foreach ($fields as $field) {
+                foreach ($this->leadScalarValues($field['value']) as $candidate) {
+                    if ($this->isLeadPhone($candidate)) {
+                        $phones[$this->leadPhoneKey($candidate)] = ['value' => $candidate, 'name' => $field['label']];
+                    }
+                }
+            }
+        }
+
+        $formName = $this->form ? (string)$this->form->name : '';
+        if (!$name) {
+            $name = $formName !== '' ? 'Заявка из формы «'.$formName.'»' : 'Заявка из формы №'.$this->form_id;
+        }
+        if ($this->page_url) {
+            $description[] = 'Страница отправки: '.$this->page_url;
+        }
+
+        $utms = is_array($this->utms) ? $this->utms : [];
+        foreach ($this->leadUtmValues($utms) as $label => $value) {
+            $description[] = $label.': '.$value;
+        }
+
+        $sourceData = [
+            'form_id' => (int)$this->form_id,
+            'form_code' => $this->form ? (string)$this->form->code : null,
+            'form_name' => $formName ?: null,
+            'form_send_id' => (int)$this->id,
+            'cms_site_id' => $this->cms_site_id ? (int)$this->cms_site_id : null,
+            'created_at' => $this->created_at ? (int)$this->created_at : null,
+            'created_by' => $this->created_by ? (int)$this->created_by : null,
+            'ip' => $this->ip ?: null,
+            'page_url' => $this->page_url ?: null,
+            'labels' => $labels,
+            'values' => $values,
+            'fields' => $fields,
+            'utm' => $utms,
+            'request' => $this->leadRequestMetadata(),
+        ];
+        if (is_array($this->additional_data) && $this->additional_data) {
+            $sourceData['additional_data'] = $this->additional_data;
+        }
+
+        (new CmsLeadService())->createFromSource([
+            'cms_site_id' => $this->cms_site_id ?: null,
+            'submitted_by_id' => $this->created_by ?: null,
+            'source_type' => CmsLead::SOURCE_FORM,
+            'source_ref' => (string)$this->id,
+            'source_name' => $formName ?: 'Форма №'.$this->form_id,
+            'source_url' => $this->page_url ?: null,
+            'source_data' => $sourceData,
+            'utm_source' => $utms['utm_source'] ?? $utms['source'] ?? null,
+            'utm_medium' => $utms['utm_medium'] ?? $utms['medium'] ?? null,
+            'utm_campaign' => $utms['utm_campaign'] ?? $utms['campaign'] ?? null,
+            'utm_content' => $utms['utm_content'] ?? $utms['content'] ?? null,
+            'utm_term' => $utms['utm_term'] ?? $utms['term'] ?? null,
+            'name' => $name,
+            'phones' => array_values($phones),
+            'emails' => array_values($emails),
+            'description' => $description ? implode("\n", $description) : null,
+            'status' => CmsLead::STATUS_NEW,
+        ]);
+    }
+
+    public function transactions()
+    {
+        return [self::SCENARIO_DEFAULT => self::OP_INSERT];
+    }
+
+    private function leadValueAsText($value): string
+    {
+        if (is_scalar($value)) {
+            return trim((string)$value);
+        }
+        if (is_array($value)) {
+            $parts = [];
+            array_walk_recursive($value, static function ($item) use (&$parts) {
+                if (is_scalar($item) && trim((string)$item) !== '') {
+                    $parts[] = trim((string)$item);
+                }
+            });
+            return implode(', ', array_unique($parts));
+        }
+
+        return '';
+    }
+
+    private function leadScalarValues($value): array
+    {
+        if (is_scalar($value)) {
+            $value = trim((string)$value);
+            return $value === '' ? [] : [$value];
+        }
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $result = [];
+        array_walk_recursive($value, static function ($item) use (&$result) {
+            if (is_scalar($item) && trim((string)$item) !== '') {
+                $result[] = trim((string)$item);
+            }
+        });
+        return array_values(array_unique($result));
+    }
+
+    private function isLeadPhone(string $value): bool
+    {
+        $digits = preg_replace('/\D+/', '', $value);
+        return strlen($digits) >= 10 && strlen($digits) <= 15;
+    }
+
+    private function leadPhoneKey(string $value): string
+    {
+        return preg_replace('/\D+/', '', $value);
+    }
+
+    private function leadUtmValues(array $utms): array
+    {
+        $result = [];
+        foreach ([
+            'UTM source' => ['utm_source', 'source'],
+            'UTM medium' => ['utm_medium', 'medium'],
+            'UTM campaign' => ['utm_campaign', 'campaign'],
+            'UTM content' => ['utm_content', 'content'],
+            'UTM term' => ['utm_term', 'term'],
+        ] as $label => $keys) {
+            foreach ($keys as $key) {
+                $value = isset($utms[$key]) ? trim((string)$utms[$key]) : '';
+                if ($value !== '') {
+                    $result[$label] = $value;
+                    break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    private function leadRequestMetadata(): array
+    {
+        $server = is_array($this->data_server) ? $this->data_server : [];
+        $result = [];
+        foreach ([
+            'REQUEST_METHOD' => 'method',
+            'HTTP_USER_AGENT' => 'user_agent',
+            'HTTP_ACCEPT_LANGUAGE' => 'accept_language',
+            'HTTP_REFERER' => 'referer',
+            'REMOTE_ADDR' => 'remote_address',
+        ] as $source => $target) {
+            if (isset($server[$source]) && is_scalar($server[$source])) {
+                $value = trim((string)$server[$source]);
+                if ($value !== '') {
+                    $result[$target] = $value;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**

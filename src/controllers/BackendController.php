@@ -69,8 +69,6 @@ class BackendController extends Controller
 
                 $validateModel = $modelFormSend->relatedPropertiesModel;
 
-                $modelFormSend->data_values = $validateModel->toArray($validateModel->attributes());
-                $modelFormSend->data_labels = $validateModel->attributeLabels();
                 $modelFormSend->emails = $modelForm->emails;
                 $modelFormSend->phones = $modelForm->phones;
 
@@ -117,14 +115,34 @@ class BackendController extends Controller
                 }
 
                 if ($validateModel->load(\Yii::$app->request->post()) && $validateModel->validate()) {
+                    $modelFormSend->data_values = $validateModel->getAttributes();
+                    $modelFormSend->data_labels = array_intersect_key(
+                        $validateModel->attributeLabels(),
+                        $modelFormSend->data_values
+                    );
+
                     if ($this->_beforeSave($modelForm, $validateModel, $modelFormSend)) {
-                        if (!$modelFormSend->save()) {
+                        $transaction = Form2FormSend::getDb()->beginTransaction();
+                        try {
+                            if (!$modelFormSend->save()) {
+                                throw new \RuntimeException(implode('; ', $modelFormSend->getFirstErrors()));
+                            }
+
+                            if (!$validateModel->save()) {
+                                throw new \RuntimeException('Не удалось сохранить значения полей формы.');
+                            }
+
+                            $transaction->commit();
+                        } catch (\Throwable $e) {
+                            if ($transaction->isActive) {
+                                $transaction->rollBack();
+                            }
+                            \Yii::error($e, 'form2');
                             $rr->success = false;
                             $rr->message = \Yii::t('skeeks/form2/app', 'Failed to send the form');
                             return (array)$rr;
                         }
 
-                        $validateModel->save();
                         $modelFormSend->notify();
 
                         $this->_afterSave($modelForm, $validateModel, $modelFormSend);
