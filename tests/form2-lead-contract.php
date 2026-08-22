@@ -40,8 +40,16 @@ foreach ([
     }
 }
 
-if (strpos($send, "'name' => \$name") === false) {
-    throw new RuntimeException('Form2 lead must map the standard name field.');
+foreach ([
+    "\$leadName = \$formName !== '' ? 'Форма на сайте «'.\$formName.'»' : 'Форма на сайте №'.\$this->form_id",
+    "\$leadName .= ' №'.\$this->id",
+    "\$mainPhone = \$phones ? reset(\$phones)['value'] : null",
+    "\$leadName .= ': '.implode(', ', \$nameParts)",
+    "'name' => \$leadName",
+] as $nameContract) {
+    if (strpos($send, $nameContract) === false) {
+        throw new RuntimeException('Form2 lead must persist its complete display name: '.$nameContract);
+    }
 }
 foreach (['phones', 'emails'] as $attribute) {
     if (strpos($send, "'{$attribute}' => array_values(\${$attribute})") === false) {

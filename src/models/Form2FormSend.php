@@ -356,8 +356,17 @@ class Form2FormSend extends RelatedElementModel
         }
 
         $formName = $this->form ? (string)$this->form->name : '';
-        if (!$name) {
-            $name = $formName !== '' ? 'Заявка из формы «'.$formName.'»' : 'Заявка из формы №'.$this->form_id;
+        $leadName = $formName !== '' ? 'Форма на сайте «'.$formName.'»' : 'Форма на сайте №'.$this->form_id;
+        if ($this->id) {
+            $leadName .= ' №'.$this->id;
+        }
+        $mainPhone = $phones ? reset($phones)['value'] : null;
+        $nameParts = array_values(array_filter([
+            $name ? trim((string)$name) : '',
+            $mainPhone ? trim((string)$mainPhone) : '',
+        ], static fn(string $part): bool => $part !== ''));
+        if ($nameParts) {
+            $leadName .= ': '.implode(', ', $nameParts);
         }
         if ($this->page_url) {
             $description[] = 'Страница отправки: '.$this->page_url;
@@ -401,7 +410,7 @@ class Form2FormSend extends RelatedElementModel
             'utm_campaign' => $utms['utm_campaign'] ?? $utms['campaign'] ?? null,
             'utm_content' => $utms['utm_content'] ?? $utms['content'] ?? null,
             'utm_term' => $utms['utm_term'] ?? $utms['term'] ?? null,
-            'name' => $name,
+            'name' => $leadName,
             'phones' => array_values($phones),
             'emails' => array_values($emails),
             'description' => $description ? implode("\n", $description) : null,
