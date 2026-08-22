@@ -244,12 +244,54 @@ class Form2FormSend extends RelatedElementModel
     {
         parent::afterSave($insert, $changedAttributes);
 
-        if (!$insert
-            || !class_exists(CmsLead::class)
-            || !class_exists(CmsLeadService::class)
-            || !CmsLead::getDb()->getTableSchema(CmsLead::tableName())
-        ) {
-            return;
+        if ($insert) {
+            $this->ensureCmsLead();
+        }
+    }
+
+    public function getLeadSiteId(): ?int
+    {
+        if ($this->cms_site_id) {
+            return (int)$this->cms_site_id;
+        }
+        if ($this->form && $this->form->cms_site_id) {
+            return (int)$this->form->cms_site_id;
+        }
+        if (\Yii::$app->has('skeeks') && \Yii::$app->skeeks->site) {
+            return (int)\Yii::$app->skeeks->site->id;
+        }
+
+        return null;
+    }
+
+    public function isCmsLeadIntegrationAvailable(): bool
+    {
+        if (!class_exists(CmsLead::class) || !class_exists(CmsLeadService::class)) {
+            return false;
+        }
+
+        try {
+            return CmsLead::getDb()->getTableSchema(CmsLead::tableName()) !== null;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    public function getCmsLead(): ?CmsLead
+    {
+        if (!$this->id || !$this->isCmsLeadIntegrationAvailable()) {
+            return null;
+        }
+
+        return CmsLead::find()
+            ->fromSource(CmsLead::SOURCE_FORM, (string)$this->id, $this->leadSiteId)
+            ->one();
+    }
+
+    public function ensureCmsLead(): ?CmsLead
+    {
+        if (!$this->isCmsLeadIntegrationAvailable()) {
+            return null;
         }
 
         $values = is_array($this->data_values) ? $this->data_values : [];
@@ -331,7 +373,7 @@ class Form2FormSend extends RelatedElementModel
             'form_code' => $this->form ? (string)$this->form->code : null,
             'form_name' => $formName ?: null,
             'form_send_id' => (int)$this->id,
-            'cms_site_id' => $this->cms_site_id ? (int)$this->cms_site_id : null,
+            'cms_site_id' => $this->leadSiteId,
             'created_at' => $this->created_at ? (int)$this->created_at : null,
             'created_by' => $this->created_by ? (int)$this->created_by : null,
             'ip' => $this->ip ?: null,
@@ -346,8 +388,8 @@ class Form2FormSend extends RelatedElementModel
             $sourceData['additional_data'] = $this->additional_data;
         }
 
-        (new CmsLeadService())->createFromSource([
-            'cms_site_id' => $this->cms_site_id ?: null,
+        return (new CmsLeadService())->createFromSource([
+            'cms_site_id' => $this->leadSiteId,
             'submitted_by_id' => $this->created_by ?: null,
             'source_type' => CmsLead::SOURCE_FORM,
             'source_ref' => (string)$this->id,

@@ -2,7 +2,10 @@
 
 $root = dirname(__DIR__).'/src';
 $controller = file_get_contents($root.'/controllers/BackendController.php');
+$adminController = file_get_contents($root.'/controllers/AdminFormSendController.php');
 $send = file_get_contents($root.'/models/Form2FormSend.php');
+$view = file_get_contents($root.'/views/admin-form-send/view.php');
+$header = file_get_contents($root.'/views/admin-form-send/_model_header.php');
 
 $load = strpos($controller, '$validateModel->load(');
 $snapshot = strpos($controller, '$modelFormSend->data_values = $validateModel->getAttributes();');
@@ -51,6 +54,53 @@ if (strpos($send, "'data_cookie'") === false || strpos($send, "'data_session'") 
 }
 if (strpos($send, "'data_cookie' =>") !== false || strpos($send, "'data_session' =>") !== false) {
     throw new RuntimeException('Lead source_data must not duplicate raw Form2 cookies or sessions.');
+}
+
+foreach ([
+    'public function getCmsLead(): ?CmsLead',
+    'public function ensureCmsLead(): ?CmsLead',
+    '->fromSource(CmsLead::SOURCE_FORM, (string)$this->id, $this->leadSiteId)',
+    '$this->ensureCmsLead();',
+    'return (new CmsLeadService())->createFromSource([',
+] as $reverseLinkContract) {
+    if (strpos($send, $reverseLinkContract) === false) {
+        throw new RuntimeException('Form2 reverse lead link is incomplete: '.$reverseLinkContract);
+    }
+}
+foreach ([
+    "'process' => [",
+    'BackendModelUpdateAction::class',
+    "'fields' => [\$this, 'processFields']",
+    "'create-lead' => [",
+    '!\\Yii::$app->request->isPost',
+    '$this->model->ensureCmsLead()',
+    "'/cms/admin-cms-lead/view'",
+] as $adminContract) {
+    if (strpos($adminController, $adminContract) === false) {
+        throw new RuntimeException('Form2 admin lead/process action is incomplete: '.$adminContract);
+    }
+}
+foreach ([
+    'BackendSurfaceWidget',
+    'BackendEntityLink',
+    'sx-detail-layout--main-first',
+    '$model->cmsLead',
+    "Url::to(['create-lead'",
+    '<details class="sx-form-send-debug">',
+] as $viewContract) {
+    if (strpos($view, $viewContract) === false) {
+        throw new RuntimeException('Form2 read-only card is incomplete: '.$viewContract);
+    }
+}
+foreach (['ActiveFormUseTab', '$model->save()', 'buttonsStandart(', 'fieldSelect('] as $legacyMutation) {
+    if (strpos($view, $legacyMutation) !== false) {
+        throw new RuntimeException('Form2 view must stay read-only and free of the legacy processing form: '.$legacyMutation);
+    }
+}
+foreach (['BackendModelHeader', "'Отправка №'.(int)\$model->id", 'sx-status'] as $headerContract) {
+    if (strpos($header, $headerContract) === false) {
+        throw new RuntimeException('Form2 model header is incomplete: '.$headerContract);
+    }
 }
 
 echo "Form2 lead contract: ok\n";
