@@ -288,6 +288,13 @@ class Form2FormSend extends RelatedElementModel
             ->one();
     }
 
+    public function getDisplayName(): string
+    {
+        $formName = $this->form ? trim((string)$this->form->name) : '';
+
+        return ($formName !== '' ? $formName : 'Отправка формы').' №'.(int)$this->id;
+    }
+
     public function ensureCmsLead(): ?CmsLead
     {
         if (!$this->isCmsLeadIntegrationAvailable()) {

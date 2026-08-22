@@ -9,22 +9,21 @@
 namespace skeeks\modules\cms\form2\controllers;
 
 use skeeks\cms\backend\actions\BackendModelAction;
-use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\DateTimeColumnData;
-use skeeks\cms\models\CmsUser;
-use skeeks\cms\widgets\AjaxSelectModel;
+use skeeks\cms\models\CmsLead;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\modules\cms\form2\models\Form2FormProperty;
 use skeeks\modules\cms\form2\models\Form2FormSend;
-use skeeks\yii2\form\fields\FieldSet;
-use skeeks\yii2\form\fields\SelectField;
-use skeeks\yii2\form\fields\TextareaField;
-use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\BadRequestHttpException;
+use yii\web\NotFoundHttpException;
 
 /**
  * Class AdminFormController
@@ -35,9 +34,10 @@ class AdminFormSendController extends BackendModelStandartController
     public function init()
     {
         $this->name = \Yii::t('skeeks/form2/app', 'Messages');
-        $this->modelShowAttribute = "id";
+        $this->modelShowAttribute = "displayName";
         $this->modelClassName = Form2FormSend::className();
         $this->modelDefaultAction = 'view';
+        $this->permissionName = 'cms/admin-lead';
         $this->modelHeader = function () {
             return $this->renderPartial('@skeeks/modules/cms/form2/views/admin-form-send/_model_header', [
                 'model' => $this->model,
@@ -57,6 +57,7 @@ class AdminFormSendController extends BackendModelStandartController
         $actions = ArrayHelper::merge(parent::actions(), [
 
             'index' => [
+                'configKey' => 'form2/messages-v2',
 
                 'filters' => [
                     'visibleFilters' => [
@@ -74,10 +75,14 @@ class AdminFormSendController extends BackendModelStandartController
                         $query = $e->sender->dataProvider->query;
                         $query->joinWith("form as form");
                         $query->andWhere(['form.cms_site_id' => \Yii::$app->cms->cmsSite->id]);
-
-                        /*$query->select([
-                            Form2FormSend::tableName().'.*',
-                        ]);*/
+                        if (!$this->isAdmin()) {
+                            $availableLeadRefs = CmsLead::find()
+                                ->forManager()
+                                ->cmsSite()
+                                ->andWhere([CmsLead::tableName().'.source_type' => CmsLead::SOURCE_FORM])
+                                ->select(CmsLead::tableName().'.source_ref');
+                            $query->andWhere([Form2FormSend::tableName().'.id' => $availableLeadRefs]);
+                        }
                     },
                     
                     'on beforeInit'        => function (Event $event) {
@@ -95,44 +100,44 @@ class AdminFormSendController extends BackendModelStandartController
 
                     'visibleColumns' => [
                         'checkbox',
-                        'actions',
-
+                        'message',
+                        'lead',
                         'created_at',
-
-                        'form_id',
-                        'status',
-
-                        'processed_at',
-                        'processed_by',
-
-
-                        'comment',
                         'emails',
+                        'phones',
                         'ip',
-
+                        'actions',
                     ],
                     'columns'        => [
-                        'created_at'   => [
-                            'class' => DateTimeColumnData::class,
+                        'message' => [
+                            'class' => BackendEntityLinkColumn::class,
+                            'attribute' => 'id',
+                            'label' => 'Сообщение',
+                            'controllerId' => '/form2/admin-form-send',
+                            'action' => 'view',
+                            'permissionName' => 'cms/admin-lead',
+                            'value' => static fn(Form2FormSend $model) => $model->displayName,
                         ],
-                        'processed_at' => [
-                            'class' => DateTimeColumnData::class,
-                        ],
-
-                        'status' => [
-                            'value' => function (Form2FormSend $model) {
-
-                                if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_NEW) {
-                                    $class = "danger";
-                                } else if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_PROCESSED) {
-                                    $class = "warning";
-                                } else if ($model->status == \skeeks\modules\cms\form2\models\Form2FormSend::STATUS_EXECUTED) {
-                                    $class = "success";
+                        'lead' => [
+                            'label' => 'Лид',
+                            'format' => 'raw',
+                            'value' => static function (Form2FormSend $model) {
+                                $lead = $model->cmsLead;
+                                if (!$lead) {
+                                    return Html::tag('span', '—', ['class' => 'sx-text--muted']);
                                 }
 
-                                return '<span class="label label-'.$class.'">'.\yii\helpers\ArrayHelper::getValue(\skeeks\modules\cms\form2\models\Form2FormSend::getStatuses(), $model->status).'</span>';
-
+                                return BackendEntityLink::widget([
+                                    'controllerId' => '/cms/admin-cms-lead',
+                                    'action' => 'view',
+                                    'modelId' => (int)$lead->id,
+                                    'label' => $lead->displayName,
+                                    'options' => ['class' => 'sx-collection-cell__primary'],
+                                ]);
                             },
+                        ],
+                        'created_at'   => [
+                            'class' => DateTimeColumnData::class,
                         ],
                     ],
                 ],
@@ -144,26 +149,17 @@ class AdminFormSendController extends BackendModelStandartController
                 'icon'     => 'svg:file',
                 'priority' => 10,
             ],
-            'process' => [
-                'class' => BackendModelUpdateAction::class,
-                'name' => 'Обработка',
-                'icon' => 'svg:edit',
-                'priority' => 20,
-                'fields' => [$this, 'processFields'],
-                'on beforeValidate' => function (Event $event) {
-                    /** @var Form2FormSend $model */
-                    $model = $event->sender->model;
-                    if ((int)$model->status !== Form2FormSend::STATUS_NEW) {
-                        $model->processed_by = $model->processed_by ?: (int)\Yii::$app->user->id;
-                        $model->processed_at = time();
-                    }
-                },
-            ],
             'create-lead' => [
                 'class' => BackendModelAction::class,
                 'isVisible' => false,
                 'callback' => [$this, 'createLead'],
                 'accessCallback' => fn() => $this->canCreateLead(),
+            ],
+            'delete' => [
+                'accessCallback' => fn() => $this->isAdmin(),
+            ],
+            'delete-multi' => [
+                'accessCallback' => fn() => $this->isAdmin(),
             ],
         ]);
 
@@ -173,51 +169,6 @@ class AdminFormSendController extends BackendModelStandartController
         ArrayHelper::remove($actions, 'related-properties');
 
         return $actions;
-    }
-
-    public function processFields($action = null): array
-    {
-        /** @var Form2FormSend|null $model */
-        $model = $action ? $action->model : null;
-        if ($model
-            && (int)$model->status === Form2FormSend::STATUS_NEW
-            && !$model->processed_by
-            && !\Yii::$app->user->isGuest
-        ) {
-            $model->status = Form2FormSend::STATUS_PROCESSED;
-            $model->processed_by = (int)\Yii::$app->user->id;
-        }
-
-        return [
-            'processing' => [
-                'class' => FieldSet::class,
-                'name' => 'Обработка отправки',
-                'fields' => [
-                    'status' => [
-                        'class' => SelectField::class,
-                        'items' => Form2FormSend::getStatuses(),
-                        'allowNull' => false,
-                    ],
-                    'processed_by' => [
-                        'class' => WidgetField::class,
-                        'label' => 'Ответственный',
-                        'widgetClass' => AjaxSelectModel::class,
-                        'widgetConfig' => [
-                            'modelClass' => CmsUser::class,
-                            'searchQuery' => static function ($word = '') {
-                                $query = CmsUser::find()->forManager()->cmsSite();
-                                return $word ? $query->search($word) : $query;
-                            },
-                        ],
-                    ],
-                    'comment' => [
-                        'class' => TextareaField::class,
-                        'label' => 'Комментарий менеджера',
-                        'elementOptions' => ['rows' => 6],
-                    ],
-                ],
-            ],
-        ];
     }
 
     public function createLead()
@@ -249,6 +200,41 @@ class AdminFormSendController extends BackendModelStandartController
         return $this->model
             && $this->model->isCmsLeadIntegrationAvailable()
             && $this->model->leadSiteId === (int)\Yii::$app->skeeks->site->id;
+    }
+
+    public function getModel()
+    {
+        if ($this->_model === null) {
+            $pk = (int)\Yii::$app->request->get($this->requestPkParamName);
+            if ($pk) {
+                $query = Form2FormSend::find()
+                    ->joinWith('form as form')
+                    ->andWhere(['form.cms_site_id' => \Yii::$app->cms->cmsSite->id])
+                    ->andWhere([Form2FormSend::tableName().'.id' => $pk]);
+
+                if (!$this->isAdmin()) {
+                    $availableLeadRefs = CmsLead::find()
+                        ->forManager()
+                        ->cmsSite()
+                        ->andWhere([CmsLead::tableName().'.source_type' => CmsLead::SOURCE_FORM])
+                        ->select(CmsLead::tableName().'.source_ref');
+                    $query->andWhere([Form2FormSend::tableName().'.id' => $availableLeadRefs]);
+                }
+
+                $this->_model = $query->limit(1)->one();
+                if (!$this->_model) {
+                    throw new NotFoundHttpException('Сообщение формы не найдено.');
+                }
+            }
+        }
+
+        return $this->_model;
+    }
+
+    private function isAdmin(): bool
+    {
+        return !\Yii::$app->user->isGuest
+            && \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
     }
     
     

@@ -6,6 +6,8 @@ $adminController = file_get_contents($root.'/controllers/AdminFormSendController
 $send = file_get_contents($root.'/models/Form2FormSend.php');
 $view = file_get_contents($root.'/views/admin-form-send/view.php');
 $header = file_get_contents($root.'/views/admin-form-send/_model_header.php');
+$viewAsset = file_get_contents($root.'/assets/FormSendViewAsset.php');
+$viewCss = file_get_contents($root.'/assets/form-send-view.css');
 
 $load = strpos($controller, '$validateModel->load(');
 $snapshot = strpos($controller, '$modelFormSend->data_values = $validateModel->getAttributes();');
@@ -76,25 +78,56 @@ foreach ([
     }
 }
 foreach ([
-    "'process' => [",
-    'BackendModelUpdateAction::class',
-    "'fields' => [\$this, 'processFields']",
     "'create-lead' => [",
     '!\\Yii::$app->request->isPost',
     '$this->model->ensureCmsLead()',
     "'/cms/admin-cms-lead/view'",
 ] as $adminContract) {
     if (strpos($adminController, $adminContract) === false) {
-        throw new RuntimeException('Form2 admin lead/process action is incomplete: '.$adminContract);
+        throw new RuntimeException('Form2 admin lead action is incomplete: '.$adminContract);
+    }
+}
+foreach (["'process' => [", 'BackendModelUpdateAction::class', 'function processFields('] as $legacyProcess) {
+    if (strpos($adminController, $legacyProcess) !== false) {
+        throw new RuntimeException('Legacy Form2 processing must not remain an admin action: '.$legacyProcess);
+    }
+}
+foreach ([
+    "'configKey' => 'form2/messages-v2'",
+    "\$this->permissionName = 'cms/admin-lead'",
+    "'message' => [",
+    'BackendEntityLinkColumn::class',
+    "'controllerId' => '/form2/admin-form-send'",
+    "'permissionName' => 'cms/admin-lead'",
+    "'lead' => [",
+    "'controllerId' => '/cms/admin-cms-lead'",
+    '->forManager()',
+    '->cmsSite()',
+    "CmsLead::tableName().'.source_type' => CmsLead::SOURCE_FORM",
+    'if (!$this->isAdmin())',
+    'public function getModel()',
+    "'delete' => [",
+    "'delete-multi' => [",
+    "'accessCallback' => fn() => \$this->isAdmin()",
+] as $collectionContract) {
+    if (strpos($adminController, $collectionContract) === false) {
+        throw new RuntimeException('Form2 lead-scoped collection is incomplete: '.$collectionContract);
+    }
+}
+foreach (['status', 'processed_at', 'processed_by', 'comment'] as $legacyColumn) {
+    if (preg_match("/'visibleColumns'\\s*=>\\s*\\[[^]]*'".preg_quote($legacyColumn, '/')."'/s", $adminController)) {
+        throw new RuntimeException('Legacy processing column must be hidden from the Form2 collection: '.$legacyColumn);
     }
 }
 foreach ([
     'BackendSurfaceWidget',
     'BackendEntityLink',
+    'FormSendViewAsset::register($this)',
     'sx-detail-layout--main-first',
     '$model->cmsLead',
     "Url::to(['create-lead'",
     '<details class="sx-form-send-debug">',
+    'Архив обработки',
 ] as $viewContract) {
     if (strpos($view, $viewContract) === false) {
         throw new RuntimeException('Form2 read-only card is incomplete: '.$viewContract);
@@ -105,10 +138,25 @@ foreach (['ActiveFormUseTab', '$model->save()', 'buttonsStandart(', 'fieldSelect
         throw new RuntimeException('Form2 view must stay read-only and free of the legacy processing form: '.$legacyMutation);
     }
 }
-foreach (['BackendModelHeader', "'Отправка №'.(int)\$model->id", 'sx-status'] as $headerContract) {
+foreach (['BackendModelHeader', "'title' => \$model->displayName", 'CmsLead::statusCssClass'] as $headerContract) {
     if (strpos($header, $headerContract) === false) {
         throw new RuntimeException('Form2 model header is incomplete: '.$headerContract);
     }
+}
+foreach (['BackendUiAsset::class', "'form-send-view.css'"] as $assetContract) {
+    if (strpos($viewAsset, $assetContract) === false) {
+        throw new RuntimeException('Form2 card asset is incomplete: '.$assetContract);
+    }
+}
+foreach (['sx-block', 'sx-panel', 'class="row', 'class="col-'] as $deprecatedUi) {
+    if (strpos($view, $deprecatedUi) !== false || strpos($viewCss, $deprecatedUi) !== false) {
+        throw new RuntimeException('Form2 card must use only the canonical surface/layout contract: '.$deprecatedUi);
+    }
+}
+if (strpos($send, 'public function getDisplayName(): string') === false
+    || strpos($send, "return (\$formName !== '' ? \$formName : 'Отправка формы').' №'.(int)\$this->id;") === false
+) {
+    throw new RuntimeException('Form2 submission must expose the canonical list/card title.');
 }
 
 echo "Form2 lead contract: ok\n";

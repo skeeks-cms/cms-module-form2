@@ -2,25 +2,24 @@
 
 use skeeks\cms\backend\helpers\BackendIcon;
 use skeeks\cms\backend\widgets\BackendModelHeader;
+use skeeks\cms\models\CmsLead;
 use skeeks\modules\cms\form2\models\Form2FormSend;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 /** @var Form2FormSend $model */
 
-$statusClass = ArrayHelper::getValue([
-    Form2FormSend::STATUS_NEW => 'sx-status--danger',
-    Form2FormSend::STATUS_PROCESSED => 'sx-status--warning',
-    Form2FormSend::STATUS_EXECUTED => 'sx-status--success',
-], (int)$model->status, 'sx-status--info');
-$statusText = ArrayHelper::getValue(Form2FormSend::getStatuses(), $model->status, 'Неизвестный статус');
-$status = Html::tag('div', Html::encode($statusText), [
-    'class' => 'sx-status '.$statusClass,
-]);
+$lead = $model->cmsLead;
+if ($lead) {
+    $status = Html::tag('div', Html::encode($lead->statusName), [
+        'class' => 'sx-status '.CmsLead::statusCssClass($lead->status),
+    ]);
+} else {
+    $status = Html::tag('div', 'Без лида', ['class' => 'sx-status sx-status--info']);
+}
 
-if ($model->processedBy) {
+if ($lead && $lead->executor) {
     $status .= Html::tag('div',
-        BackendIcon::render('user', ['size' => 13]).' '.Html::encode((string)$model->processedBy->displayName),
+        BackendIcon::render('user', ['size' => 13]).' '.Html::encode((string)$lead->executor->displayName),
         ['class' => 'sx-model-header__status-note']
     );
 }
@@ -33,7 +32,7 @@ if ($model->form) {
 
 echo BackendModelHeader::widget([
     'model' => $model,
-    'title' => 'Отправка №'.(int)$model->id,
+    'title' => $model->displayName,
     'imageSrc' => false,
     'metaItems' => $metaItems,
     'status' => $status,
