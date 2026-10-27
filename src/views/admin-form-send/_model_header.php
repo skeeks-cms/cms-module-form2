@@ -14,7 +14,7 @@ if ($lead) {
         'class' => 'sx-status '.CmsLead::statusCssClass($lead->status),
     ]);
 } else {
-    $status = Html::tag('div', 'Без лида', ['class' => 'sx-status sx-status--info']);
+    $status = Html::tag('div', 'Без сделки', ['class' => 'sx-status sx-status--info']);
 }
 
 if ($lead && $lead->executor) {

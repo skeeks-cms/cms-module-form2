@@ -62,7 +62,7 @@ if ($lead) {
         ])
         .Html::tag('span',
             Html::tag('span', Html::encode($lead->displayName), ['class' => 'sx-form-send-lead-title'])
-            .Html::tag('span', 'Открыть лид и продолжить обработку в CRM', ['class' => 'sx-form-send-lead-hint']),
+            .Html::tag('span', 'Открыть сделку и продолжить обработку в CRM', ['class' => 'sx-form-send-lead-hint']),
             ['class' => 'sx-form-send-lead-copy']
         )
         .$leadStatus
@@ -73,7 +73,7 @@ if ($lead) {
         ['class' => 'sx-form-send-lead-body']
     );
     $surface = BackendSurfaceWidget::widget([
-        'title' => 'Связанный лид',
+        'title' => 'Связанная сделка',
         'hint' => 'Отправка уже находится в общем процессе CRM.',
         'titleTag' => 'h2',
         'raised' => true,
@@ -88,7 +88,7 @@ if ($lead) {
         'content' => $surface,
         'options' => [
             'class' => 'sx-form-send-lead-link',
-            'aria-label' => 'Открыть лид №'.(int)$lead->id,
+            'aria-label' => 'Открыть сделку №'.(int)$lead->id,
         ],
     ]);
 } else {
@@ -100,26 +100,26 @@ if ($lead) {
             ['class' => 'sx-form-send-create-lead']
         )
             .Html::submitButton(
-                BackendIcon::render('plus', ['size' => 15]).' Создать лид',
+                BackendIcon::render('plus', ['size' => 15]).' Создать сделку',
                 [
                     'class' => 'sx-button sx-button--primary sx-button--sm',
-                    'data-confirm' => 'Создать лид из этой отправки формы?',
+                    'data-confirm' => 'Создать сделку из этой отправки формы?',
                 ]
             )
             .Html::endForm();
     }
     $leadContent = BackendSurfaceWidget::widget([
-        'title' => 'Лид ещё не создан',
+        'title' => 'Сделка ещё не создана',
         'hint' => $canCreateLead
-            ? 'Это старая отправка. Создайте лид выборочно — данные формы и контакты перенесутся автоматически.'
-            : 'Интеграция с лидами для этой отправки сейчас недоступна.',
+            ? 'Это старая отправка. Создайте сделку выборочно — данные формы и контакты перенесутся автоматически.'
+            : 'Интеграция со сделками для этой отправки сейчас недоступна.',
         'titleTag' => 'h2',
         'raised' => true,
         'responsive' => true,
         'actions' => $leadAction,
         'content' => Html::tag('div',
             Html::tag('span', BackendIcon::render('info', ['size' => 18]), ['aria-hidden' => 'true'])
-            .Html::tag('span', 'Повторное действие безопасно: отправка может быть связана только с одним лидом.'),
+            .Html::tag('span', 'Повторное действие безопасно: отправка может быть связана только с одной сделкой.'),
             ['class' => 'sx-form-send-lead-empty']
         ),
         'options' => ['class' => 'sx-form-send-lead-surface sx-form-send-lead-surface--empty'],

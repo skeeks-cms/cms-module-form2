@@ -119,7 +119,7 @@ class AdminFormSendController extends BackendModelStandartController
                             'value' => static fn(Form2FormSend $model) => $model->displayName,
                         ],
                         'lead' => [
-                            'label' => 'Лид',
+                            'label' => 'Сделка',
                             'format' => 'raw',
                             'value' => static function (Form2FormSend $model) {
                                 $lead = $model->cmsLead;
@@ -174,18 +174,18 @@ class AdminFormSendController extends BackendModelStandartController
     public function createLead()
     {
         if (!\Yii::$app->request->isPost) {
-            throw new BadRequestHttpException('Лид можно создать только явным действием из карточки отправки.');
+            throw new BadRequestHttpException('Сделку можно создать только явным действием из карточки отправки.');
         }
 
         $existing = $this->model->cmsLead;
         try {
             $lead = $this->model->ensureCmsLead();
             if (!$lead) {
-                throw new \RuntimeException('Механизм лидов сейчас недоступен.');
+                throw new \RuntimeException('Механизм сделок сейчас недоступен.');
             }
             \Yii::$app->session->setFlash('success', $existing
-                ? 'Эта отправка уже связана с лидом.'
-                : 'Лид создан из отправки формы.');
+                ? 'Эта отправка уже связана со сделкой.'
+                : 'Сделка создана из отправки формы.');
 
             return $this->redirect(['/cms/admin-cms-lead/view', 'pk' => $lead->id]);
         } catch (\Throwable $e) {
