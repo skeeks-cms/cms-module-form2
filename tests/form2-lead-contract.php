@@ -35,7 +35,11 @@ foreach ([
     "'utm' => \$utms",
     "'request' => \$this->leadRequestMetadata()",
     "'source_ref' => (string)\$this->id",
-    "'source_type' => CmsLead::SOURCE_FORM",
+    // The channel of the form: «Форма» by default, «Визит» for a form with that setting (Form2Form::$lead_source_type).
+    "'source_type' => \$this->leadSourceType()",
+    "CmsLead::SOURCE_FORM,",
+    "defined(CmsLead::class.'::SOURCE_VISIT') ? CmsLead::SOURCE_VISIT : null",
+    "foreach (self::leadSourceTypes() as \$type)",
 ] as $fragment) {
     if (strpos($send, $fragment) === false) {
         throw new RuntimeException('Missing Form2 lead source contract: '.$fragment);
@@ -69,7 +73,7 @@ if (strpos($send, "'data_cookie' =>") !== false || strpos($send, "'data_session'
 foreach ([
     'public function getCmsLead(): ?CmsLead',
     'public function ensureCmsLead(): ?CmsLead',
-    '->fromSource(CmsLead::SOURCE_FORM, (string)$this->id, $this->leadSiteId)',
+    '->fromSource($type, (string)$this->id, $this->leadSiteId)',
     '$this->ensureCmsLead();',
     'return (new CmsLeadService())->createFromSource([',
 ] as $reverseLinkContract) {
@@ -103,7 +107,7 @@ foreach ([
     "'controllerId' => '/cms/admin-cms-lead'",
     '->forManager()',
     '->cmsSite()',
-    "CmsLead::tableName().'.source_type' => CmsLead::SOURCE_FORM",
+    "CmsLead::tableName().'.source_type' => Form2FormSend::leadSourceTypes()",
     'if (!$this->isAdmin())',
     'public function getModel()',
     "'delete' => [",

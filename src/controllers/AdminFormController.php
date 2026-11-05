@@ -213,6 +213,16 @@ class AdminFormController extends BackendModelStandartController
 
     public function updateFields()
     {
+        $leadChannel = [];
+        if (Form2Form::leadSourceTypeItems() && (new Form2Form())->hasAttribute('lead_source_type')) {
+            $leadChannel['lead_source_type'] = [
+                'class' => \skeeks\yii2\form\fields\SelectField::class,
+                'items' => Form2Form::leadSourceTypeItems(),
+                'allowNull' => true,
+                'nullLabel' => 'Форма — обычная заявка с сайта',
+            ];
+        }
+
         return [
             'name',
             'code',
@@ -232,7 +242,7 @@ class AdminFormController extends BackendModelStandartController
                     'placeholder' => 'Я принимаю <a href="{url}" target="_blank" data-pjax="0">условия обработки персональных данных</a>'
                 ]
             ],
-        ];
+        ] + $leadChannel;
     }
 
 }

@@ -75,6 +75,12 @@ class Form2Form extends Core
 
             [['code'], 'unique', 'targetAttribute' => ['code', 'cms_site_id']],
 
+            // The channel of the deal a submission creates: empty — «Форма», `visit` — «Визит в салон / офис».
+            [['lead_source_type'], 'filter', 'filter' => static fn($value) => $value === '' ? null : $value,
+                'when' => static fn(self $model) => $model->hasAttribute('lead_source_type')],
+            [['lead_source_type'], 'in', 'range' => array_keys(self::leadSourceTypeItems()),
+                'when' => static fn(self $model) => $model->hasAttribute('lead_source_type')],
+
             [
                 ['emails'],
                 function ($attribute) {
@@ -117,7 +123,23 @@ class Form2Form extends Core
             'user_ids'                => \Yii::t('skeeks/form2/app', 'User Ids'),
             'is_add_legal_checkbox'   => "Показывать checkbox о согласии с обработкой персональных данных",
             'legal_checkbox_template' => "Сообщение возле галочки о персональных данных",
+            'lead_source_type'        => 'Канал сделки',
         ]);
+    }
+
+    /**
+     * Channels a form may give its deals besides «Форма» (the core CRM must know them).
+     *
+     * @return string[] value => label
+     */
+    public static function leadSourceTypeItems(): array
+    {
+        $lead = '\skeeks\cms\models\CmsLead';
+        if (!class_exists($lead) || !defined($lead.'::SOURCE_VISIT')) {
+            return [];
+        }
+
+        return [$lead::SOURCE_VISIT => 'Визит в салон / офис — анкета посетителя, QR-код в зале'];
     }
 
     public function getLegalCheckboxText()
@@ -135,6 +157,7 @@ class Form2Form extends Core
         return ArrayHelper::merge(parent::attributeLabels(), [
             'emails' => \Yii::t('skeeks/form2/app', 'You can specify multiple Email addresses (separated by commas), which will receive the notification and filling out this form.'),
             'legal_checkbox_template' => "{url} - ссылка на условия обработки персональных данных. Если не заполнено поле, то будет показано автоматически.",
+            'lead_source_type' => 'По умолчанию сделка из формы получает канал «Форма». Для анкеты посетителей салона или офиса (например, по QR-коду у входа) выберите «Визит»: в CRM и отчётах такие сделки будут считаться визитами.',
         ]);
     }
 

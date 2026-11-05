@@ -79,7 +79,7 @@ class AdminFormSendController extends BackendModelStandartController
                             $availableLeadRefs = CmsLead::find()
                                 ->forManager()
                                 ->cmsSite()
-                                ->andWhere([CmsLead::tableName().'.source_type' => CmsLead::SOURCE_FORM])
+                                ->andWhere([CmsLead::tableName().'.source_type' => Form2FormSend::leadSourceTypes()])
                                 ->select(CmsLead::tableName().'.source_ref');
                             $query->andWhere([Form2FormSend::tableName().'.id' => $availableLeadRefs]);
                         }
@@ -216,7 +216,7 @@ class AdminFormSendController extends BackendModelStandartController
                     $availableLeadRefs = CmsLead::find()
                         ->forManager()
                         ->cmsSite()
-                        ->andWhere([CmsLead::tableName().'.source_type' => CmsLead::SOURCE_FORM])
+                        ->andWhere([CmsLead::tableName().'.source_type' => Form2FormSend::leadSourceTypes()])
                         ->select(CmsLead::tableName().'.source_ref');
                     $query->andWhere([Form2FormSend::tableName().'.id' => $availableLeadRefs]);
                 }

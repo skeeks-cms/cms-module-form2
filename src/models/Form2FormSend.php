@@ -283,9 +283,37 @@ class Form2FormSend extends RelatedElementModel
             return null;
         }
 
-        return CmsLead::find()
-            ->fromSource(CmsLead::SOURCE_FORM, (string)$this->id, $this->leadSiteId)
-            ->one();
+        // The channel of the form may have changed since: the deal is looked up by every channel of a form.
+        foreach (self::leadSourceTypes() as $type) {
+            $lead = CmsLead::find()->fromSource($type, (string)$this->id, $this->leadSiteId)->one();
+            if ($lead) {
+                return $lead;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Channels of deals made from submissions: «Форма» and, with a core that has it, «Визит в салон / офис».
+     *
+     * @return string[]
+     */
+    public static function leadSourceTypes(): array
+    {
+        return array_values(array_filter([
+            CmsLead::SOURCE_FORM,
+            defined(CmsLead::class.'::SOURCE_VISIT') ? CmsLead::SOURCE_VISIT : null,
+        ]));
+    }
+
+    /** The channel of the deal of this submission: the setting of its form (Form2Form::$lead_source_type), else «Форма». */
+    public function leadSourceType(): string
+    {
+        $form = $this->form;
+        $type = $form && $form->hasAttribute('lead_source_type') ? (string)$form->lead_source_type : '';
+
+        return $type !== '' && in_array($type, self::leadSourceTypes(), true) ? $type : CmsLead::SOURCE_FORM;
     }
 
     public function getDisplayName(): string
@@ -407,7 +435,7 @@ class Form2FormSend extends RelatedElementModel
         return (new CmsLeadService())->createFromSource([
             'cms_site_id' => $this->leadSiteId,
             'submitted_by_id' => $this->created_by ?: null,
-            'source_type' => CmsLead::SOURCE_FORM,
+            'source_type' => $this->leadSourceType(),
             'source_ref' => (string)$this->id,
             'source_name' => $formName ?: 'Форма №'.$this->form_id,
             'source_url' => $this->page_url ?: null,
