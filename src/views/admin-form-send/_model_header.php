@@ -9,7 +9,9 @@ use yii\helpers\Html;
 /** @var Form2FormSend $model */
 
 $lead = $model->cmsLead;
-if ($lead) {
+if ($model->isSuspicious()) {
+    $status = Html::tag('div', 'Подозрительная', ['class' => 'sx-status sx-status--warning']);
+} elseif ($lead) {
     $status = Html::tag('div', Html::encode($lead->statusName), [
         'class' => 'sx-status '.CmsLead::statusCssClass($lead->status),
     ]);

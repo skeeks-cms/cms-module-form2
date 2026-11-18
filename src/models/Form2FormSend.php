@@ -20,7 +20,14 @@ use skeeks\cms\services\CmsLeadService;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\models\User;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
+use skeeks\cms\relatedProperties\PropertyType;
+use yii\helpers\Html;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeStorageFile;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText;
+use skeeks\modules\cms\form2\Module;
+use skeeks\modules\cms\form2\protection\FormProtection;
+use yii\base\Event;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -52,6 +59,14 @@ use yii\helpers\ArrayHelper;
  * @property string                  $data_request
  * @property string                  $additional_data
  * @property array                   $utms
+ * @property string|null             $check_status  accepted, suspicious; null — before the protection
+ * @property string|null             $check_reasons codes of the reasons, comma separated
+ * @property string|null             $check_data    details of the checks (JSON)
+ * @property string|null             $submit_key    the one-time key of the form stamp
+ * @property string|null             $phone         the normalized main phone
+ * @property string|null             $session_hash
+ * @property string|null             $client_id     the Metrika ClientID
+ * @property string|null             $user_agent
  *
  * @property User                    $processedBy
  * @property Form2Form               $form
@@ -65,6 +80,17 @@ class Form2FormSend extends RelatedElementModel
     const STATUS_NEW = 0;
     const STATUS_PROCESSED = 5;
     const STATUS_EXECUTED = 10;
+
+    /**
+     * A submission was accepted — automatically when it passed the checks, or by hand from «suspicious». Fires
+     * exactly once per submission, after the commit, never for a suspicious one. Project integrations with side
+     * effects (SMS, CRM, webhooks) listen here instead of BackendController::_afterSave():
+     * `Event::on(Form2FormSend::class, Form2FormSend::EVENT_ACCEPTED, fn ($e) => …$e->sender…)`.
+     */
+    const EVENT_ACCEPTED = 'form2Accepted';
+
+    /** Columns of the protection schema (migration m261118_100000). */
+    const PROTECTION_COLUMNS = ['check_status', 'check_reasons', 'check_data', 'submit_key', 'phone', 'session_hash', 'client_id', 'user_agent'];
 
     static public function getStatuses()
     {
@@ -125,42 +151,19 @@ class Form2FormSend extends RelatedElementModel
             [['email_message', 'phone_message'], 'string'],
             [['data_labels', 'data_values', 'data_server', 'data_session', 'data_cookie', 'additional_data', 'data_request'], 'safe'],
             [['emails', 'phones', 'user_ids'], 'string'],
-            [['ip'], 'string', 'max' => 32],
+            [['ip'], 'string', 'max' => 45],
             [['page_url'], 'string', 'max' => 500],
             [['comment'], 'string'],
             [['utms'], 'safe'],
             [['status'], 'in', 'range' => array_keys(self::getStatuses())],
 
-            [
-                'data_request',
-                'default',
-                'value' => function (self $model, $attribute) {
-                    return $_REQUEST;
-                },
-            ],
-
+            // Only a short allowlist of the request: full $_SERVER, cookies, the session and the request are not
+            // stored any more (session cookie, CSRF token, server environment). Old submissions keep their dumps.
             [
                 'data_server',
                 'default',
                 'value' => function (self $model, $attribute) {
-                    return $_SERVER;
-                },
-            ],
-
-            [
-                'data_cookie',
-                'default',
-                'value' => function (self $model, $attribute) {
-                    return $_COOKIE;
-                },
-            ],
-
-            [
-                'data_session',
-                'default',
-                'value' => function (self $model, $attribute) {
-                    \Yii::$app->session->open();
-                    return $_SESSION;
+                    return self::requestServerAllowlist();
                 },
             ],
 
@@ -171,7 +174,379 @@ class Form2FormSend extends RelatedElementModel
                     return \Yii::$app->request->userIP;
                 },
             ],
-        ]);
+        ], $this->protectionRules());
+    }
+
+    /** The fields of $_SERVER kept with a submission. */
+    public static function requestServerAllowlist(): array
+    {
+        $result = [];
+        foreach (['REQUEST_METHOD', 'HTTP_USER_AGENT', 'HTTP_ACCEPT_LANGUAGE', 'HTTP_REFERER', 'REMOTE_ADDR'] as $key) {
+            if (isset($_SERVER[$key]) && is_scalar($_SERVER[$key])) {
+                $result[$key] = mb_substr((string)$_SERVER[$key], 0, 500);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * The protection schema is complete: every column of m261118_100000, the unique index of submit_key and the
+     * notification table of m261118_110000. Until then submissions work as before the protection: nothing reads or
+     * writes the new columns, a suspicious request is not saved (see BackendController).
+     */
+    public static function isProtectionReady(): bool
+    {
+        $db = self::getDb();
+        $key = $db->dsn.'|'.$db->tablePrefix;
+        if (!array_key_exists($key, self::$_protectionReady)) {
+            self::$_protectionReady[$key] = self::detectProtectionSchema();
+        }
+
+        return self::$_protectionReady[$key];
+    }
+
+    /** Forget the cached schema state (tests, migrations in the same process). */
+    public static function resetProtectionReady(): void
+    {
+        self::$_protectionReady = [];
+    }
+
+    private static $_protectionReady = [];
+
+    private static function detectProtectionSchema(): bool
+    {
+        try {
+            $db = self::getDb();
+            $schema = $db->getTableSchema(self::tableName(), true);
+            if (!$schema) {
+                return false;
+            }
+            foreach (self::PROTECTION_COLUMNS as $column) {
+                if ($schema->getColumn($column) === null) {
+                    return false;
+                }
+            }
+            $unique = false;
+            foreach ($db->getSchema()->findUniqueIndexes($schema) as $columns) {
+                if ($columns === ['submit_key']) {
+                    $unique = true;
+                    break;
+                }
+            }
+
+            return $unique && Form2FormSendNotification::isTableReady();
+        } catch (\Throwable $e) {
+            \Yii::warning('Form2: protection schema check failed: '.$e->getMessage(), 'form2');
+            return false;
+        }
+    }
+
+    /**
+     * Rules of the protection columns, only with the complete protection schema: the code of a package may reach a
+     * site before its migration.
+     */
+    private function protectionRules(): array
+    {
+        if (!self::isProtectionReady()) {
+            return [];
+        }
+
+        return [
+            [['check_status'], 'in', 'range' => [FormProtection::STATUS_ACCEPTED, FormProtection::STATUS_SUSPICIOUS]],
+            [['check_reasons'], 'string', 'max' => 255],
+            [['check_data'], 'string'],
+            [['submit_key', 'session_hash', 'client_id'], 'string', 'max' => 64],
+            [['phone'], 'string', 'max' => 20],
+            [['user_agent'], 'string', 'max' => 500],
+            [['submit_key', 'phone', 'session_hash', 'client_id', 'user_agent', 'check_reasons', 'check_data'], 'default', 'value' => null],
+            [
+                'session_hash',
+                'default',
+                'value' => function () {
+                    if (!\Yii::$app->has('session')) {
+                        return null;
+                    }
+                    \Yii::$app->session->open();
+                    $id = (string)\Yii::$app->session->id;
+
+                    return $id !== '' ? hash('sha256', $id) : null;
+                },
+            ],
+            [
+                'user_agent',
+                'default',
+                'value' => function () {
+                    $agent = trim((string)\Yii::$app->request->userAgent);
+
+                    return $agent !== '' ? mb_substr($agent, 0, 500) : null;
+                },
+            ],
+            [
+                'client_id',
+                'default',
+                'value' => function () {
+                    // The Metrika ClientID already set by the counter; nothing new is collected.
+                    $uid = $_COOKIE['_ym_uid'] ?? '';
+
+                    return is_string($uid) && preg_match('/^\d{5,40}$/', $uid) ? $uid : null;
+                },
+            ],
+        ];
+    }
+
+    /** A submission that failed the protection checks: saved, but without notifications and a CRM deal. */
+    public function isSuspicious(): bool
+    {
+        return self::isProtectionReady()
+            && $this->getAttribute('check_status') === FormProtection::STATUS_SUSPICIOUS;
+    }
+
+    /** @return string[] codes of the reasons of suspicion */
+    public function getCheckReasonCodes(): array
+    {
+        if (!self::isProtectionReady()) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map('trim', explode(',', (string)$this->getAttribute('check_reasons')))));
+    }
+
+    public function getCheckDetails(): array
+    {
+        if (!self::isProtectionReady() || !$this->getAttribute('check_data')) {
+            return [];
+        }
+        $data = json_decode((string)$this->getAttribute('check_data'), true);
+
+        return is_array($data) ? $data : [];
+    }
+
+    /**
+     * Accepts a suspicious submission by hand, atomically: only the request that really changes the status gets the
+     * consequences (the CRM deal, the notifications, EVENT_ACCEPTED). A concurrent or repeated request returns false
+     * and changes nothing.
+     */
+    public function accept(?int $userId = null): bool
+    {
+        if (!self::isProtectionReady()) {
+            return false;
+        }
+        $db = self::getDb();
+        $transaction = $db->beginTransaction();
+        try {
+            $changed = $db->createCommand()->update(self::tableName(),
+                ['check_status' => FormProtection::STATUS_ACCEPTED, 'updated_at' => time()],
+                ['id' => (int)$this->id, 'check_status' => FormProtection::STATUS_SUSPICIOUS]
+            )->execute();
+            if ($changed !== 1) {
+                $transaction->rollBack();
+                $this->refresh();
+                return false;
+            }
+            $this->refresh();
+            $details = $this->getCheckDetails();
+            $details['accepted_by'] = $userId;
+            $details['accepted_at'] = time();
+            $checkData = json_encode($details, JSON_UNESCAPED_UNICODE);
+            $db->createCommand()->update(self::tableName(), ['check_data' => $checkData], ['id' => (int)$this->id])->execute();
+            $this->setAttribute('check_data', $checkData);
+            $this->setOldAttribute('check_data', $checkData);
+
+            $this->ensureCmsLead();
+            $this->queueNotifications();
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+            throw $e;
+        }
+
+        $this->afterAccepted();
+
+        return true;
+    }
+
+    /**
+     * Creates the notification rows of an accepted submission (one per recipient). Call inside the transaction that
+     * accepts it; repeated calls add only missing recipients.
+     */
+    public function queueNotifications(): void
+    {
+        if (!Form2FormSendNotification::isTableReady() || !$this->form) {
+            return;
+        }
+        // Recipients are compared as the unique index of the table does (case-insensitive collation): one address
+        // written twice in different case is one recipient, never a duplicate key that rolls the submission back.
+        $existing = [];
+        foreach (Form2FormSendNotification::find()
+            ->select('recipient')
+            ->andWhere(['form_send_id' => (int)$this->id, 'channel' => Form2FormSendNotification::CHANNEL_EMAIL])
+            ->column() as $recipient) {
+            $existing[Form2FormSendNotification::recipientKey((string)$recipient)] = true;
+        }
+        $now = time();
+        foreach ($this->form->emailsAsArray as $email) {
+            $email = trim((string)$email);
+            $key = Form2FormSendNotification::recipientKey($email);
+            if ($email === '' || isset($existing[$key]) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                continue;
+            }
+            $existing[$key] = true;
+            self::getDb()->createCommand()->insert(Form2FormSendNotification::tableName(), [
+                'form_send_id' => (int)$this->id,
+                'channel' => Form2FormSendNotification::CHANNEL_EMAIL,
+                'recipient' => $email,
+                'status' => Form2FormSendNotification::STATUS_PENDING,
+                'attempts' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ])->execute();
+        }
+    }
+
+    /**
+     * What follows the acceptance of a submission, automatic or manual, after its transaction: delivery of the
+     * queued notifications and EVENT_ACCEPTED for project integrations.
+     */
+    public function afterAccepted(): void
+    {
+        $this->deliverNotifications();
+        $this->trigger(self::EVENT_ACCEPTED, new Event());
+    }
+
+    /**
+     * Delivers pending and failed notifications. Each row is claimed atomically, so a recipient already sent is
+     * never sent again and two deliveries never send one row twice.
+     *
+     * A row left «sending» longer than STALE_SENDING_SECONDS means the process stopped between handing the letter to
+     * the mailer and recording the result: the letter may have gone. It is never sent again automatically — it becomes
+     * «Результат неизвестен» (STATUS_UNKNOWN) for a person to check with the recipient.
+     *
+     * @return array [sent, failed] counts of this call
+     */
+    public function deliverNotifications(): array
+    {
+        if (!Form2FormSendNotification::isTableReady()) {
+            $this->notifyLegacy();
+            return [0, 0];
+        }
+        $sent = 0;
+        $failed = 0;
+        $db = self::getDb();
+        $table = Form2FormSendNotification::tableName();
+
+        $db->createCommand()->update($table,
+            [
+                'status' => Form2FormSendNotification::STATUS_UNKNOWN,
+                'updated_at' => time(),
+                'last_error' => 'Отправка прервалась: неизвестно, ушло ли письмо. Уточните у получателя.',
+            ],
+            ['and',
+                ['form_send_id' => (int)$this->id],
+                ['status' => Form2FormSendNotification::STATUS_SENDING],
+                ['<', 'updated_at', time() - Form2FormSendNotification::STALE_SENDING_SECONDS],
+            ]
+        )->execute();
+
+        $rows = Form2FormSendNotification::find()
+            ->andWhere(['form_send_id' => (int)$this->id])
+            ->andWhere(['status' => [Form2FormSendNotification::STATUS_PENDING, Form2FormSendNotification::STATUS_FAILED]])
+            ->all();
+        foreach ($rows as $row) {
+            $claimed = $db->createCommand()->update($table,
+                [
+                    'status' => Form2FormSendNotification::STATUS_SENDING,
+                    'attempts' => new Expression('attempts + 1'),
+                    'updated_at' => time(),
+                ],
+                ['id' => (int)$row->id, 'status' => [Form2FormSendNotification::STATUS_PENDING, Form2FormSendNotification::STATUS_FAILED]]
+            )->execute();
+            if ($claimed !== 1) {
+                continue;
+            }
+
+            $error = null;
+            try {
+                if (!$this->sendNotificationEmail((string)$row->recipient)) {
+                    $error = 'Почтовый сервис не принял письмо.';
+                }
+            } catch (\Throwable $e) {
+                \Yii::error($e, 'form2');
+                $error = mb_substr('Ошибка отправки: '.$e->getMessage(), 0, 500);
+            }
+
+            $db->createCommand()->update($table, $error === null
+                ? ['status' => Form2FormSendNotification::STATUS_SENT, 'sent_at' => time(), 'updated_at' => time(), 'last_error' => null]
+                : ['status' => Form2FormSendNotification::STATUS_FAILED, 'updated_at' => time(), 'last_error' => $error],
+                ['id' => (int)$row->id]
+            )->execute();
+            $error === null ? $sent++ : $failed++;
+        }
+
+        return [$sent, $failed];
+    }
+
+    /**
+     * A value of a field for the administration (the card and the list columns). Values come from visitors: the base
+     * getAsHtml() of a property type returns raw text, which is escaped here; a type that overrides getAsHtml() builds
+     * its own safe markup (file links) and keeps it.
+     */
+    public function propertyValueHtml(string $code): string
+    {
+        $model = $this->relatedPropertiesModel;
+        $property = $model->getRelatedProperty($code);
+        if (!$property) {
+            return '';
+        }
+        $handler = $property->handler;
+        if ($handler && (new \ReflectionMethod($handler, 'getAsHtml'))->getDeclaringClass()->getName() !== PropertyType::class) {
+            return (string)$model->getAttributeAsHtml($code);
+        }
+
+        return nl2br(Html::encode((string)$model->getAttributeAsText($code)));
+    }
+
+    /** @return \yii\db\ActiveQuery */
+    public function getNotifications()
+    {
+        return $this->hasMany(Form2FormSendNotification::class, ['form_send_id' => 'id'])->orderBy(['id' => SORT_ASC]);
+    }
+
+    /**
+     * A field of the format «Телефон» (skeeks/cms PropertyTypeText::FIELD_PHONE). Fields of forms are arbitrary, so
+     * a phone is recognized only by this explicit format, never by a name.
+     */
+    public function isPhoneFormatField(string $code): bool
+    {
+        if (!defined(PropertyTypeText::class.'::FIELD_PHONE')) {
+            return false;
+        }
+        $property = $this->relatedPropertiesModel->getRelatedProperty($code);
+        $handler = $property ? $property->handler : null;
+
+        return $handler instanceof PropertyTypeText && $handler->fieldElement === PropertyTypeText::FIELD_PHONE;
+    }
+
+    /**
+     * Phones of fields of the format «Телефон» with their limit keys: [key => ['value' => …, 'name' => label]].
+     */
+    public function phoneFormatValues(array $values, array $labels): array
+    {
+        $protection = Module::protection();
+        $result = [];
+        foreach ($values as $code => $value) {
+            if (!is_string($value) || trim($value) === '' || !$this->isPhoneFormatField((string)$code)) {
+                continue;
+            }
+            $key = $protection->phoneKey($value);
+            if ($key !== null && !isset($result[$key])) {
+                $result[$key] = ['value' => trim($value), 'name' => trim((string)($labels[$code] ?? $code))];
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -244,7 +619,7 @@ class Form2FormSend extends RelatedElementModel
     {
         parent::afterSave($insert, $changedAttributes);
 
-        if ($insert) {
+        if ($insert && !$this->isSuspicious()) {
             $this->ensureCmsLead();
         }
     }
@@ -328,6 +703,10 @@ class Form2FormSend extends RelatedElementModel
         if (!$this->isCmsLeadIntegrationAvailable()) {
             return null;
         }
+        // A suspicious submission gets a deal only through acceptance (accept()), never directly.
+        if ($this->isSuspicious()) {
+            return null;
+        }
 
         $values = is_array($this->data_values) ? $this->data_values : [];
         $labels = is_array($this->data_labels) ? $this->data_labels : [];
@@ -355,13 +734,6 @@ class Form2FormSend extends RelatedElementModel
             if ($name === null && preg_match('/(^|\s)(имя|фио|название|name|title)(\s|$)|обраща|контактн(?:ое|ый)?\s+лиц/u', $haystack)) {
                 $name = $text;
             }
-            if (preg_match('/телефон|phone|mobile/u', $haystack)) {
-                foreach ($this->leadScalarValues($value) as $candidate) {
-                    if ($this->isLeadPhone($candidate)) {
-                        $phones[$this->leadPhoneKey($candidate)] = ['value' => $candidate, 'name' => $label];
-                    }
-                }
-            }
             if (preg_match('/e-?mail|почт/u', $haystack)) {
                 foreach ($this->leadScalarValues($value) as $candidate) {
                     if (filter_var($candidate, FILTER_VALIDATE_EMAIL)) {
@@ -380,15 +752,9 @@ class Form2FormSend extends RelatedElementModel
                 }
             }
         }
-        if (!$phones) {
-            foreach ($fields as $field) {
-                foreach ($this->leadScalarValues($field['value']) as $candidate) {
-                    if ($this->isLeadPhone($candidate)) {
-                        $phones[$this->leadPhoneKey($candidate)] = ['value' => $candidate, 'name' => $field['label']];
-                    }
-                }
-            }
-        }
+        // Phones of the deal come only from fields of the format «Телефон» (the number is already validated by the
+        // field); a field name or a number-like value of an arbitrary field never makes a phone.
+        $phones = $this->phoneFormatValues($values, $labels);
 
         $formName = $this->form ? (string)$this->form->name : '';
         $leadName = $formName !== '' ? 'Форма на сайте «'.$formName.'»' : 'Форма на сайте №'.$this->form_id;
@@ -495,17 +861,6 @@ class Form2FormSend extends RelatedElementModel
         return array_values(array_unique($result));
     }
 
-    private function isLeadPhone(string $value): bool
-    {
-        $digits = preg_replace('/\D+/', '', $value);
-        return strlen($digits) >= 10 && strlen($digits) <= 15;
-    }
-
-    private function leadPhoneKey(string $value): string
-    {
-        return preg_replace('/\D+/', '', $value);
-    }
-
     private function leadUtmValues(array $utms): array
     {
         $result = [];
@@ -582,54 +937,87 @@ class Form2FormSend extends RelatedElementModel
     }
 
     /**
-     * Уведомить всех кого надо и как надо
+     * Notifies the recipients of the form. With the protection schema it queues one notification per recipient and
+     * delivers them (a recipient already notified is not notified again); without it — the old direct sending.
+     * A suspicious submission is never notified.
      */
     public function notify()
     {
-        if ($this->form) {
-            if ($this->form->emailsAsArray) {
-                foreach ($this->form->emailsAsArray as $email) {
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/modules/cms/form2/mail';
+        if ($this->isSuspicious()) {
+            return;
+        }
+        if (!Form2FormSendNotification::isTableReady()) {
+            $this->notifyLegacy();
+            return;
+        }
+        $this->queueNotifications();
+        $this->deliverNotifications();
+    }
 
-                    $message = \Yii::$app->mailer->compose('send-message', [
-                        'form'     => $this->form,
-                        'formSend' => $this,
-                    ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
-                        ->setTo($email)
-                        ->setSubject(\Yii::t('skeeks/form2/app', 'Submitting form').": «{$this->form->name}» #".$this->id);
+    /** The sending before the notification table (migration m261118_110000), one letter per recipient. */
+    protected function notifyLegacy(): void
+    {
+        if (!$this->form) {
+            return;
+        }
+        $seen = [];
+        foreach ($this->form->emailsAsArray as $email) {
+            $email = trim((string)$email);
+            $key = Form2FormSendNotification::recipientKey($email);
+            if ($email === '' || isset($seen[$key])) {
+                continue;
+            }
+            $seen[$key] = true;
+            try {
+                if (!$this->sendNotificationEmail($email)) {
+                    \Yii::error('Form2: the mailer did not accept the notification of #'.$this->id.' to '.$email, 'form2');
+                }
+            } catch (\Throwable $e) {
+                \Yii::error($e, 'form2');
+            }
+        }
+    }
 
-                    $rp = $this->relatedPropertiesModel;
-                    $rp->initAllProperties();
+    /**
+     * The letter about this submission to one recipient.
+     *
+     * @return bool what the mailer returned
+     */
+    public function sendNotificationEmail(string $email): bool
+    {
+        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/modules/cms/form2/mail';
 
-                    foreach ($rp->toArray() as $code => $value) {
-                        $property = $rp->getRelatedProperty($code);
+        $message = \Yii::$app->mailer->compose('send-message', [
+            'form'     => $this->form,
+            'formSend' => $this,
+        ])
+            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName])
+            ->setTo($email)
+            ->setSubject(\Yii::t('skeeks/form2/app', 'Submitting form').": «{$this->form->name}» #".$this->id);
 
-                        if ($property && $property->handler instanceof PropertyTypeStorageFile) {
-                            if ($property->handler->isMultiple) {
-                                if ($files = StorageFile::find()->where(['id' => $value])->all()) {
-                                    /**
-                                     * @var StorageFile $file
-                                     */
-                                    foreach ($files as $file) {
-                                        $message->attach($file->getRootSrc());
-                                    }
-                                }
-                            } else {
-                                if ($file = StorageFile::find()->where(['id' => $value])->one()) {
-                                    /**
-                                     * @var StorageFile $file
-                                     */
-                                    $message->attach($file->getRootSrc());
-                                }
-                            }
+        $rp = $this->relatedPropertiesModel;
+        $rp->initAllProperties();
+
+        foreach ($rp->toArray() as $code => $value) {
+            $property = $rp->getRelatedProperty($code);
+
+            if ($property && $property->handler instanceof PropertyTypeStorageFile) {
+                if ($property->handler->isMultiple) {
+                    if ($files = StorageFile::find()->where(['id' => $value])->all()) {
+                        /** @var StorageFile $file */
+                        foreach ($files as $file) {
+                            $message->attach($file->getRootSrc());
                         }
                     }
-
-
-                    $message->send();
+                } else {
+                    if ($file = StorageFile::find()->where(['id' => $value])->one()) {
+                        /** @var StorageFile $file */
+                        $message->attach($file->getRootSrc());
+                    }
                 }
             }
         }
+
+        return (bool)$message->send();
     }
 }

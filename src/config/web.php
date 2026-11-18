@@ -27,6 +27,12 @@ return [
                                 "url"   => ["form2/admin-form-send"],
                                 "image" => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/mail.svg'],
                             ],
+
+                            [
+                                "name"  => 'Защита форм',
+                                "url"   => ["form2/admin-form-protection"],
+                                "image" => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/form.svg'],
+                            ],
                         ],
                     ],
 

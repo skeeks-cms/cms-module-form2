@@ -17,12 +17,17 @@ use skeeks\cms\models\CmsLead;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\modules\cms\form2\models\Form2FormProperty;
 use skeeks\modules\cms\form2\models\Form2FormSend;
+use skeeks\modules\cms\form2\models\Form2FormSendNotification;
+use skeeks\modules\cms\form2\protection\FormProtection;
+use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -54,15 +59,45 @@ class AdminFormSendController extends BackendModelStandartController
      */
     public function actions()
     {
+        $hasProtection = Form2FormSend::isProtectionReady();
+
         $actions = ArrayHelper::merge(parent::actions(), [
 
             'index' => [
                 'configKey' => 'form2/messages-v2',
 
                 'filters' => [
-                    'visibleFilters' => [
+                    'visibleFilters' => array_values(array_filter([
                         'form_id',
-                    ],
+                        $hasProtection ? 'protection' : null,
+                    ])),
+                    'filtersModel' => $hasProtection ? [
+                        'rules' => [
+                            ['protection', 'safe'],
+                        ],
+                        'attributeDefines' => [
+                            'protection',
+                        ],
+                        'fields' => [
+                            'protection' => [
+                                'class' => SelectField::class,
+                                'label' => 'Проверка',
+                                'items' => [
+                                    FormProtection::STATUS_ACCEPTED => 'Принятые',
+                                    FormProtection::STATUS_SUSPICIOUS => 'Подозрительные',
+                                ],
+                                'on apply' => function (QueryFiltersEvent $e) {
+                                    $query = $e->dataProvider->query;
+                                    $column = Form2FormSend::tableName().'.check_status';
+                                    if ($e->field->value === FormProtection::STATUS_SUSPICIOUS) {
+                                        $query->andWhere([$column => FormProtection::STATUS_SUSPICIOUS]);
+                                    } elseif ($e->field->value === FormProtection::STATUS_ACCEPTED) {
+                                        $query->andWhere(['or', [$column => null], [$column => FormProtection::STATUS_ACCEPTED]]);
+                                    }
+                                },
+                            ],
+                        ],
+                    ] : [],
                 ],
 
                 "grid" => [
@@ -98,9 +133,15 @@ class AdminFormSendController extends BackendModelStandartController
                         'id' => SORT_DESC,
                     ],
 
+                    // A suspicious submission is marked by the tone of its row, as other CRM lists do.
+                    'rowOptions' => static function (Form2FormSend $model) {
+                        return $model->isSuspicious() ? ['class' => 'sx-collection-item--warning'] : [];
+                    },
+
                     'visibleColumns' => [
                         'checkbox',
                         'message',
+                        'check',
                         'lead',
                         'created_at',
                         'emails',
@@ -117,6 +158,24 @@ class AdminFormSendController extends BackendModelStandartController
                             'action' => 'view',
                             'permissionName' => 'cms/admin-lead',
                             'value' => static fn(Form2FormSend $model) => $model->displayName,
+                        ],
+                        'check' => [
+                            'label' => 'Проверка',
+                            'format' => 'raw',
+                            'value' => static function (Form2FormSend $model) {
+                                if (!Form2FormSend::isProtectionReady()) {
+                                    return Html::tag('span', '—', ['class' => 'sx-text--muted']);
+                                }
+                                if (!$model->isSuspicious()) {
+                                    return Html::tag('span', 'Принята', ['class' => 'sx-status sx-status--success']);
+                                }
+                                $reasons = array_map([FormProtection::class, 'reasonLabel'], $model->getCheckReasonCodes());
+
+                                return Html::tag('span', 'Подозрительная', [
+                                    'class' => 'sx-status sx-status--warning',
+                                    'title' => implode("\n", $reasons),
+                                ]);
+                            },
                         ],
                         'lead' => [
                             'label' => 'Сделка',
@@ -155,6 +214,18 @@ class AdminFormSendController extends BackendModelStandartController
                 'callback' => [$this, 'createLead'],
                 'accessCallback' => fn() => $this->canCreateLead(),
             ],
+            'accept' => [
+                'class' => BackendModelAction::class,
+                'isVisible' => false,
+                'callback' => [$this, 'acceptSend'],
+                'accessCallback' => fn() => $this->canAccept(),
+            ],
+            'retry-notifications' => [
+                'class' => BackendModelAction::class,
+                'isVisible' => false,
+                'callback' => [$this, 'retryNotifications'],
+                'accessCallback' => fn() => $this->isAdmin() && $this->model && !$this->model->isSuspicious(),
+            ],
             'delete' => [
                 'accessCallback' => fn() => $this->isAdmin(),
             ],
@@ -176,6 +247,10 @@ class AdminFormSendController extends BackendModelStandartController
         if (!\Yii::$app->request->isPost) {
             throw new BadRequestHttpException('Сделку можно создать только явным действием из карточки отправки.');
         }
+        // A suspicious submission gets a deal only by «Принять заявку».
+        if ($this->model->isSuspicious()) {
+            throw new ForbiddenHttpException('Это подозрительная заявка. Чтобы создать сделку, примите заявку.');
+        }
 
         $existing = $this->model->cmsLead;
         try {
@@ -195,9 +270,88 @@ class AdminFormSendController extends BackendModelStandartController
         }
     }
 
+    /**
+     * A suspicious submission accepted by hand: the CRM deal, the notifications and EVENT_ACCEPTED, exactly once
+     * even for concurrent requests (Form2FormSend::accept()).
+     */
+    public function acceptSend()
+    {
+        if (!\Yii::$app->request->isPost) {
+            throw new BadRequestHttpException('Заявку можно принять только явным действием из карточки отправки.');
+        }
+
+        try {
+            if (!$this->model->accept((int)\Yii::$app->user->id)) {
+                \Yii::$app->session->setFlash('info', 'Заявка уже принята.');
+            } else {
+                \Yii::$app->session->setFlash('success', 'Заявка принята. '.$this->deliverySummary());
+            }
+        } catch (\Throwable $e) {
+            \Yii::error($e, 'form2');
+            \Yii::$app->session->setFlash('error', 'Не удалось принять заявку: '.$e->getMessage());
+        }
+
+        return $this->redirect(['view', 'pk' => $this->model->id]);
+    }
+
+    /**
+     * Retries the notifications that were not delivered; delivered recipients are not notified again.
+     */
+    public function retryNotifications()
+    {
+        if (!\Yii::$app->request->isPost) {
+            throw new BadRequestHttpException('Повторить отправку можно только явным действием из карточки отправки.');
+        }
+        $this->model->deliverNotifications();
+        \Yii::$app->session->setFlash('info', $this->deliverySummary());
+
+        return $this->redirect(['view', 'pk' => $this->model->id]);
+    }
+
+    /** The real state of the notifications of the current submission, for a flash message. */
+    private function deliverySummary(): string
+    {
+        if (!Form2FormSendNotification::isTableReady()) {
+            return 'Уведомления отправлены.';
+        }
+        $counts = ['sent' => 0, 'failed' => 0, 'unknown' => 0, 'other' => 0];
+        foreach ($this->model->getNotifications()->all() as $notification) {
+            if ($notification->status === Form2FormSendNotification::STATUS_SENT) {
+                $counts['sent']++;
+            } elseif ($notification->status === Form2FormSendNotification::STATUS_FAILED) {
+                $counts['failed']++;
+            } elseif ($notification->status === Form2FormSendNotification::STATUS_UNKNOWN) {
+                $counts['unknown']++;
+            } else {
+                $counts['other']++;
+            }
+        }
+        if (!array_sum($counts)) {
+            return 'Получателей уведомлений у формы нет.';
+        }
+        $parts = ['Уведомлений доставлено: '.$counts['sent']];
+        if ($counts['failed']) {
+            $parts[] = 'не доставлено: '.$counts['failed'].' — см. блок «Уведомления»';
+        }
+        if ($counts['unknown']) {
+            $parts[] = 'результат неизвестен: '.$counts['unknown'].' — уточните у получателя';
+        }
+        if ($counts['other']) {
+            $parts[] = 'в очереди: '.$counts['other'];
+        }
+
+        return implode(', ', $parts).'.';
+    }
+
+    public function canAccept(): bool
+    {
+        return $this->isAdmin() && $this->model && $this->model->isSuspicious();
+    }
+
     private function canCreateLead(): bool
     {
         return $this->model
+            && !$this->model->isSuspicious()
             && $this->model->isCmsLeadIntegrationAvailable()
             && $this->model->leadSiteId === (int)\Yii::$app->skeeks->site->id;
     }
@@ -266,11 +420,9 @@ class AdminFormSendController extends BackendModelStandartController
 
                 'label'  => "" . $property->name . " [данные]",
                 'format' => 'raw',
-                'value'  => function ($model, $key, $index) use ($name, $relatedPropertiesModel) {
-                    /**
-                     * @var $model \skeeks\cms\models\CmsContentElement
-                     */
-                    return $model->relatedPropertiesModel->getAttributeAsHtml($name);
+                'value'  => function (Form2FormSend $model, $key, $index) use ($name) {
+                    // Values come from visitors: escaped except safe markup of their type (file links).
+                    return $model->propertyValueHtml((string)$name);
                 },
             ];
         }

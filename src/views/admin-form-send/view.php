@@ -4,8 +4,11 @@ use skeeks\cms\backend\helpers\BackendIcon;
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\widgets\BackendSurfaceWidget;
 use skeeks\cms\models\CmsLead;
+use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\modules\cms\form2\assets\FormSendViewAsset;
 use skeeks\modules\cms\form2\models\Form2FormSend;
+use skeeks\modules\cms\form2\models\Form2FormSendNotification;
+use skeeks\modules\cms\form2\protection\FormProtection;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -51,7 +54,40 @@ $json = static function ($value): string {
 };
 
 $leadContent = '';
-if ($lead) {
+if ($model->isSuspicious()) {
+    $reasonItems = '';
+    foreach ($model->getCheckReasonCodes() as $code) {
+        $reasonItems .= Html::tag('li', Html::encode(FormProtection::reasonLabel($code)));
+    }
+    $acceptAction = '';
+    if (method_exists($controller, 'canAccept') && $controller->canAccept()) {
+        $acceptAction = Html::beginForm(
+            Url::to(['accept', $controller->requestPkParamName => $model->id]),
+            'post',
+            ['class' => 'sx-form-send-create-lead']
+        )
+            .Html::submitButton(
+                BackendIcon::render('check-circle', ['size' => 15]).' Принять заявку',
+                [
+                    'class' => 'sx-button sx-button--primary sx-button--sm',
+                    'data-confirm' => 'Принять заявку? Будут отправлены уведомления и создана сделка, как для обычной заявки.',
+                ]
+            )
+            .Html::endForm();
+    }
+    $leadContent = BackendSurfaceWidget::widget([
+        'title' => 'Подозрительная заявка',
+        'hint' => 'Заявка сохранена, но уведомления не отправлялись и сделка не создана. Если это настоящий клиент — примите заявку.',
+        'titleTag' => 'h2',
+        'raised' => true,
+        'responsive' => true,
+        'actions' => $acceptAction,
+        'content' => $reasonItems !== ''
+            ? Html::tag('ul', $reasonItems, ['class' => 'sx-form-send-reasons'])
+            : Html::tag('span', 'Причина не указана.', ['class' => 'sx-form-send-muted']),
+        'options' => ['class' => 'sx-form-send-lead-surface sx-form-send-lead-surface--empty'],
+    ]);
+} elseif ($lead) {
     $leadStatus = Html::tag('span', Html::encode($lead->statusName), [
         'class' => 'sx-status '.CmsLead::statusCssClass($lead->status),
     ]);
@@ -128,7 +164,8 @@ if ($lead) {
 
 $propertyRows = [];
 foreach ($model->relatedProperties as $property) {
-    $value = (string)$model->relatedPropertiesModel->getAttributeAsHtml($property->code);
+    // Values come from visitors: escaped except safe markup of their type (Form2FormSend::propertyValueHtml()).
+    $value = $model->propertyValueHtml((string)$property->code);
     $propertyRows[] = Html::tag('div',
         Html::tag('div', Html::encode((string)$property->name), ['class' => 'sx-form-send-field-label'])
         .Html::tag('div', $value !== '' ? $value : '—', ['class' => 'sx-form-send-field-value']),
@@ -151,6 +188,31 @@ if ($model->site) {
     $meta[] = $cell('Сайт', $siteLink, true);
 }
 $meta[] = $cell('IP-адрес', trim((string)$model->ip));
+if (Form2FormSend::isProtectionReady() && $model->check_status) {
+    $details = $model->getCheckDetails();
+    $checkFacts = [];
+    if (isset($details['fill_seconds'])) {
+        $checkFacts[] = 'заполнение '.(int)$details['fill_seconds'].' с'.(!empty($details['fast_fill']) ? ' (быстро)' : '');
+    }
+    if (!empty($details['bot_check']['status'])) {
+        $botStatuses = ['passed' => 'пройдена', 'failed' => 'не пройдена', 'unavailable' => 'недоступна'];
+        $botStatus = (string)$details['bot_check']['status'];
+        $checkFacts[] = 'проверка на бота: '.($botStatuses[$botStatus] ?? $botStatus);
+    }
+    if (!empty($details['accepted_at'])) {
+        $checkFacts[] = 'принята вручную '.$formatDateTime($details['accepted_at']);
+    }
+    $meta[] = $cell('Проверка', ($model->isSuspicious() ? 'Подозрительная' : 'Принята').($checkFacts ? ': '.implode(', ', $checkFacts) : ''));
+}
+if (Form2FormSend::isProtectionReady() && $model->phone) {
+    $meta[] = $cell('Телефон для лимитов', '+'.$model->phone);
+}
+if (Form2FormSend::isProtectionReady() && $model->client_id) {
+    $meta[] = $cell('ClientID Метрики', (string)$model->client_id);
+}
+if (Form2FormSend::isProtectionReady() && $model->user_agent) {
+    $meta[] = $cell('Браузер', (string)$model->user_agent);
+}
 if ($model->page_url) {
     $pageLink = Html::a(
         Html::encode((string)$model->page_url),
@@ -171,11 +233,14 @@ $notifications = array_filter([
     'Пользователи' => trim((string)$model->user_ids),
 ]);
 
+// Full request dumps of old submissions (cookies, the session, the raw request, $_SERVER) stay in the database but are
+// never sent to the browser: they hold session cookies and tokens. Only the allowlisted request fields are shown.
+$serverFacts = array_intersect_key(
+    is_array($model->data_server) ? $model->data_server : [],
+    array_flip(['REQUEST_METHOD', 'HTTP_USER_AGENT', 'HTTP_ACCEPT_LANGUAGE', 'HTTP_REFERER', 'REMOTE_ADDR'])
+);
 $technicalGroups = [
-    'SERVER' => $model->data_server,
-    'REQUEST' => $model->data_request,
-    'SESSION' => $model->data_session,
-    'COOKIE' => $model->data_cookie,
+    'Запрос' => $serverFacts,
     'Подписи полей' => $model->data_labels,
     'Значения полей' => $model->data_values,
     'Дополнительные данные' => $model->additional_data,
@@ -203,7 +268,7 @@ $technicalGroups = [
 
             <?php BackendSurfaceWidget::begin([
                 'title' => 'Технические данные',
-                'hint' => 'Служебные payload’ы скрыты по умолчанию и нужны только для диагностики.',
+                'hint' => 'Нужны только для диагностики. Полные дампы запроса старых заявок хранятся в базе, но здесь не показываются.',
                 'titleTag' => 'h2',
                 'raised' => true,
                 'responsive' => true,
@@ -228,11 +293,56 @@ $technicalGroups = [
             ]); ?>
                 <div class="sx-form-send-meta-list"><?= implode('', $meta); ?></div>
 
-                <?php if ($notifications) : ?>
+                <?php
+                $deliveries = Form2FormSendNotification::isTableReady() ? $model->getNotifications()->all() : [];
+                $canRetry = false;
+                foreach ($deliveries as $delivery) {
+                    if (in_array($delivery->status, [Form2FormSendNotification::STATUS_FAILED, Form2FormSendNotification::STATUS_PENDING], true)) {
+                        $canRetry = true;
+                    }
+                }
+                $canRetry = $canRetry && !$model->isSuspicious()
+                    && !\Yii::$app->user->isGuest
+                    && \Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+                ?>
+                <?php if ($deliveries) : ?>
                     <section class="sx-form-send-meta-group">
                         <div class="sx-form-send-meta-group__heading">
                             <div class="sx-form-send-meta-group__title">Уведомления</div>
-                            <div class="sx-form-send-meta-group__hint">Получатели исходного сообщения формы.</div>
+                            <div class="sx-form-send-meta-group__hint">Фактическая доставка писем получателям формы.</div>
+                        </div>
+                        <div class="sx-form-send-meta-list">
+                        <?php foreach ($deliveries as $delivery) : ?>
+                            <?php
+                            $state = $delivery->statusLabel;
+                            if ($delivery->status === Form2FormSendNotification::STATUS_SENT && $delivery->sent_at) {
+                                $state .= ', '.$formatDateTime($delivery->sent_at);
+                            }
+                            if ($delivery->status !== Form2FormSendNotification::STATUS_SENT && $delivery->last_error) {
+                                $state .= ': '.$delivery->last_error;
+                            }
+                            if ($delivery->attempts > 1) {
+                                $state .= ' (попыток: '.(int)$delivery->attempts.')';
+                            }
+                            ?>
+                            <?= $cell((string)$delivery->recipient, $state); ?>
+                        <?php endforeach; ?>
+                        </div>
+                        <?php if ($canRetry) : ?>
+                            <?= Html::beginForm(Url::to(['retry-notifications', $controller->requestPkParamName => $model->id]), 'post')
+                                .Html::submitButton(BackendIcon::render('refresh', ['size' => 15]).' Повторить отправку', [
+                                    'class' => 'sx-button sx-button--secondary sx-button--sm',
+                                ])
+                                .Html::endForm(); ?>
+                        <?php endif; ?>
+                    </section>
+                <?php elseif ($notifications) : ?>
+                    <section class="sx-form-send-meta-group">
+                        <div class="sx-form-send-meta-group__heading">
+                            <div class="sx-form-send-meta-group__title">Уведомления</div>
+                            <div class="sx-form-send-meta-group__hint"><?= $model->isSuspicious()
+                                ? 'Подозрительной заявке уведомления не отправляются.'
+                                : 'Получатели исходного сообщения формы.'; ?></div>
                         </div>
                         <div class="sx-form-send-meta-list">
                         <?php foreach ($notifications as $label => $value) : ?>
