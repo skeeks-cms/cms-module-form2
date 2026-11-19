@@ -144,6 +144,16 @@ class Form2Form extends Core
 
     public function getLegalCheckboxText()
     {
+        $legal = \Yii::$app->has('legal') ? \Yii::$app->legal : null;
+
+        //Галочка ведёт на отдельный документ согласия (152-ФЗ), если ядро его поддерживает.
+        if ($legal && method_exists($legal, 'getConsentCheckboxText')) {
+            if (!$this->legal_checkbox_template) {
+                return $legal->getConsentCheckboxText();
+            }
+            return str_replace("{url}", $legal->getConsentUrl(), $this->legal_checkbox_template);
+        }
+
         $template = $this->legal_checkbox_template ? $this->legal_checkbox_template : 'Я принимаю <a href="{url}" target="_blank" data-pjax="0">условия обработки персональных данных</a>';
         $url = Url::to(['/cms/legal/personal-data']);
         $template = str_replace("{url}", $url, $template);
@@ -156,7 +166,7 @@ class Form2Form extends Core
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'emails' => \Yii::t('skeeks/form2/app', 'You can specify multiple Email addresses (separated by commas), which will receive the notification and filling out this form.'),
-            'legal_checkbox_template' => "{url} - ссылка на условия обработки персональных данных. Если не заполнено поле, то будет показано автоматически.",
+            'legal_checkbox_template' => "{url} - ссылка на документ «Согласие на обработку персональных данных». Если поле не заполнено, используется текст из «Правовой информации» сайта.",
             'lead_source_type' => 'По умолчанию сделка из формы получает канал «Форма». Для анкеты посетителей салона или офиса (например, по QR-коду у входа) выберите «Визит»: в CRM и отчётах такие сделки будут считаться визитами.',
         ]);
     }

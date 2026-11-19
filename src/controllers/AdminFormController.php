@@ -239,7 +239,7 @@ class AdminFormController extends BackendModelStandartController
             'legal_checkbox_template'      => [
                 'class' => TextField::class,
                 'elementOptions' => [
-                    'placeholder' => 'Я принимаю <a href="{url}" target="_blank" data-pjax="0">условия обработки персональных данных</a>'
+                    'placeholder' => 'Я даю <a href="{url}" target="_blank" data-pjax="0">согласие на обработку персональных данных</a>'
                 ]
             ],
         ] + $leadChannel;
