@@ -119,8 +119,9 @@ JS
 <? endif; ?>
 <?php if ($widget->modelForm->is_add_legal_checkbox) : ?>
 <div class="form-group field-rules required has-error">
-    <input type="checkbox" required id="sx-rules">
-    <label for="sx-rules"><?php echo $widget->modelForm->legalCheckboxText; ?></label>
+    <?php $rulesId = $widget->id . "-rules"; /* у каждой формы свой id: на странице может быть несколько форм и корзина */ ?>
+    <input type="checkbox" required id="<?php echo $rulesId; ?>" class="sx-rules">
+    <label for="<?php echo $rulesId; ?>"><?php echo $widget->modelForm->legalCheckboxText; ?></label>
 </div>
 <? endif; ?>
 
