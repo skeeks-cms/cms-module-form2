@@ -358,7 +358,9 @@ class AdminFormSendController extends BackendModelStandartController
 
     public function getModel()
     {
-        if ($this->_model === null) {
+        // Embedded as the "Сообщения" tab of a form (BackendGridModelRelatedAction) the request pk
+        // belongs to the form, not to a submission: there is no current submission then.
+        if ($this->_model === null && \Yii::$app->controller === $this) {
             $pk = (int)\Yii::$app->request->get($this->requestPkParamName);
             if ($pk) {
                 $query = Form2FormSend::find()
